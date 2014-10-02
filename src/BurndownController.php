@@ -18,9 +18,13 @@ final class BurndownController extends PhabricatorController {
   private $tasks;
   private $xactions;
 
-  public function willProcessRequest(array $data) {
+   public function shouldAllowPublic() {
+        return true;
+   }
+
+   public function willProcessRequest(array $data) {
     $this->projectID = $data['id'];
-  }
+   }
 
   public function processRequest() {
 
