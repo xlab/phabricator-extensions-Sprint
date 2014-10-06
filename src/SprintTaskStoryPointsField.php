@@ -7,6 +7,7 @@
 final class SprintTaskStoryPointsField extends ManiphestCustomField
   implements PhabricatorStandardCustomFieldInterface {
 
+  // == General field identity stuff
   public function __construct() {
     $proxy = id(new PhabricatorStandardCustomFieldText())
       ->setFieldKey($this->getFieldKey())
@@ -23,7 +24,6 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
     return true;
   }
 
-  // == General field identity stuff
   public function getFieldKey() {
     return 'isdc:sprint:storypoints';
   }
@@ -70,7 +70,7 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
 
   public function renderPropertyViewLabel() {
     if (!$this->showField()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {
@@ -81,7 +81,7 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
 
   public function renderPropertyViewValue(array $handles) {
     if (!$this->showField()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {
@@ -96,7 +96,7 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
 
   public function renderEditControl(array $handles) {
     if (!$this->showField()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {

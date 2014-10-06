@@ -7,16 +7,7 @@
 final class BurndownController extends PhabricatorController {
 
   // Project data
-  private $projectID;
-  private $project;
-
-  // Start and end date for the sprint
-  private $startdate;
-  private $enddate;
-
-  // Tasks and transactions
-  private $tasks;
-  private $xactions;
+   private $projectID;
 
    public function shouldAllowPublic() {
         return true;
@@ -48,10 +39,10 @@ final class BurndownController extends PhabricatorController {
 
     try {
       $data = new BurndownData($project, $viewer);
-
+     // $data = new BurndownDataChart($project, $viewer);
       $burndown_chart = $data->buildBurnDownChart();
-      $burndown_table = $data->buildBurnDownTable();
       $tasks_table    = $data->buildTasksTable();
+      $burndown_table = $data->buildBurnDownTable();
       $events_table   = $data->buildEventTable();
     } catch (BurndownException $e) {
       $error_box = id(new AphrontErrorView())
@@ -70,8 +61,8 @@ final class BurndownController extends PhabricatorController {
         $crumbs,
         $error_box,
         $burndown_chart,
-        $burndown_table,
         $tasks_table,
+        $burndown_table,
         $events_table,
       ),
       array(

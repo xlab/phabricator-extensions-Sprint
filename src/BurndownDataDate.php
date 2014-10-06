@@ -27,6 +27,10 @@ class BurndownDataDate {
     return $this;
   }
 
+ /**
+  * @return string|null
+  */
+
   public function getDate() {
     return $this->date;
   }

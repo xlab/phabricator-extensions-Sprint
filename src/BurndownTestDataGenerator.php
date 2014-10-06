@@ -14,7 +14,6 @@ final class BurndownTestDataGenerator
     // Prepend or append 'Sprint'
     $title = (mt_rand(0,1)) ? $title.' Sprint':'Sprint '.$title;
     $author = $this->loadPhabrictorUser();
-    $authorPHID = $author->getPHID();
     $project = PhabricatorProject::initializeNewProject($author);
 
     $this->addTransaction(
@@ -57,13 +56,6 @@ final class BurndownTestDataGenerator
       ->setOldValue(null)
       ->setNewValue($end);
 
-    $editor = id(new PhabricatorProjectTransactionEditor())
-      ->setActor($author)
-      ->setContentSource(PhabricatorContentSource::newConsoleSource())
-      ->setContinueOnNoEffect(true)
-      ->setContinueOnMissingFields(true)
-      ->applyTransactions($project, $this->xactions);
-
     $project->save();
 
     // Generate a bunch of tasks created the before the sprint starts
@@ -99,6 +91,12 @@ final class BurndownTestDataGenerator
       ->generateSeveral(rand(30, 40));
   }
 
+  /**
+   * @param $project
+   * @param integer $start
+   * @param integer $end
+   * @return
+   */
   public function generateTask($project, $start, $end) {
     // Decide when the task was created
     switch (mt_rand(0,10)) {

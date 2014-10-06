@@ -33,7 +33,7 @@ final class SprintEndDateField extends SprintProjectCustomField {
 
   public function renderPropertyViewValue(array $handles) {
     if (!$this->shouldShowSprintFields()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()->getFieldValue())

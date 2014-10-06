@@ -38,7 +38,7 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
    */
   public function renderPropertyViewLabel() {
     if (!$this->shouldShowSprintFields()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {
@@ -50,10 +50,13 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
 
   /**
    * Each subclass must either declare a proxy or implement this method
+   * @param array $handles
+   * @throws PhabricatorCustomFieldImplementationIncompleteException
+   * @return
    */
   public function renderPropertyViewValue(array $handles) {
     if (!$this->shouldShowSprintFields()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {
@@ -69,10 +72,13 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
 
   /**
    * Each subclass must either declare a proxy or implement this method
+   * @param array $handles
+   * @throws PhabricatorCustomFieldImplementationIncompleteException
+   * @return
    */
   public function renderEditControl(array $handles) {
     if (!$this->shouldShowSprintFields()) {
-      return;
+      return null;
     }
 
     if ($this->getProxy()) {
