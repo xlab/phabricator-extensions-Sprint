@@ -37,7 +37,7 @@ final class BurndownActionMenuEventListener extends PhabricatorEventListener {
 
     $project = $event->getValue('object');
 
-    $view_uri = '/burndown/view/'.$project->getId();
+    $view_uri = '/sprint/view/'.$project->getId();
 
     return id(new PhabricatorActionView())
       ->setIcon('fa-bar-chart-o')

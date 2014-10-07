@@ -20,6 +20,7 @@ phutil_register_library_map(array(
     'SprintStartDateField' => 'src/SprintStartDateField.php',
     'SprintEndDateField' => 'src/SprintEndDateField.php',
     'SprintProjectCustomField' => 'src/SprintProjectCustomField.php',
+    'SprintReportController' => 'src/SprintReportController.php',
     'SprintTaskStoryPointsField' => 'src/SprintTaskStoryPointsField.php',
   ),
   'function' => array(),
@@ -36,6 +37,7 @@ phutil_register_library_map(array(
       'PhabricatorProjectCustomField',
       'PhabricatorStandardCustomFieldInterface',
     ),
+    'SprintReportController' => 'ManiphestController',
     'SprintTaskStoryPointsField' => array(
       'ManiphestCustomField',
       'PhabricatorStandardCustomFieldInterface',

@@ -6,12 +6,24 @@
 
 final class BurndownListController extends PhabricatorController {
 
+  private $view;
   public function willProcessRequest(array $data) {
   }
 
   public function processRequest() {
     $request = $this->getRequest();
     $viewer = $request->getUser();
+
+    $nav = new AphrontSideNavFilterView();
+    $nav->setBaseURI(new PhutilURI('/sprint/report/'));
+    $nav->addLabel(pht('Open Tasks'));
+    $nav->addFilter('user', pht('By User'));
+    $nav->addFilter('project', pht('By Project'));
+    $nav->addLabel(pht('Burndown'));
+    $nav->addFilter('burn', pht('Burndown Rate'));
+
+    $this->view = $nav->selectFilter($this->view, 'user');
+
 
     // Load all projects with "Sprint" in the name.
     $projects = id(new PhabricatorProjectQuery())
@@ -38,7 +50,7 @@ final class BurndownListController extends PhabricatorController {
       $rows[] = array(
         'project' => phutil_tag('a',
           array(
-            'href'  => '/burndown/view/'.$project->getId(),
+            'href'  => '/sprint/view/'.$project->getId(),
             'style' => 'font-weight:bold',
           ),
           $project->getName()
@@ -62,8 +74,10 @@ final class BurndownListController extends PhabricatorController {
           'date',
         ));
 
+
     $crumbs = $this->buildApplicationCrumbs();
     $crumbs->addTextCrumb(pht('Burndown List'));
+
 
     $help = id(new PHUIBoxView())
       ->appendChild(phutil_tag('p', array(),
@@ -72,18 +86,24 @@ final class BurndownListController extends PhabricatorController {
       ))
       ->addMargin(PHUI::MARGIN_LARGE);
 
-    $box = id(new PHUIBoxView())
+    $box= id(new PHUIBoxView())
       ->appendChild($projects_table)
       ->addMargin(PHUI::MARGIN_LARGE);
 
+    $nav->appendChild(
+        array(
+            $crumbs,
+            $help,
+            $box,
+        ));
+
     return $this->buildApplicationPage(
+
       array(
-        $crumbs,
-        $help,
-        $box,
+        $nav,
       ),
       array(
-        'title' => array(pht('Burndown List')),
+        'title' => array(pht('Sprint List')),
         'device' => true,
       ));
   }
