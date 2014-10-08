@@ -24,11 +24,10 @@ final class BurndownListController extends PhabricatorController {
 
     $this->view = $nav->selectFilter($this->view, 'project');
 
-
-    // Load all projects with "Sprint" in the name.
+    // Load all projects with "§" in the name.
     $projects = id(new PhabricatorProjectQuery())
       ->setViewer($viewer)
-      ->withDatasourceQuery('sprint')
+      ->withDatasourceQuery('§')
       ->execute();
 
     $rows = array();
@@ -82,7 +81,7 @@ final class BurndownListController extends PhabricatorController {
     $help = id(new PHUIBoxView())
       ->appendChild(phutil_tag('p', array(),
           "To have a project show up in this list, make sure it's name includes"
-          ."\"sprint\" and then edit it to set the start and end date."
+          ."\"§\" and then edit it to set the start and end date."
       ))
       ->addMargin(PHUI::MARGIN_LARGE);
 
