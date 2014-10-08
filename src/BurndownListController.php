@@ -30,6 +30,9 @@ final class BurndownListController extends PhabricatorController {
       ->withDatasourceQuery('§')
       ->execute();
 
+    $order = $request->getStr('order', 'name');
+    list($order, $reverse) = AphrontTableView::parseSort($order);
+
     $rows = array();
     foreach ($projects as $project) {
       // We need the custom fields so we can pull out the start and end date
@@ -46,32 +49,68 @@ final class BurndownListController extends PhabricatorController {
       $end = idx($aux_fields, 'isdc:sprint:enddate')
         ->getProxy()->getFieldValue();
 
-      $rows[] = array(
-        'project' => phutil_tag('a',
+      $row = array();
+      $row[] =  phutil_tag(
+          'a',
           array(
             'href'  => '/sprint/view/'.$project->getId(),
             'style' => 'font-weight:bold',
           ),
-          $project->getName()
-        ),
-        'start'   => phabricator_datetime($start, $viewer),
-        'end'     => phabricator_datetime($end, $viewer),
-      );
+          $project->getName());
+      $row[] = phabricator_datetime($start, $viewer);
+      $row[] = phabricator_datetime($end, $viewer);
+
+      switch ($order) {
+        case 'Name':
+          $row['sort'] = $project->getId();
+          break;
+        case 'Start':
+          $row['sort'] = $start;
+          break;
+        case 'End':
+          $row['sort'] = $end;
+          break;
+        case 'name':
+        default:
+          $row['sort'] = $project->getId();
+          break;
+      }
+
+    $rows[] = $row;
+    }
+
+
+    $rows = isort($rows, 'sort');
+    foreach ($rows as $k => $row) {
+      unset($rows[$k]['sort']);
+    }
+    if ($reverse) {
+      $rows = array_reverse($rows);
     }
 
     $projects_table = id(new AphrontTableView($rows))
-      ->setHeaders(
-        array(
-          'Project/Sprint name',
-          'Start Date',
-          'End Date',
-        ))
-      ->setColumnClasses(
-        array(
-          'wide',
-          'date',
-          'date',
-        ));
+        ->setHeaders(
+            array(
+                'Sprint Name',
+                'Start Date',
+                'End Date',
+            ))
+        ->setColumnClasses(
+            array(
+                'left',
+                'left narrow',
+                'left narrow',
+            ))
+        ->makeSortable(
+            $request->getRequestURI(),
+                'order',
+            $order,
+            $reverse,
+            array(
+                'Name',
+                'Start',
+                'End',
+            ));
 
 
     $crumbs = $this->buildApplicationCrumbs();

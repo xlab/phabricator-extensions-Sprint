@@ -27,13 +27,15 @@ final class SprintReportController extends ManiphestController {
 
     $nav = new AphrontSideNavFilterView();
     $nav->setBaseURI(new PhutilURI('/sprint/report/'));
+    $nav->addLabel(pht('Sprint Projects'));
+    $nav->addFilter('', pht('List'));
     $nav->addLabel(pht('Open Tasks'));
     $nav->addFilter('project', pht('By Project'));
     $nav->addFilter('user', pht('By User'));
     $nav->addLabel(pht('Burndown'));
     $nav->addFilter('burn', pht('Burndown Rate'));
 
-    $this->view = $nav->selectFilter($this->view, 'user');
+    $this->view = $nav->selectFilter($this->view, 'list');
 
     require_celerity_resource('maniphest-report-css');
 
