@@ -17,8 +17,8 @@ final class BurndownListController extends PhabricatorController {
     $nav = new AphrontSideNavFilterView();
     $nav->setBaseURI(new PhutilURI('/sprint/report/'));
     $nav->addLabel(pht('Open Tasks'));
-    $nav->addFilter('user', pht('By User'));
     $nav->addFilter('project', pht('By Project'));
+    $nav->addFilter('user', pht('By User'));
     $nav->addLabel(pht('Burndown'));
     $nav->addFilter('burn', pht('Burndown Rate'));
 
