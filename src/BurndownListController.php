@@ -22,7 +22,7 @@ final class BurndownListController extends PhabricatorController {
     $nav->addLabel(pht('Burndown'));
     $nav->addFilter('burn', pht('Burndown Rate'));
 
-    $this->view = $nav->selectFilter($this->view, 'user');
+    $this->view = $nav->selectFilter($this->view, 'project');
 
 
     // Load all projects with "Sprint" in the name.
