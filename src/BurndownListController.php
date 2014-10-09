@@ -7,49 +7,24 @@
 final class BurndownListController extends PhabricatorController {
 
   private $view;
-  public function willProcessRequest(array $data) {
-  }
 
   public function processRequest() {
+
     $request = $this->getRequest();
     $viewer = $request->getUser();
 
-    $nav = new AphrontSideNavFilterView();
-    $nav->setBaseURI(new PhutilURI('/sprint/report/'));
-    $nav->addLabel(pht('Sprint Projects'));
-    $nav->addFilter('list', pht('List'));
-    $nav->addLabel(pht('Open Tasks'));
-    $nav->addFilter('project', pht('By Project'));
-    $nav->addFilter('user', pht('By User'));
-    $nav->addLabel(pht('Burndown'));
-    $nav->addFilter('burn', pht('Burndown Rate'));
-
-    $this->view = $nav->selectFilter($this->view, 'list');
-
-    // Load all projects with "§" in the name.
-    $projects = id(new PhabricatorProjectQuery())
-      ->setViewer($viewer)
-      ->withDatasourceQuery('§')
-      ->execute();
+    $nav = $this->buildNavMenu();
+    $projects = $this->loadAllProjects($viewer);
 
     $order = $request->getStr('order', 'name');
     list($order, $reverse) = AphrontTableView::parseSort($order);
 
     $rows = array();
     foreach ($projects as $project) {
-      // We need the custom fields so we can pull out the start and end date
-      // TODO: query in a loop is bad
-      $field_list = PhabricatorCustomField::getObjectFields(
-        $project,
-        PhabricatorCustomField::ROLE_EDIT);
-      $field_list->setViewer($viewer);
-      $field_list->readFieldsFromStorage($project);
-      $aux_fields = $field_list->getFields();
 
-      $start = idx($aux_fields, 'isdc:sprint:startdate')
-        ->getProxy()->getFieldValue();
-      $end = idx($aux_fields, 'isdc:sprint:enddate')
-        ->getProxy()->getFieldValue();
+      $aux_fields = $this->getAuxFields($project, $viewer);
+      $start = $this->getStartDate($aux_fields);
+      $end = $this->getEndDate($aux_fields);
 
       $row = array();
       $row[] =  phutil_tag(
@@ -80,7 +55,6 @@ final class BurndownListController extends PhabricatorController {
 
     $rows[] = $row;
     }
-
 
     $rows = isort($rows, 'sort');
     foreach ($rows as $k => $row) {
@@ -148,4 +122,52 @@ final class BurndownListController extends PhabricatorController {
       ));
   }
 
+  private function buildNavMenu() {
+    $nav = new AphrontSideNavFilterView();
+    $nav->setBaseURI(new PhutilURI('/sprint/report/'));
+    $nav->addLabel(pht('Sprint Projects'));
+    $nav->addFilter('list', pht('List'));
+    $nav->addLabel(pht('Open Tasks'));
+    $nav->addFilter('project', pht('By Project'));
+    $nav->addFilter('user', pht('By User'));
+    $nav->addLabel(pht('Burndown'));
+    $nav->addFilter('burn', pht('Burndown Rate'));
+
+    $this->view = $nav->selectFilter($this->view, 'list');
+
+    return $nav;
+  }
+
+  // Load all projects with "§" in the name.
+  private function loadAllProjects($viewer) {
+    $projects = id(new PhabricatorProjectQuery())
+      ->setViewer($viewer)
+      ->withDatasourceQuery('§')
+      ->execute();
+    return $projects;
+  }
+
+  private function getAuxFields($project, $viewer) {
+    // We need the custom fields so we can pull out the start and end date
+    // TODO: query in a loop is bad
+    $field_list = PhabricatorCustomField::getObjectFields(
+        $project,
+        PhabricatorCustomField::ROLE_EDIT);
+    $field_list->setViewer($viewer);
+    $field_list->readFieldsFromStorage($project);
+    $aux_fields = $field_list->getFields();
+    return $aux_fields;
+  }
+
+  private function getStartDate($aux_fields) {
+    $start = idx($aux_fields, 'isdc:sprint:startdate')
+        ->getProxy()->getFieldValue();
+    return $start;
+  }
+
+  private function getEndDate($aux_fields) {
+    $end = idx($aux_fields, 'isdc:sprint:enddate')
+        ->getProxy()->getFieldValue();
+    return $end;
+  }
 }

@@ -39,20 +39,20 @@ class BurndownData {
     $this->viewer = $viewer;
 
     // We need the custom fields so we can pull out the start and end date
-    $aux_fields = $this->getAuxFields($project, $viewer);
+    $aux_fields = $this->getAuxFields();
     $start = $this->getStartDate($aux_fields);
     $end = $this->getEndDate($aux_fields);
     $this->dates = $this->buildDateArray($start, $end);
 
-    $tasks = $this->getTasks($project, $viewer);
+    $tasks = $this->getTasks();
 
     $this->checkNull($start, $end, $tasks);
 
-    $xactions = $this->getXactions($tasks, $viewer);
+    $xactions = $this->getXactions($tasks);
 
     $this->examineXactions($xactions, $tasks);
 
-    $this->buildDailyData($start, $end, $viewer);
+    $this->buildDailyData($start, $end);
     $this->buildTaskArrays();
 
 
@@ -61,10 +61,10 @@ class BurndownData {
 
   }
 
-  private function getAuxFields($project, $viewer) {
-    $field_list = PhabricatorCustomField::getObjectFields($project, PhabricatorCustomField::ROLE_EDIT);
-    $field_list->setViewer($viewer);
-    $field_list->readFieldsFromStorage($project);
+  private function getAuxFields() {
+    $field_list = PhabricatorCustomField::getObjectFields($this->project, PhabricatorCustomField::ROLE_EDIT);
+    $field_list->setViewer($this->viewer);
+    $field_list->readFieldsFromStorage($this->project);
     $aux_fields = $field_list->getFields();
     return $aux_fields;
   }
@@ -117,10 +117,10 @@ class BurndownData {
   // First, load *every task* in the project. We have to do something like
   // this because there's no straightforward way to determine which tasks
   // have activity in the project period.
-  private function getTasks($project, $viewer) {
+  private function getTasks() {
     $tasks = id(new ManiphestTaskQuery())
-        ->setViewer($viewer)
-        ->withAnyProjects(array($project->getPHID()))
+        ->setViewer($this->viewer)
+        ->withAnyProjects(array($this->project->getPHID()))
         ->execute();
     return $tasks;
   }
@@ -140,11 +140,11 @@ class BurndownData {
   // Now load *every transaction* for those tasks. This loads all the
   // comments, etc., for every one of the tasks. Again, not very fast, but
   // we largely do not have ways to select this data more narrowly yet.
-  private function getXactions($tasks, $viewer) {
+  private function getXactions($tasks) {
     $task_phids = mpull($tasks, 'getPHID');
 
     $xactions = id(new ManiphestTransactionQuery())
-        ->setViewer($viewer)
+        ->setViewer($this->viewer)
         ->withObjectPHIDs($task_phids)
         ->execute();
     return $xactions;
@@ -184,7 +184,7 @@ class BurndownData {
   }
 
   // Now loop through the events and build the data for each day
-  private function buildDailyData($start, $end, $viewer) {
+  private function buildDailyData($start, $end) {
     foreach ($this->events as $event) {
 
       $xaction = $this->xactions[$event['transactionPHID']];
@@ -199,7 +199,7 @@ class BurndownData {
         $date = 'after';
       } else {
         //$date = id(new DateTime("@".$xaction_date))->format('D M j');
-        $date = phabricator_format_local_time($xaction_date, $viewer, 'D M j');
+        $date = phabricator_format_local_time($xaction_date, $this->viewer, 'D M j');
       }
 
       switch ($event['type']) {
