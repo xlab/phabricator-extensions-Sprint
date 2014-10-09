@@ -62,7 +62,7 @@ final class BurndownListController extends PhabricatorController {
 
       switch ($order) {
         case 'Name':
-          $row['sort'] = $project->getId();
+          $row['sort'] = $project->getName();
           break;
         case 'Start':
           $row['sort'] = $start;
@@ -72,7 +72,7 @@ final class BurndownListController extends PhabricatorController {
           break;
         case 'name':
         default:
-          $row['sort'] = $project->getId();
+          $row['sort'] = $project->getName();
           break;
       }
 
