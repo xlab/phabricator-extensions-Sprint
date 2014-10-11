@@ -1,12 +1,8 @@
 <?php
 
-final class SprintReportController extends ManiphestController {
+final class SprintReportController extends BurndownController {
 
   private $view;
-
-  public function shouldAllowPublic() {
-    return true;
-  }
 
   public function willProcessRequest(array $data) {
     $this->view = idx($data, 'view');

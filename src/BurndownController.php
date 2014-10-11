@@ -4,71 +4,65 @@
  * Licensed under GNU GPL v3. See LICENSE for full details
  */
 
-final class BurndownController extends PhabricatorController {
+abstract class BurndownController extends PhabricatorController {
 
-  // Project data
-   private $projectID;
-
-   public function shouldAllowPublic() {
+    public function shouldAllowPublic() {
         return true;
    }
 
-   public function willProcessRequest(array $data) {
-    $this->projectID = $data['id'];
-   }
+  public function getProjectsURI() {
+    return '/project/';
+  }
 
-  public function processRequest() {
+  public function buildApplicationMenu() {
+    return $this->buildSideNavView(true)->getMenu();
+  }
 
-    $request = $this->getRequest();
-    $viewer = $request->getUser();
+  public function buildSideNavView($for_app = false) {
+    $user = $this->getRequest()->getUser();
 
-    // Load the project we're looking at, based on the project ID in the URL.
-    $project = id(new PhabricatorProjectQuery())
-      ->setViewer($viewer)
-      ->withIDs(array($this->projectID))
-      ->executeOne();
-    if (!$project) {
-      return new Aphront404Response();
+    $nav = new AphrontSideNavFilterView();
+    $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
+
+    if ($for_app) {
+      $nav->addFilter('create', pht('Create Task'));
     }
 
-    $error_box = false;
-    $burndown_chart = false;
-    $burndown_table = false;
-    $tasks_table = false;
-    $events_table = false;
+    id(new ManiphestTaskSearchEngine())
+        ->setViewer($user)
+        ->addNavigationItems($nav->getMenu());
 
-    try {
-      $data = new BurndownData($project, $viewer);
-     // $data = new BurndownDataChart($project, $viewer);
-      $burndown_chart = $data->buildBurnDownChart();
-      $tasks_table    = $data->buildTasksTable();
-      $burndown_table = $data->buildBurnDownTable();
-      $events_table   = $data->buildEventTable();
-    } catch (BurndownException $e) {
-      $error_box = id(new AphrontErrorView())
-        ->setTitle(pht('Burndown could not be rendered for this project'))
-        ->setErrors(array($e->getMessage()));
+    if ($user->isLoggedIn()) {
+      // For now, don't give logged-out users access to reports.
+      $nav->addLabel(pht('Reports'));
+      $nav->addFilter('report', pht('Reports'));
     }
 
-    $crumbs = $this->buildApplicationCrumbs();
-    $crumbs->addTextCrumb(
-      $project->getName(),
-      '/project/view/'.$project->getID());
-    $crumbs->addTextCrumb(pht('Burndown'));
+    $nav->selectFilter(null);
 
-    return $this->buildApplicationPage(
-      array(
-        $crumbs,
-        $error_box,
-        $burndown_chart,
-        $tasks_table,
-        $burndown_table,
-        $events_table,
-      ),
-      array(
-        'title' => array(pht('Burndown'), $project->getName()),
-        'device' => true,
-      ));
+    return $nav;
+  }
+
+  public function getAuxFields($project, $viewer) {
+    $field_list = PhabricatorCustomField::getObjectFields(
+        $project,
+        PhabricatorCustomField::ROLE_EDIT);
+    $field_list->setViewer($viewer);
+    $field_list->readFieldsFromStorage($project);
+    $aux_fields = $field_list->getFields();
+    return $aux_fields;
+  }
+
+  protected function buildApplicationCrumbs() {
+    $crumbs = parent::buildApplicationCrumbs();
+
+    $crumbs->addAction(
+        id(new PHUIListItemView())
+            ->setName(pht('Create Sprint'))
+            ->setHref($this->getProjectsURI().'create/')
+            ->setIcon('fa-calendar'));
+
+    return $crumbs;
   }
 
 }

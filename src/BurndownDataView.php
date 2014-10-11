@@ -4,9 +4,9 @@
  * Licensed under GNU GPL v3. See LICENSE for full details
  */
 
-class BurndownData {
+final class BurndownDataView extends SprintView {
 
-  // Array of BurndownDataDates
+  // Array of BurndownDataDatessta
   // There are two special keys, 'before' and 'after'
   //
   // Looks like: array(
@@ -16,8 +16,8 @@ class BurndownData {
   //   ...
   //   'after' => BurndownDataDate
   // )
-  private $type_status = 'core:customfield';
-  private $storypoints;
+  private $type_status = SprintConstants::CUSTOMFIELD_TYPE_STATUS;
+
   private $dates;
   private $data;
   // These hold an array of each task, and how many points are assigned, and
@@ -33,32 +33,23 @@ class BurndownData {
   private $events;
   private $xactions;
 
-  public function __construct($project, $viewer) {
-
+  public function setProject ($project) {
     $this->project = $project;
+    return $this;
+  }
+
+  public function setViewer ($viewer) {
     $this->viewer = $viewer;
+    return $this;
+  }
 
-    // We need the custom fields so we can pull out the start and end date
-    $aux_fields = $this->getAuxFields();
-    $start = $this->getStartDate($aux_fields);
-    $end = $this->getEndDate($aux_fields);
-    $this->dates = $this->buildDateArray($start, $end);
+  public function render() {
 
-    $tasks = $this->getTasks();
-
-    $this->checkNull($start, $end, $tasks);
-
-    $xactions = $this->getXactions($tasks);
-
-    $this->examineXactions($xactions, $tasks);
-
-    $this->buildDailyData($start, $end);
-    $this->buildTaskArrays();
-
-
-    $this->sumSprintStats();
-    $this->computeIdealPoints();
-
+    $chart = $this->buildBurnDownChart();
+    $tasks_table = $this->buildTasksTable();
+    $burndown_table = $this->buildBurnDownTable();
+    $event_table = $this->buildEventTable();
+    return array ($chart, $tasks_table, $burndown_table, $event_table);
   }
 
   private function getAuxFields() {
@@ -316,7 +307,31 @@ class BurndownData {
     }
   }
 
+
+
   private function buildChartDataSet() {
+
+
+    $aux_fields = $this->getAuxFields();
+    $start = $this->getStartDate($aux_fields);
+    $end = $this->getEndDate($aux_fields);
+    $this->dates = $this->buildDateArray($start, $end);
+
+    $tasks = $this->getTasks();
+
+    $this->checkNull($start, $end, $tasks);
+
+    $xactions = $this->getXactions($tasks);
+
+    $this->examineXactions($xactions, $tasks);
+
+    $this->buildDailyData($start, $end);
+    $this->buildTaskArrays();
+
+
+    $this->sumSprintStats();
+    $this->computeIdealPoints();
+
     $data = array(array(
         pht('Date'),
         pht('Total Points'),
@@ -343,7 +358,7 @@ class BurndownData {
 
   }
 
-  public function buildBurnDownChart() {
+  private function buildBurnDownChart() {
 
     $this->data = $this->buildChartDataSet();
     // Format the data for the chart

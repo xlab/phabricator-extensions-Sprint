@@ -4,13 +4,9 @@
  * Licensed under GNU GPL v3. See LICENSE for full details
  */
 
-final class BurndownListController extends PhabricatorController {
+final class BurndownListController extends BurndownController {
 
   private $view;
-
-  public function shouldAllowPublic() {
-    return true;
-  }
 
   public function processRequest() {
 
@@ -149,18 +145,6 @@ final class BurndownListController extends PhabricatorController {
       ->withDatasourceQuery(SprintConstants::MAGIC_WORD)
       ->execute();
     return $projects;
-  }
-
-  private function getAuxFields($project, $viewer) {
-    // We need the custom fields so we can pull out the start and end date
-    // TODO: query in a loop is bad
-    $field_list = PhabricatorCustomField::getObjectFields(
-        $project,
-        PhabricatorCustomField::ROLE_EDIT);
-    $field_list->setViewer($viewer);
-    $field_list->readFieldsFromStorage($project);
-    $aux_fields = $field_list->getFields();
-    return $aux_fields;
   }
 
   private function getStartDate($aux_fields) {

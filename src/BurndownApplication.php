@@ -35,7 +35,7 @@ final class BurndownApplication extends PhabricatorApplication {
         'report/' => 'BurndownListController',
         'report/list/' => 'BurndownListController',
         'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
-        'view/(?P<id>\d+)/' => 'BurndownController',
+        'view/(?P<id>\d+)/' => 'BurndownDataViewController',
       ),
     );
   }
