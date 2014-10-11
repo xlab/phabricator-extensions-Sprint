@@ -222,8 +222,10 @@ final class SprintReportController extends ManiphestController {
         if (($project_handle) &&
             ($project_handle->getPHID() == $handle->getPHID())) {
           $tasks = idx($result, $handle->getPHID(), array());
+          $closed = idx($result_closed, $handle->getPHID(), array());
         } else {
           $tasks = idx($result, $handle->getPHID(), array());
+          $closed = idx($result_closed, $handle->getPHID(), array());
         }
 
         $name = phutil_tag(
@@ -232,7 +234,7 @@ final class SprintReportController extends ManiphestController {
                 'href' => $base_link.$handle->getPHID(),
             ),
             $handle->getName());
-        $closed = idx($result_closed, $handle->getPHID(), array());
+
       } else {
         $tasks = $leftover;
         $name  = $leftover_name;
@@ -803,7 +805,8 @@ final class SprintReportController extends ManiphestController {
         $label,
         number_format($info['open']),
         number_format($info['close']),
-        $fmt);
+        $fmt,
+    );
   }
 }
 
