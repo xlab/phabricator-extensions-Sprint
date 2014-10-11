@@ -3,7 +3,11 @@
 final class SprintReportController extends ManiphestController {
 
   private $view;
-  //private $type_status = 'core:customfield';
+
+  public function shouldAllowPublic() {
+    return true;
+  }
+
   public function willProcessRequest(array $data) {
     $this->view = idx($data, 'view');
   }
@@ -202,6 +206,14 @@ final class SprintReportController extends ManiphestController {
         $leftover_name = phutil_tag('em', array(), pht('(No Project)'));
         $col_header = pht('Project');
         $header = pht('Open Tasks by Project and Priority (%s)', $date);
+        break;
+      default:
+        $result = array();
+        $result_closed = array();
+        $base_link = null;
+        $leftover = array();
+        $leftover_closed = array();
+        $leftover_name = null;
         break;
     }
 

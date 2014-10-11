@@ -8,6 +8,10 @@ final class BurndownListController extends PhabricatorController {
 
   private $view;
 
+  public function shouldAllowPublic() {
+    return true;
+  }
+
   public function processRequest() {
 
     $request = $this->getRequest();
