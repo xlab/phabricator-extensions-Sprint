@@ -59,7 +59,7 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
       // Set show to true if one of the Projects contains "Sprint"
       $show = false;
       foreach($names as $name) {
-        if (strpos($name, '§') !== false) {
+        if (strpos($name, SprintConstants::MAGIC_WORD) !== false) {
           $show = true;
         }
       }

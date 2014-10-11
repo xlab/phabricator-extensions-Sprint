@@ -22,7 +22,7 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
    */
   protected function shouldShowSprintFields()
   {
-    return (strpos($this->getObject()->getName(),'§') !== FALSE);
+    return (strpos($this->getObject()->getName(),SprintConstants::MAGIC_WORD) !== FALSE);
   }
 
   /**

@@ -142,7 +142,7 @@ final class BurndownListController extends PhabricatorController {
   private function loadAllProjects($viewer) {
     $projects = id(new PhabricatorProjectQuery())
       ->setViewer($viewer)
-      ->withDatasourceQuery('§')
+      ->withDatasourceQuery(SprintConstants::MAGIC_WORD)
       ->execute();
     return $projects;
   }
