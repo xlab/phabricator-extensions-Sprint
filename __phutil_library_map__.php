@@ -21,7 +21,12 @@ phutil_register_library_map(array(
     'SprintConstants' => 'src/SprintConstants.php',
     'SprintEndDateField' => 'src/SprintEndDateField.php',
     'SprintProjectCustomField' => 'src/SprintProjectCustomField.php',
+    'SprintReportBurndownView' => 'src/SprintReportBurndownView.php',
     'SprintReportController' => 'src/SprintReportController.php',
+    'SprintStartDateField' => 'src/SprintStartDateField.php',
+
+
+    'SprintReportOpenTasksView' => 'src/SprintReportOpenTasksView.php',
     'SprintStartDateField' => 'src/SprintStartDateField.php',
     'SprintTaskStoryPointsField' => 'src/SprintTaskStoryPointsField.php',
     'SprintView' => 'src/SprintView.php',
@@ -38,12 +43,18 @@ phutil_register_library_map(array(
     'BurndownTestDataGenerator' => 'PhabricatorTestDataGenerator',
     'SprintConstants' => 'ManiphestConstants',
     'SprintStartDateField' => 'SprintProjectCustomField',
+    'SprintConstants' => 'ManiphestConstants',
+    'SprintStartDateField' => 'SprintProjectCustomField',
     'SprintEndDateField' => 'SprintProjectCustomField',
     'SprintProjectCustomField' => array(
       'PhabricatorProjectCustomField',
       'PhabricatorStandardCustomFieldInterface',
     ),
     'SprintReportController' => 'BurndownController',
+    'SprintReportController' => 'ManiphestController',
+    'SprintReportBurndownView' => 'SprintView',
+    'SprintReportController' => 'BurndownController',
+    'SprintReportOpenTasksView' => 'SprintView',
     'SprintTaskStoryPointsField' => array(
       'ManiphestCustomField',
       'PhabricatorStandardCustomFieldInterface',
