@@ -251,9 +251,9 @@ final class BurndownDataView extends SprintView {
     $pointstoday = $this->data[3];
     $timeseries = array_keys($this->dates);
 
-    require_celerity_resource('d3');
-    require_celerity_resource('c3-css');
-    require_celerity_resource('c3');
+    require_celerity_resource('d3','sprint');
+    require_celerity_resource('c3-css','sprint');
+    require_celerity_resource('c3','sprint');
 
     $id = 'chart';
     Javelin::initBehavior('c3-chart', array(
@@ -263,7 +263,7 @@ final class BurndownDataView extends SprintView {
         'remainingpoints' => $remainingpoints,
         'idealpoints' =>   $idealpoints,
         'pointstoday' =>   $pointstoday
-    ));
+    ), 'sprint');
 
     $chart= id(new PHUIObjectBoxView())
         ->setHeaderText(pht('Burndown for ' . $this->project->getName()))
