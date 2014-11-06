@@ -14,7 +14,7 @@ final class CeleritySprintResources extends CelerityResourcesOnDisk {
   }
 
   public function getPathToMap() {
-    return $this->getSprintPath('src/celerity/map.php');
+    return $this->getSprintPath('celerity/map.php');
   }
 
   private function getSprintPath($to_file) {
