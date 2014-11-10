@@ -10,7 +10,7 @@ final class CeleritySprintResources extends CelerityResourcesOnDisk {
   }
 
   public function getPathToResources() {
-    return $this->getSprintPath('rsrc');
+    return $this->getSprintPath('../rsrc');
   }
 
   public function getPathToMap() {
