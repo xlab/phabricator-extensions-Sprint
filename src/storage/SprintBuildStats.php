@@ -2,9 +2,6 @@
 
 final class SprintBuildStats {
 
-  private $task_open_status_sum;
-  private $task_closed_status_sum;
-
     public function buildDateArray($start, $end, $timezone) {
 
     $period = new DatePeriod(
