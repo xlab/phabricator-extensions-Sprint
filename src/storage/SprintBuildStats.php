@@ -43,8 +43,8 @@ final class SprintBuildStats {
     foreach ($dates as $current) {
       $current->setTasksTotal($current->getTasksAddedToday());
       $current->setPointsTotal($current->getPointsAddedToday());
-      $current->setTasksRemaining($current->getTasksAddedToday());
-      $current->setPointsRemaining($current->getPointsAddedToday());
+      $current->setTasksRemaining($current->getTasksAddedToday()-$current->getTasksClosedToday());
+      $current->setPointsRemaining($current->getPointsAddedToday()-$current->getPointsClosedToday());
       if ($previous) {
         $current->sumTasksTotal($current, $previous);
         $current->sumPointsTotal($current, $previous);
