@@ -4,11 +4,27 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cd5c9578b0672de3e1952a437b4b2254",
+    "hash": "7ca56896a9d81ad7a21373533f600eaf",
     "packages": [
         {
+            "name": "libphutil/libphutil",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/christopher-johnson/libphutil.git",
+                "reference": "master"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/christopher-johnson/libphutil/archive/master.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "phabricator/phabricator",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/christopher-johnson/phabricator.git",
