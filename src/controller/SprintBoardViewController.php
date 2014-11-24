@@ -1,7 +1,7 @@
 <?php
 
-final class SprintProjectBoardViewController
-  extends PhabricatorProjectBoardController {
+final class SprintBoardViewController
+  extends SprintBoardController {
 
   private $id;
   private $slug;
@@ -209,15 +209,15 @@ final class SprintProjectBoardViewController
       ->setUser($viewer)
       ->setID($board_id);
 
-    $this->initBehavior(
-      'project-boards',
+    Javelin::initBehavior(
+      'sprint-boards',
       array(
         'boardID' => $board_id,
         'projectPHID' => $project->getPHID(),
         'moveURI' => $this->getApplicationURI('move/'.$project->getID().'/'),
         'createURI' => '/maniphest/task/create/',
         'order' => $this->sortKey,
-      ));
+      ), 'sprint');
 
     $this->handles = ManiphestTaskListView::loadTaskHandles($viewer, $tasks);
 

@@ -1,11 +1,10 @@
 <?php
 
 final class SprintProjectProfileController
-  extends PhabricatorProjectController {
+  extends SprintController {
 
   private $id;
   private $slug;
-  private $is_sprint;
 
   public function shouldAllowPublic() {
     return true;
@@ -43,9 +42,9 @@ final class SprintProjectProfileController
     }
     return $board_name;
   }
-  private function getProject($user) {
+  private function getProject($viewer) {
     $query = id(new PhabricatorProjectQuery())
-        ->setViewer($user)
+        ->setViewer($viewer)
         ->needMembers(true)
         ->needWatchers(true)
         ->needImages(true)

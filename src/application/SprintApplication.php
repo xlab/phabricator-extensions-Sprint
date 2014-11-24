@@ -49,6 +49,7 @@ final class SprintApplication extends PhabricatorApplication {
               => 'PhabricatorProjectMembersEditController',
               'members/(?P<id>[1-9]\d*)/remove/'
               => 'PhabricatorProjectMembersRemoveController',
+              'move/(?P<id>[1-9]\d*)/' => 'SprintBoardMoveController',
               'picture/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectEditPictureController',
               'icon/(?P<id>[1-9]\d*)/'
@@ -56,23 +57,23 @@ final class SprintApplication extends PhabricatorApplication {
               'board/(?P<id>[1-9]\d*)/' .
               '(?P<filter>filter/)?' .
               '(?:query/(?P<queryKey>[^/]+)/)?'
-              => 'SprintProjectBoardViewController',
+              => 'SprintBoardViewController',
               'board/(?P<projectID>[1-9]\d*)/' => array(
                   'edit/(?:(?P<id>\d+)/)?'
-                  => 'SprintProjectColumnEditController',
+                  => 'SprintBoardColumnEditController',
                   'hide/(?:(?P<id>\d+)/)?'
-                  => 'SprintProjectColumnHideController',
+                  => 'SprintBoardColumnHideController',
                   'column/(?:(?P<id>\d+)/)?'
-                  => 'SprintProjectColumnDetailController',
+                  => 'SprintBoardColumnDetailController',
                   'import/'
-                  => 'SprintProjectBoardImportController',
+                  => 'SprintBoardImportController',
                   'reorder/'
-                  => 'SprintProjectBoardReorderController',
+                  => 'SprintBoardReorderController',
               ),
           ),
           '/tag/' => array(
               '(?P<slug>[^/]+)/' => 'SprintProjectProfileController',
-              '(?P<slug>[^/]+)/board/' => 'SprintProjectBoardViewController',
+              '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',
           ),
       );
     }

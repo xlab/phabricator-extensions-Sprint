@@ -1,7 +1,7 @@
 <?php
 
-final class SprintProjectBoardImportController
-  extends PhabricatorProjectBoardController {
+final class SprintBoardImportController
+  extends SprintBoardController {
 
   private $projectID;
 
