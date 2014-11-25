@@ -56,6 +56,8 @@ final class SprintApplication extends PhabricatorApplication {
               => 'PhabricatorProjectEditIconController',
               'board/task/edit/(?P<id>[1-9]\d*)/'
               =>  'SprintBoardTaskEditController',
+              'board/task/create/'
+              => 'SprintBoardTaskEditController',
               'board/(?P<id>[1-9]\d*)/' .
               '(?P<filter>filter/)?' .
               '(?:query/(?P<queryKey>[^/]+)/)?'
