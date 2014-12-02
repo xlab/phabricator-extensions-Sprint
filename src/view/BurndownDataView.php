@@ -55,10 +55,10 @@ final class BurndownDataView extends SprintView
     $stats = id(new SprintBuildStats());
     $tasks = $query->getTasks();
     $query->checkNull($start, $end, $tasks);
-
     $timezone = $stats->setTimezone($this->viewer);
     $dates = $stats->buildDateArray($start, $end, $timezone);
     $this->timeseries = $stats->buildTimeSeries($start, $end);
+
 
     $xactions = $query->getXactions($tasks);
     $events = $query->getEvents($xactions, $tasks);
