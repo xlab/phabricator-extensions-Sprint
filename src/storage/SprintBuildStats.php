@@ -2,7 +2,9 @@
 
 final class SprintBuildStats {
   private $timezone;
+  private $total_tasks_added;
   private $tasks_remaining;
+  private $total_points_added;
   private $points_remaining;
 
   public function setTimezone ($viewer) {
@@ -51,13 +53,15 @@ final class SprintBuildStats {
     $first = true;
     $previous = new BurndownDataDate($date=null);
     foreach ($dates as $date) {
-      $tasks_added = $date->getTasksAddedToday();
+      $this->total_tasks_added += $date->getTasksAddedToday();
       if ($first) {
-        $date->setTasksTotal($tasks_added);
+        $date->setTasksTotal($this->total_tasks_added);
+        $tasks_total = $this->total_tasks_added;
       } else {
         $tasks_total = $date->sumTasksTotal($date, $previous);
         $date->setTasksTotal($tasks_total);
       }
+      $this->total_tasks_added += $tasks_total;
       $previous = $date;
       $first = false;
     }
@@ -68,15 +72,15 @@ final class SprintBuildStats {
     $first = true;
     $previous = new BurndownDataDate($date=null);
     foreach ($dates as $date) {
-      $points_added = $date->getPointsAddedToday();
+      $this->total_points_added += $date->getPointsAddedToday();
       if ($first) {
-        $points_before = $this->getPointsBefore();
-        $points_total = $points_added + $points_before;
-        $date->setPointsTotal($points_total);
+        $date->setPointsTotal($this->total_points_added);
+        $points_total = $this->total_points_added;
       } else {
         $points_total = $date->sumPointsTotal($date, $previous);
         $date->setPointsTotal($points_total);
       }
+      $this->total_points_added += $points_total;
       $previous = $date;
       $first = false;
     }
@@ -90,17 +94,23 @@ final class SprintBuildStats {
       $points_closed = $date->getPointsClosedToday();
       $points_reopened = $date->getPointsReopenedToday();
       $points_removed = $date->getPointsRemovedToday();
+
       if ($first) {
-        $points_total = ($points_added + $points_reopened) - ($points_removed + $points_closed);
-        $net_change = 0;
+        $points_total = $points_added + $points_reopened - $points_removed - $points_closed;
+        $net_change =0;
       } else {
         $points_total = $this->points_remaining;
-        $net_change = ($points_added  + $points_reopened) - ($points_removed + $points_closed);
+        $net_change = $points_added + $points_reopened - $points_removed - $points_closed;
       }
-      $points_diff = abs($net_change);
-      $points_remaining = $points_total - $points_diff;
+
+      $points_diff = $net_change;
+      $points_remaining = $points_total + $points_diff;
+      if ($points_remaining < 0) {
+        $points_remaining = 0;
+      }
       $date->setPointsRemaining($points_remaining);
       $this->points_remaining = $points_remaining;
+
       $first = false;
     }
     return $dates;
@@ -114,14 +124,14 @@ final class SprintBuildStats {
       $tasks_reopened = $date->getTasksReopenedToday();
       $tasks_removed = $date->getTasksRemovedToday();
       if ($first) {
-        $tasks_total = ($tasks_added + $tasks_reopened) - ($tasks_removed + $tasks_closed);
+        $tasks_total = $tasks_added + $tasks_reopened - $tasks_removed - $tasks_closed;
         $net_change = 0;
       } else {
         $tasks_total = $this->tasks_remaining;
-        $net_change = ($tasks_added + $tasks_reopened) - ($tasks_removed + $tasks_closed);
+        $net_change = $tasks_added + $tasks_reopened - $tasks_removed - $tasks_closed;
       }
-      $tasks_diff = abs($net_change);
-      $tasks_remaining = $tasks_total - $tasks_diff;
+      $tasks_diff = $net_change;
+      $tasks_remaining = $tasks_total + $tasks_diff;
       $date->setTasksRemaining($tasks_remaining);
       $this->tasks_remaining = $tasks_remaining;
       $first = false;

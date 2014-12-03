@@ -35,9 +35,14 @@ final class SprintTransaction  {
           case "points":
             // Points were changed
             $old_point_value = $xaction->getOldValue();
-           $this->SetPointsBefore($sprint_start, $task_phid, $points, $old_point_value, $dates);
+            $this->SetPointsBefore($sprint_start, $points, $old_point_value, $dates);
+            $this->closePoints($date, $task_phid, $points, $old_point_value, $dates);
             break;
         }
+      }
+
+      if ( $xaction_date > $end ) {
+        continue;
       }
 
         // Determine which date to attach this data to
@@ -75,9 +80,11 @@ final class SprintTransaction  {
               break;
             case "points":
               // Points were changed
-              $old_point_value = $xaction->getOldValue();
-              $this->changePoints($date, $task_phid, $points, $old_point_value, $dates);
-              $this->closePoints($date, $task_phid, $points, $old_point_value, $dates);
+              if ($this->task_in_sprint[$task_phid]) {
+                $old_point_value = $xaction->getOldValue();
+                $this->changePoints($date, $task_phid, $points, $old_point_value, $dates);
+                $this->closePoints($date, $task_phid, $points, $old_point_value, $dates);
+              }
               break;
           }
       }
@@ -155,11 +162,9 @@ final class SprintTransaction  {
     return $this->task_statuses[$task_phid];
   }
 
-  private function SetPointsBefore($points, $old_point_value, $dates) {
-    foreach ($dates as $date) {
-      $before = $points - $old_point_value;
-      $this->setPointsBefore = $before;
-    }
+  private function SetPointsBefore($sprint_start, $points,  $old_point_value, $dates) {
+    $points = $points - $old_point_value;
+    $dates[$sprint_start]->setPointsAddedToday($points);
   }
 
   private function SumTasksBefore($sprint_start, $dates) {
