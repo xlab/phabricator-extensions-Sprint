@@ -630,6 +630,9 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return array($aux_fields, $field_list);
   }
 
+  /**
+   * @param AphrontRequest $request
+   */
   private function setTaskError($task, $new_title, $new_desc, $request, $owner_phid) {
     $task->setTitle($new_title)
         ->setDescription($new_desc)
@@ -640,6 +643,9 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return $task;
   }
 
+  /**
+   * @param PhabricatorUserProfileEditor $placeholder_editor
+   */
   private function setFieldErrors($aux_field, $placeholder_editor, $aux_old_value, $aux_new_value, $errors) {
     $field_errors = $aux_field->validateApplicationTransactions(
         $placeholder_editor,
@@ -656,6 +662,9 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return $errors;
   }
 
+  /**
+   * @param AphrontRequest $request
+   */
   private function setTaskChanges($request, $owner_phid, $user, $task) {
     list($can_edit_assign,$can_edit_policies,$can_edit_priority,
         $can_edit_projects, $can_edit_status)
@@ -701,6 +710,12 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return $changes;
   }
 
+  /**
+   * @param boolean $is_new
+   * @param AphrontRequest $request
+   *
+   * @return ManiphestTask
+   */
   private function createEvent($task, $is_new, $transactions, $user, $request) {
     $event = new PhabricatorEvent(
         PhabricatorEventType::TYPE_MANIPHEST_WILLEDITTASK,
@@ -733,6 +748,9 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return $task;
   }
 
+  /**
+   * @param ManiphestTransaction $template
+   */
   private function setTransactions($template, $changes) {
     $transactions = array();
 
@@ -761,6 +779,9 @@ final class SprintBoardTaskEditController extends ManiphestController {
     return array ($transactions);
   }
 
+  /**
+   * @param ManiphestTransaction $template
+   */
   private function setAuxFieldTransactions($aux_fields, $template, $old_values) {
     foreach ($aux_fields as $aux_field) {
       $transaction = clone $template;

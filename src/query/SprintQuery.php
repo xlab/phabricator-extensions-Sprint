@@ -57,6 +57,9 @@ final class SprintQuery  {
     return $tasks;
   }
 
+  /**
+   * @return string
+   */
   private function getTaskStoryPoints($task_phid,$points_data) {
     $storypoints = array();
     foreach ($points_data as $k=>$subarray) {

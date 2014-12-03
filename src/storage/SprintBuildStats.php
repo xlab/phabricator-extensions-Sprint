@@ -33,6 +33,9 @@ final class SprintBuildStats {
     return $timeseries;
   }
 
+  /**
+   * @param string $date
+   */
   public function getBurndownDate ($date) {
     $sprint_date = id(new BurndownDataDate($date));
     return $sprint_date;

@@ -75,6 +75,8 @@ final class TasksTableView {
    *
    * We ignore any tasks not in this sprint.
    *
+   * @param string $order
+   * @param integer $reverse
    * @return array
    */
   private function buildTasksTree($order, $reverse) {
@@ -122,6 +124,10 @@ final class TasksTableView {
     return $rows;
   }
 
+  /**
+   * @param string $priority
+   * @param string $points
+   */
   private function setSortOrder ($row, $order, $task, $assigned_to, $priority,
                                  $points, $status) {
     switch ($order) {
@@ -243,6 +249,9 @@ final class TasksTableView {
     return $output;
   }
 
+  /**
+   * @return string
+   */
   private function getTaskStoryPoints($task,$points_data) {
     $storypoints = array();
     foreach ($points_data as $k=>$subarray) {

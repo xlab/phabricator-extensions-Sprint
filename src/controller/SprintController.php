@@ -39,6 +39,9 @@ abstract class SprintController extends PhabricatorController {
     return $nav;
   }
 
+  /**
+   * @param PhutilURI $uri
+   */
   public function buildSideNavView($for_app = false, $user, $uri) {
 
     $nav = new AphrontSideNavFilterView();

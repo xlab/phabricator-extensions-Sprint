@@ -95,6 +95,9 @@ final class SprintBoardColumnDetailController
     return $header;
   }
 
+  /**
+   * @return PhabricatorProjectColumn
+   */
   private function buildActionView(PhabricatorProjectColumn $column) {
     $viewer = $this->getRequest()->getUser();
 

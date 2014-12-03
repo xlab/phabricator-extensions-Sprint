@@ -66,6 +66,10 @@ final class EventTableView {
     return $box;
   }
 
+  /**
+   * @param string $order
+   * @param integer $reverse
+   */
   private function buildEventsTree ($order, $reverse) {
     $query = id(new SprintQuery())
         ->setProject($this->project)
@@ -117,6 +121,10 @@ final class EventTableView {
     return $row;
   }
 
+  /**
+   * @param string $when
+   * @param PhutilSafeHTML $task
+   */
   private function setSortOrder ($row, $order, $stamp, $when, $task, $action) {
     switch ($order) {
       case 'Date':
