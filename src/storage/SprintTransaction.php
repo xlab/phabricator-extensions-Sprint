@@ -102,65 +102,41 @@ final class SprintTransaction  {
     return;
   }
 
-  /**
-   * @param string $date
-   */
   private function AddTasksToday($date, $dates) {
     $dates[$date]->setTasksAddedToday();
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function RemoveTasksToday($date, $dates) {
     $dates[$date]->setTasksRemovedToday();
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function CloseTasksToday($date, $dates) {
     $dates[$date]->setTasksClosedToday();
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function ReopenedTasksToday($date, $dates) {
    $dates[$date]->setTasksReopenedToday();
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function AddPointsToday($date, $points, $dates) {
     $dates[$date]->setPointsAddedToday($points);
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function RemovePointsToday($date, $points, $dates) {
    $dates[$date]->setPointsRemovedToday($points);
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function ClosePointsToday($date, $points, $dates) {
    $dates[$date]->setPointsClosedToday($points);
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function ReopenedPointsToday($date, $points, $dates) {
     $dates[$date]->setPointsReopenedToday($points);
     return $dates;
@@ -186,25 +162,16 @@ final class SprintTransaction  {
     return $this->task_statuses[$task_phid];
   }
 
-  /**
-   * @param string $sprint_start
-   */
   private function SetPointsBefore($sprint_start, $points,  $old_point_value, $dates) {
     $points = $points - $old_point_value;
     $dates[$sprint_start]->setPointsAddedToday($points);
   }
 
-  /**
-   * @param string $sprint_start
-   */
   private function SumTasksBefore($sprint_start, $dates) {
     $dates[$sprint_start]->setTasksAddedToday();
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function changePoints($date, $task_phid, $points, $old_point_value, $dates) {
 
     // Adjust points for that day
@@ -213,9 +180,6 @@ final class SprintTransaction  {
     return $dates;
   }
 
-  /**
-   * @param string $date
-   */
   private function closePoints($date, $task_phid, $points, $old_point_value, $dates)
   {
     // If the task is closed, adjust completed points as well
