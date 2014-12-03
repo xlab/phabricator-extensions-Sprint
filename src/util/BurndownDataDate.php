@@ -19,7 +19,6 @@ class BurndownDataDate {
   // Totals over time
   private $tasks_total;
   private $tasks_remaining;
-  private $points_before;
   private $points_total;
   private $points_remaining;
   private $points_ideal_remaining;
@@ -32,7 +31,6 @@ class BurndownDataDate {
 
   public function setTasksAddedToday () {
     return $this->tasks_added_today = $this->tasks_added_today +1;
-    return $this;
   }
 
   public function getTasksAddedToday () {
@@ -41,12 +39,14 @@ class BurndownDataDate {
 
   public function setTasksRemovedToday () {
     return $this->tasks_removed_today = $this->tasks_removed_today + 1;
-    return $this;
   }
 
-  public function setTasksClosedToday () {
+  public function getTasksRemovedToday () {
+    return $this->tasks_removed_today;
+  }
+
+   public function setTasksClosedToday () {
     return $this->tasks_closed_today = $this->tasks_closed_today + 1;
-    return $this;
   }
 
   public function getTasksClosedToday () {
@@ -55,14 +55,9 @@ class BurndownDataDate {
 
   public function setTasksReopenedToday () {
       return $this->tasks_reopened_today = $this->tasks_reopened_today + 1;
-    return $this;
   }
 
   public function getTasksReopenedToday () {
-    return $this->tasks_reopened_today;
-  }
-
-  public function getTasksRemovedToday () {
     return $this->tasks_reopened_today;
   }
 
@@ -83,7 +78,7 @@ class BurndownDataDate {
   }
 
   public function setPointsAddedToday ($points) {
-    $this->points_added_today = $points;
+    $this->points_added_today = $this->points_added_today + $points;
   }
 
   public function getPointsAddedToday () {
@@ -91,7 +86,7 @@ class BurndownDataDate {
   }
 
   public function setPointsClosedToday ($points) {
-    $this->points_closed_today = $points;
+    $this->points_closed_today = $this->points_closed_today + $points;
   }
 
   public function getPointsClosedToday () {
@@ -99,7 +94,7 @@ class BurndownDataDate {
   }
 
   public function setPointsRemovedToday ($points) {
-    $this->points_removed_today = $points;
+    $this->points_removed_today = $this->points_removed_today + $points;
   }
 
   public function getPointsRemovedToday () {
@@ -107,7 +102,7 @@ class BurndownDataDate {
   }
 
   public function setPointsReopenedToday ($points) {
-    $this->points_reopened_today = $points;
+    $this->points_reopened_today = $this->points_reopened_today + $points;
   }
 
   public function getPointsReopenedToday () {
@@ -116,14 +111,6 @@ class BurndownDataDate {
 
   public function getDate() {
     return $this->date;
-  }
-
-   public function setPointsBefore($points) {
-    $this->points_before = $this->points_before + $points;
-  }
-
-  public function getPointsBefore() {
-    return $this->points_before;
   }
 
   public function setPointsTotal($points_total) {
