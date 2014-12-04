@@ -208,4 +208,14 @@ class BurndownDataDate {
     return $current->points_total;
   }
 
+  public function sumTasksRemaining($current, $previous) {
+    $current->tasks_remaining = $previous->tasks_remaining - $current->tasks_closed_today;
+    return $current->tasks_remaining;
+  }
+
+  public function sumPointsRemaining($current, $previous) {
+    $current->points_remaining = $previous->points_remaining - $current->points_closed_today;
+    return $current->points_remaining;
+  }
+
 }

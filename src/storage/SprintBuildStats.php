@@ -2,8 +2,6 @@
 
 final class SprintBuildStats {
   private $timezone;
-  private $tasks_remaining;
-  private $points_remaining;
 
   public function setTimezone ($viewer) {
     $this->timezone = new DateTimeZone($viewer->getTimezoneIdentifier());
@@ -11,9 +9,8 @@ final class SprintBuildStats {
   }
 
   public function setSprintData($dates, $before) {
-    $stats = id(new SprintBuildStats());
     $dates = $this->sumSprintStats($dates, $before);
-    $sprint_data = $stats->computeIdealPoints($dates);
+    $sprint_data = $this->computeIdealPoints($dates, $before);
     return $sprint_data;
   }
 
@@ -53,13 +50,73 @@ final class SprintBuildStats {
 
   // Now that we have the data for each day, we need to loop over and sum
   // up the relevant columns
+
   public function sumSprintStats($dates, $before) {
-     //$this->sumTasksTotal($dates, $before);
-     $this->calcTasksRemaining($dates, $before);
-     //$this->sumPointsTotal($dates, $before);
+//    $this->sumTasksTotal($dates, $before);
+    $this->sumPointsTotal($dates, $before);
+    $this->calcTasksRemaining($dates, $before);
      $this->calcPointsRemaining($dates, $before);
     return $dates;
+  }
 
+  public function sumTasksTotal($dates, $before) {
+    $first = true;
+    $previous = new BurndownDataDate($date=null);
+    $tasks_added_today = null;
+    $tasks_reopened_today = null;
+    $tasks_closed_today = null;
+
+    $tasks_added_before = $before->getTasksAddedBefore();
+    $tasks_reopened_before = $before->getTasksReopenedBefore();
+    $tasks_closed_before = $before->getTasksClosedBefore();
+    $tasks_before = $tasks_added_before + $tasks_reopened_before - $tasks_closed_before;
+
+    foreach ($dates as $date) {
+      $tasks_added_today += $date->getTasksAddedToday();
+      $tasks_reopened_today += $date->getTasksReopenedToday();
+      $tasks_closed_today += $date->getTasksClosedToday();
+      $tasks_today = $tasks_added_today + $tasks_reopened_today - $tasks_closed_today;
+      if ($first) {
+        $start_tasks = $tasks_before + $tasks_today;
+        $date->setTasksTotal($start_tasks);
+      } else {
+        $tasks_total = $previous->getTasksRemaining();
+        $date->setTasksTotal($tasks_total);
+      }
+      $previous = $date;
+      $first = false;
+    }
+    return $dates;
+  }
+
+  public function sumPointsTotal($dates, $before) {
+    $first = true;
+    $previous = new BurndownDataDate($date=null);
+    $points_added_today = null;
+    $points_reopened_today = null;
+    $points_closed_today = null;
+
+    $points_added_before = $before->getPointsAddedBefore();
+    $points_reopened_before = $before->getPointsReopenedBefore();
+    $points_closed_before = $before->getPointsClosedBefore();
+    $points_before = $points_added_before + $points_reopened_before - $points_closed_before;
+
+    foreach ($dates as $date) {
+      $points_added_today += $date->getPointsAddedToday();
+      $points_reopened_today += $date->getPointsReopenedToday();
+      $points_closed_today += $date->getPointsClosedToday();
+      $points_today = $points_added_today + $points_reopened_today - $points_closed_today;
+      if ($first) {
+        $start_points = $points_before + $points_today;
+        $date->setPointsTotal($start_points);
+      } else {
+        $points_total = $previous->getPointsTotal();
+        $date->setPointsTotal($points_total);
+      }
+      $previous = $date;
+      $first = false;
+    }
+    return $dates;
   }
 
   public function calcPointsRemaining($dates, $before) {
@@ -79,7 +136,7 @@ final class SprintBuildStats {
       $points_today = $points_added_today + $points_reopened_today - $points_closed_today;
       if ($first) {
         $points_added_before = $before->getPointsAddedBefore();
-        $points_reopened_before = $before->getPointsAddedBefore();
+        $points_reopened_before = $before->getPointsReopenedBefore();
         $points_closed_before = $before->getPointsClosedBefore();
         $points_before = $points_added_before + $points_reopened_before - $points_closed_before;
         $points_remaining = $points_today + $points_before;
@@ -88,12 +145,11 @@ final class SprintBuildStats {
         $date->setYesterdayPointsRemaining($yesterday_points_remaining);
         $points_remaining = $points_today + $yesterday_points_remaining;
       }
-      if (!$points_remaining < 0) {
-        $date->setPointsRemaining($points_remaining);
-      } else {
+
+      if ($points_remaining < 0) {
         $points_remaining = 0;
-        $date->setPointsRemaining($points_remaining);
       }
+      $date->setPointsRemaining($points_remaining);
       $previous = $date;
       $first = false;
     }
@@ -132,7 +188,7 @@ final class SprintBuildStats {
     return $dates;
   }
 
-  public function computeIdealPoints($dates) {
+  public function computeIdealPoints($dates, $before) {
     $total_business_days = 0;
     foreach ($dates as $key => $date) {
       $day_of_week = id(new DateTime($date->getDate()))->format('w');

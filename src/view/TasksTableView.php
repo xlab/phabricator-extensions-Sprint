@@ -44,6 +44,7 @@ final class TasksTableView {
             array(
                 pht('Task'),
                 pht('Date Created'),
+                pht('Last Update'),
                 pht('Assigned to'),
                 pht('Priority'),
                 pht('Points'),
@@ -57,6 +58,7 @@ final class TasksTableView {
         array(
             'Task',
             'Date Created',
+            'Last Update',
             'Assigned to',
             'Priority',
             'Points',
@@ -109,8 +111,8 @@ final class TasksTableView {
       }
 
       $row = $this->addTaskToTree($output, $task, $tasks, $map, $handles);
-      list ($task, $created, $assigned_to, $priority,$points, $status) = $row[0];
-      $row['sort'] = $this->setSortOrder($row, $order, $task, $created, $assigned_to, $priority,$points, $status);
+      list ($task, $created, $last_update, $assigned_to, $priority,$points, $status) = $row[0];
+      $row['sort'] = $this->setSortOrder($row, $order, $task, $created, $last_update, $assigned_to, $priority,$points, $status);
       $rows[] = $row;
     }
     $rows = isort($rows, 'sort');
@@ -130,7 +132,7 @@ final class TasksTableView {
    * @param string $priority
    * @param string $points
    */
-  private function setSortOrder ($row, $order, $task, $created, $assigned_to, $priority,
+  private function setSortOrder ($row, $order, $task, $created, $last_update, $assigned_to, $priority,
                                  $points, $status) {
     switch ($order) {
       case 'Task':
@@ -138,6 +140,9 @@ final class TasksTableView {
         break;
       case 'Date Created':
         $row['sort'] = $created;
+        break;
+      case 'Date Modified':
+        $row['sort'] = $last_update;
         break;
       case 'Assigned to':
         $row['sort'] = $assigned_to;
@@ -208,6 +213,11 @@ final class TasksTableView {
     return $date_created;
   }
 
+  private function getTaskModifiedDate($task) {
+    $last_updated = $task->getDateModified();
+    return $last_updated;
+  }
+
   private function getPriorityName($task) {
     $priority_name = new ManiphestTaskPriority;
     return $priority_name->getTaskPriorityName($task->getPriority());
@@ -222,6 +232,8 @@ final class TasksTableView {
     $points = $this->getTaskPoints($task);
     $cdate = $this->getTaskCreatedDate($task);
     $date_created = phabricator_datetime($cdate, $this->viewer);
+    $udate = $this->getTaskModifiedDate($task);
+    $last_updated = phabricator_datetime($udate, $this->viewer);
 
     $status = $this->setTaskStatus($task);
     $depth_indent = '';
@@ -246,6 +258,7 @@ final class TasksTableView {
             ) . ($repeat ? '&nbsp;&nbsp;<em title="This task is a child of more than one task in this list. Children are only shown on ' .
                 'the first occurance">[Repeat]</em>' : '')),
         $date_created,
+        $last_updated,
         $owner_link,
         $priority_name,
         $points,

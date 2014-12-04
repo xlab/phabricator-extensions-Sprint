@@ -28,6 +28,8 @@ final class SprintTransaction  {
         $points = $query->getStoryPoints($task_phid);
         $date = phabricator_format_local_time($xaction_date, $this->viewer, 'D M j');
 
+
+
         if ($xaction_date < $start) {
 
           switch ($event['type']) {
@@ -46,9 +48,9 @@ final class SprintTransaction  {
               break;
             case "points":
               // Points were changed
-              $old_point_value = $xaction->getOldValue();
-              $this->ChangePointsBefore($before, $points, $old_point_value, $dates);
-              break;
+                $old_point_value = $xaction->getOldValue();
+                $this->ChangePointsBefore($before, $points, $old_point_value, $dates);
+                 break;
           }
         }
 
@@ -84,12 +86,11 @@ final class SprintTransaction  {
               $this->ReopenedPointsToday($date, $points, $dates);
               break;
             case "points":
+//              $this->transLog($event);
               // Points were changed
-              if ($this->task_in_sprint[$task_phid]) {
                 $old_point_value = $xaction->getOldValue();
                 $this->changePoints($date, $task_phid, $points, $old_point_value, $dates);
 //                $this->closePoints($date, $task_phid, $points, $old_point_value, $dates);
-              }
               break;
           }
         }
@@ -196,5 +197,29 @@ final class SprintTransaction  {
 
   private function AddTaskCreated($task_phid) {
     $this->task_created = $task_phid;
+  }
+
+  function getxActionValue($mapping, $keys) {
+    foreach($keys as $key) {
+      $output_arr[] = $mapping[$key];
+    }
+    return $output_arr;
+  }
+
+  private function transLog($event) {
+    list ($phid, $epoch, $key, $type, $title) = $this->getxActionValue($event, array('transactionPHID', 'epoch', 'key', 'type', 'title'));
+    $tmp = "/tmp/xaction.log";
+    $format = "%a %b %c %d %e";
+    $log = new PhutilDeferredLog($tmp, $format);
+    $log->setData(
+          array(
+              'a' =>  $phid,
+              'b' =>  $epoch,
+              'c' =>  $key,
+              'd' =>  $type,
+              'e' =>  $title,
+          ));
+
+    unset($log);
   }
 }
