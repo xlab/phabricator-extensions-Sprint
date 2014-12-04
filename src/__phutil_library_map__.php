@@ -20,6 +20,7 @@ phutil_register_library_map(array(
     'CeleritySprintResources' => 'celerity/CeleritySprintResources.php',
     'DateIterator' => 'tests/DateIterator.php',
     'EventTableView' => 'view/EventTableView.php',
+    'HistoryTableView' => 'view/HistoryTableView.php',
     'OpenTasksView' => 'view/OpenTasksView.php',
     'ProjectOpenTasksView' => 'view/ProjectOpenTasksView.php',
     'SprintApplication' => 'application/SprintApplication.php',
