@@ -40,13 +40,13 @@ final class SprintTransaction  {
               break;
             case "close":
               // A task was closed, mark it as done
-  //             $this->CloseTasksBefore($before, $dates);
-             // $this->ClosePointsBefore($before, $points, $dates);
+              $this->CloseTasksBefore($before, $dates);
+ //             $this->ClosePointsBefore($before, $points, $dates);
               break;
             case "reopen":
               // A task was reopened, subtract from done
-    //          $this->ReopenedTasksBefore($before, $dates);
-    //          $this->ReopenedPointsBefore($before, $points, $dates);
+               $this->ReopenedTasksBefore($before, $dates);
+ //              $this->ReopenedPointsBefore($before, $points, $dates);
               break;
             case "points":
               // Points were changed
