@@ -214,7 +214,7 @@ final class SprintBuildStats {
 
   public function buildDataSet ($dates) {
     $data = array(array(
-        pht('Total Points'),
+        pht('Start Points'),
         pht('Remaining Points'),
         pht('Ideal Points'),
         pht('Points Closed Today'),
