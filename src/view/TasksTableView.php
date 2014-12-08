@@ -170,6 +170,7 @@ final class TasksTableView {
         break;
       case 'Status':
         $row['sort'] = $status;
+        break;
       default:
         $row['sort'] = -$numpriority;
         break;
