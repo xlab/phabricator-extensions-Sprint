@@ -57,8 +57,8 @@ final class SprintQuery  {
     return $tasks;
   }
 
-  private function getTaskStoryPoints($task_phid,$points_data) {
-    $storypoints = array();
+  public function getTaskStoryPoints($task_phid,$points_data) {
+    $storypoints = null;
     foreach ($points_data as $k=>$subarray) {
       if (isset ($subarray['objectPHID']) && $subarray['objectPHID'] == $task_phid) {
         $points_data[$k] = $subarray;

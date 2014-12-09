@@ -220,7 +220,7 @@ final class TasksTableView {
         ->setProject($this->project)
         ->setViewer($this->viewer);
     $data = $query->getXactionData(SprintConstants::CUSTOMFIELD_TYPE_STATUS);
-    $points = $this->getTaskStoryPoints($task->getPHID(),$data);
+    $points = $query->getTaskStoryPoints($task->getPHID(),$data);
     $points = trim($points, '"');
     return $points;
   }
@@ -298,20 +298,6 @@ final class TasksTableView {
       }
     }
     return $output;
-  }
-
-  /**
-   * @return string
-   */
-  private function getTaskStoryPoints($task,$points_data) {
-    $storypoints = array();
-    foreach ($points_data as $k=>$subarray) {
-      if (isset ($subarray['objectPHID']) && $subarray['objectPHID'] == $task) {
-        $points_data[$k] = $subarray;
-        $storypoints = $subarray['newValue'];
-      }
-    }
-    return $storypoints;
   }
 
   private function setTaskStatus($task) {
