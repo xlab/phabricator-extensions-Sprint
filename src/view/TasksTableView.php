@@ -124,14 +124,16 @@ final class TasksTableView {
     $output = array();
     $rows = array();
     foreach ($tasks as $task) {
-      // If parents is set, it means this task has a parent in this sprint so
-      // skip it, the parent will handle adding this task to the output
-      if (isset($map[$task->getPHID()]['parents'])) {
-        continue;
+      if (isset($map[$task->getPHID()]['independent'])) {
+        $blocked = false;
+      } elseif (isset($map[$task->getPHID()]['parent']))  {
+        $blocked = false;
+      } else {
+        $blocked = true;
       }
 
       $points = $this->getTaskPoints($task, $points_data);
-      $row = $this->addTaskToTree($output, $task, $tasks, $map, $handles, $points);
+      $row = $this->addTaskToTree($output, $blocked, $task, $handles, $points);
       list ($task, $cdate, $date_created, $udate, $last_update, $owner_link, $numpriority, $priority, $points, $status) = $row[0];
       $row['sort'] = $this->setSortOrder($row, $order, $task, $cdate, $udate, $owner_link, $numpriority, $points, $status);
       $rows[] = $row;
@@ -180,7 +182,8 @@ final class TasksTableView {
     return $row['sort'];
   }
 
-  private function buildTaskMap ($edges, $tasks) {
+  private function buildTaskMap ($edges, $tasks)
+  {
     $map = array();
     foreach ($tasks as $task) {
       if ($parents =
@@ -188,18 +191,18 @@ final class TasksTableView {
         foreach ($parents as $parent) {
           // Make sure this task is in this sprint.
           if (isset($tasks[$parent['dst']]))
-            $map[$task->getPHID()]['parents'][] = $parent['dst'];
+            $map[$task->getPHID()]['parent'][] = $parent['dst'];
         }
-      }
-
-      if ($children =
+      } elseif ($children =
           $edges[$task->getPHID()][PhabricatorEdgeConfig::TYPE_TASK_DEPENDS_ON_TASK]) {
-        foreach ($children as $child) {
+          foreach ($children as $child) {
           // Make sure this task is in this sprint.
-          if (isset($tasks[$child['dst']])) {
-            $map[$task->getPHID()]['children'][] = $child['dst'];
+            if (isset($tasks[$child['dst']])) {
+              $map[$task->getPHID()]['child'][] = $child['dst'];
+            }
           }
-        }
+      } else {
+          $map[$task->getPHID()]['independent'][] = $task->getPHID();
       }
     }
     return $map;
@@ -244,12 +247,7 @@ final class TasksTableView {
     return $task->getPriority();
   }
 
-  private function addTaskToTree($output, $task, $tasks, $map, $handles, $points,  $depth = 0) {
-    static $included = array();
-
-    // If this task is already in this tree, this is a repeat.
-    $repeat = isset($included[$task->getPHID()]);
-
+  private function addTaskToTree($output, $blocked, $task, $handles, $points) {
 
     $cdate = $this->getTaskCreatedDate($task);
     $date_created = phabricator_datetime($cdate, $this->viewer);
@@ -257,18 +255,13 @@ final class TasksTableView {
     $last_updated = phabricator_datetime($udate, $this->viewer);
 
     $status = $this->setTaskStatus($task);
-    $depth_indent = '';
-    for ($i = 0; $i < $depth; $i++) {
-      $depth_indent .= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-    }
 
     $owner_link = $this->setOwnerLink($handles, $task);
     $priority = $this->getPriority($task);
     $priority_name = $this->getPriorityName($task);
 
-    // Build the row
     $output[] = array(
-        phutil_safe_html($depth_indent . phutil_tag(
+        phutil_safe_html(phutil_tag(
                 'a',
                 array(
                     'href' => '/' . $task->getMonogram(),
@@ -277,8 +270,7 @@ final class TasksTableView {
                         : '',
                 ),
                 $task->getMonogram() . ': ' . $task->getTitle()
-            ) . ($repeat ? '&nbsp;&nbsp;<em title="This task is a child of more than one task in this list. Children are only shown on ' .
-                'the first occurance">[Repeat]</em>' : '')),
+            ) . ($blocked ? '&nbsp;&nbsp;<em title="This task is a parent of another task.">[BLOCKED]</em>' : '')),
         $cdate,
         $date_created,
         $udate,
@@ -289,14 +281,7 @@ final class TasksTableView {
         $points,
         $status,
     );
-    $included[$task->getPHID()] = $task->getPHID();
 
-    if (isset($map[$task->getPHID()]['children'])) {
-      foreach ($map[$task->getPHID()]['children'] as $child) {
-        $child = $tasks[$child];
-        $this->addTaskToTree($output, $child, $map, $handles, $points, $depth + 1);
-      }
-    }
     return $output;
   }
 
