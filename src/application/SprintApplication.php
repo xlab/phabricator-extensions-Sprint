@@ -29,6 +29,12 @@ final class SprintApplication extends PhabricatorApplication {
     );
   }
 
+  public function getFactObjectsForAnalysis() {
+    return array(
+        new ManiphestTask(),
+    );
+  }
+
   public function getRoutes() {
       return array(
           '/project/' => array(
@@ -78,7 +84,6 @@ final class SprintApplication extends PhabricatorApplication {
           ),
           '/tag/' => array(
               '(?P<slug>[^/]+)/' => 'SprintProjectProfileController',
-              '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',
           ),
       );
     }
