@@ -31,7 +31,7 @@ final class SprintApplication extends PhabricatorApplication {
 
   public function getFactObjectsForAnalysis() {
     return array(
-        new ManiphestTask(),
+        new ManiphestTransaction(),
     );
   }
 
