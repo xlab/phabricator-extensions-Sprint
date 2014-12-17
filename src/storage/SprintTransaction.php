@@ -15,7 +15,6 @@ final class SprintTransaction  {
   public function buildDailyData($events, $before, $start, $end, $dates, $xactions, $project) {
 
     $query = id(new SprintQuery());
-    $points_data = $query->getPointsTransactions();
 
     foreach ($events as $event) {
       $date = null;
@@ -26,7 +25,7 @@ final class SprintTransaction  {
       $project_phids = $xaction->getObject()->getProjectPHIDs();
 
       if (in_array($project_phid, $project_phids)) {
-        $points = $query->getStoryPoints($task_phid, $points_data);
+        $points = $query->getStoryPointsForTask($task_phid);
         $old_point_value = $xaction->getOldValue();
         $new_point_value = $xaction->getNewValue();
         $date = phabricator_format_local_time($xaction_date, $this->viewer, 'D M j');

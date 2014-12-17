@@ -111,8 +111,7 @@ final class TasksTableView {
     $edges = $query->getEdges($tasks);
     $map = $this->buildTaskMap($edges, $tasks);
 
-    $points_data = $query->getPointsTransactions();
-    // We also collect the phids we need to fetch owner information
+        // We also collect the phids we need to fetch owner information
     $handle_phids = array();
     foreach ($tasks as $task) {
       // Get the owner (assigned to) phid
@@ -132,7 +131,7 @@ final class TasksTableView {
         $blocked = true;
       }
 
-      $points = $this->getTaskPoints($task, $points_data);
+      $points = $this->getTaskPoints($task);
       $row = $this->addTaskToTree($output, $blocked, $task, $handles, $points);
       list ($task, $cdate, $date_created, $udate, $last_update, $owner_link, $numpriority, $priority, $points, $status) = $row[0];
       $row['sort'] = $this->setSortOrder($row, $order, $task, $cdate, $udate, $owner_link, $numpriority, $points, $status);
@@ -220,11 +219,11 @@ final class TasksTableView {
     return $owner_link;
   }
 
-  private function getTaskPoints($task, $points_data) {
+  private function getTaskPoints($task) {
     $query = id(new SprintQuery())
         ->setProject($this->project)
         ->setViewer($this->viewer);
-    $points = $query->getPointsfromArray($task->getPHID(),$points_data);
+    $points = $query->getStoryPointsForTask($task->getPHID());
     return $points;
   }
 
@@ -290,10 +289,10 @@ final class TasksTableView {
     return $status;
   }
 
-  private function sumPointsbyStatus ($task, $points_data) {
+  private function sumPointsbyStatus ($task) {
     $stats = id(new SprintBuildStats());
     $status = $this->setTaskStatus($task);
-    $points = $this->getTaskPoints($task, $points_data);
+    $points = $this->getTaskPoints($task);
     if ($status == 'open') {
       $this->task_open_status_sum = $stats->setTaskOpenStatusSum($this->task_open_status_sum, $points);
     } elseif ($status == 'resolved') {
@@ -307,10 +306,9 @@ final class TasksTableView {
         ->setProject($this->project)
         ->setViewer($this->viewer);
     $tasks = $query->getTasks();
-    $points_data = $query->getXactionData(SprintConstants::CUSTOMFIELD_TYPE_STATUS);
     $tasks = mpull($tasks, null, 'getPHID');
     foreach ($tasks as $task) {
-      $this->sumPointsbyStatus($task, $points_data);
+      $this->sumPointsbyStatus($task);
     }
    return;
   }
