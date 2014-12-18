@@ -5,8 +5,10 @@ final class TasksTableView {
   private $project;
   private $viewer;
   private $request;
+  private $tasks;
   private $task_open_status_sum;
   private $task_closed_status_sum;
+  private $query;
 
   public function setProject ($project) {
     $this->project = $project;
@@ -20,6 +22,16 @@ final class TasksTableView {
 
   public function setRequest ($request) {
     $this->request =  $request;
+    return $this;
+  }
+
+  public function setTasks ($tasks) {
+    $this->tasks =  $tasks;
+    return $this;
+  }
+
+  public function setQuery ($query) {
+    $this->query =  $query;
     return $this;
   }
 
@@ -103,26 +115,21 @@ final class TasksTableView {
    * @return array
    */
   private function buildTasksTree($order, $reverse) {
-    $query = id(new SprintQuery())
-        ->setProject($this->project)
-        ->setViewer($this->viewer);
-    $tasks = $query->getTasks();
-    $tasks = mpull($tasks, null, 'getPHID');
-    $edges = $query->getEdges($tasks);
-    $map = $this->buildTaskMap($edges, $tasks);
+    $edges = $this->query->getEdges($this->tasks);
+    $map = $this->buildTaskMap($edges, $this->tasks);
 
         // We also collect the phids we need to fetch owner information
     $handle_phids = array();
-    foreach ($tasks as $task) {
+    foreach ($this->tasks as $task) {
       // Get the owner (assigned to) phid
       $handle_phids[$task->getOwnerPHID()] = $task->getOwnerPHID();
     }
-    $handles = $query->getViewerHandles($this->request, $handle_phids);
+    $handles = $this->query->getViewerHandles($this->request, $handle_phids);
 
     // Now we loop through the tasks, and add them to the output
     $output = array();
     $rows = array();
-    foreach ($tasks as $task) {
+    foreach ($this->tasks as $task) {
       if (isset($map[$task->getPHID()]['independent'])) {
         $blocked = false;
       } elseif (isset($map[$task->getPHID()]['parent']))  {
@@ -302,12 +309,7 @@ final class TasksTableView {
   }
 
   public function setStatusPoints () {
-    $query = id(new SprintQuery())
-        ->setProject($this->project)
-        ->setViewer($this->viewer);
-    $tasks = $query->getTasks();
-    $tasks = mpull($tasks, null, 'getPHID');
-    foreach ($tasks as $task) {
+    foreach ($this->tasks as $task) {
       $this->sumPointsbyStatus($task);
     }
    return;

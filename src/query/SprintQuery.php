@@ -73,7 +73,6 @@ final class SprintQuery extends SprintDAO {
 
   public function getXactions($tasks) {
     $task_phids = mpull($tasks, 'getPHID');
-
     $xactions = id(new ManiphestTransactionQuery())
         ->setViewer($this->viewer)
         ->withObjectPHIDs($task_phids)
