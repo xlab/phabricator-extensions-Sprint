@@ -65,7 +65,7 @@ final class SprintQuery extends SprintDAO {
         $points = idx($array, 'fieldValue');
       }
     } else {
-      $points = null;
+      $points = 0;
     }
      return $points;
   }
