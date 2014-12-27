@@ -71,7 +71,6 @@ final class SprintQuery extends SprintDAO {
      return $points;
   }
 
-
   public function getXactions($tasks) {
     $task_phids = mpull($tasks, 'getPHID');
     $xactions = id(new ManiphestTransactionQuery())
@@ -103,6 +102,16 @@ final class SprintQuery extends SprintDAO {
     return $conn;
   }
 
+  public function getCustomFieldObj () {
+    $table = new ManiphestCustomFieldStorage();
+    return $table;
+  }
+
+  public function getCustomFieldConn () {
+    $conn = $this->getCustomFieldObj()->establishConnection('r');
+    return $conn;
+  }
+
   public function getJoins() {
 
     $joins = '';
@@ -110,6 +119,22 @@ final class SprintQuery extends SprintDAO {
       $joins = qsprintf(
           $this->getXactionConn(),
           'JOIN %T t ON x.objectPHID = t.phid
+          JOIN %T p ON p.src = t.phid AND p.type = %d AND p.dst = %s',
+          id(new ManiphestTask())->getTableName(),
+          PhabricatorEdgeConfig::TABLE_NAME_EDGE,
+          PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
+          $this->project_phid);
+    }
+    return $joins;
+  }
+
+  public function getCustomFieldJoins() {
+
+    $joins = '';
+    if ($this->project_phid) {
+      $joins = qsprintf(
+          $this->getCustomFieldConn(),
+          'JOIN %T t ON f.objectPHID = t.phid
           JOIN %T p ON p.src = t.phid AND p.type = %d AND p.dst = %s',
           id(new ManiphestTask())->getTableName(),
           PhabricatorEdgeConfig::TABLE_NAME_EDGE,
@@ -130,6 +155,18 @@ final class SprintQuery extends SprintDAO {
         $where);
     return $data;
  }
+
+  public function getTaskData($where) {
+    $task_dao = new ManiphestCustomFieldStorage();
+    $data = queryfx_all(
+        $this->getCustomFieldConn(),
+        'SELECT f.* FROM %T f %Q',
+        $this->getCustomFieldObj()->getTableName(),
+        $this->getCustomFieldJoins());
+
+    $task_data = $task_dao->loadAllFromArray($data);
+    return $task_data;
+  }
 
   public function getEdges ($tasks) {
     // Load all edges of depends and depended on tasks

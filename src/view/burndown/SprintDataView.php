@@ -13,6 +13,7 @@ final class SprintDataView extends SprintView
   private $project;
   private $viewer;
   private $tasks;
+  private $taskpoints;
   private $events;
   private $xactions;
   private $start;
@@ -37,31 +38,39 @@ final class SprintDataView extends SprintView
   public function render() {
     $query = id(new SprintQuery())
         ->setProject($this->project)
-        ->setViewer($this->viewer);
+        ->setViewer($this->viewer)
+        ->setPHID($this->project->getPHID());
+
+    $this->taskpoints = $query->getTaskData(SprintConstants::CUSTOMFIELD_INDEX);
     $tasks = $query->getTasks();
     $this->tasks = mpull($tasks, null, 'getPHID');
 
     $chart = $this->buildC3Chart($query);
+
     $tasks_table_view = id(new TasksTableView())
         ->setProject($this->project)
         ->setViewer($this->viewer)
         ->setRequest($this->request)
         ->setTasks($this->tasks)
+        ->setTaskPoints($this->taskpoints)
         ->setQuery($query);
 
     $tasks_table = $tasks_table_view->buildTasksTable();
-    $pie = $this->buildC3Pie($tasks_table_view);
+    $pie = $this->buildC3Pie();
     $history_table_view = new HistoryTableView();
     $history_table = $history_table_view->buildHistoryTable($this->before);
     $sprint_table_view = new SprintTableView();
-    $sprint_table = $sprint_table_view->buildSprintTable($this->sprint_data, $this->before);
+    $sprint_table = $sprint_table_view->buildSprintTable($this->sprint_data,
+        $this->before);
     $event_table_view = id(new EventTableView())
         ->setProject($this->project)
         ->setViewer($this->viewer)
         ->setRequest($this->request);
-    $event_table = $event_table_view->buildEventTable($this->events, $this->xactions,
+    $event_table = $event_table_view->buildEventTable($this->events,
+        $this->xactions,
         $this->tasks, $this->start, $this->end);
-    return array($chart, $tasks_table, $pie, $history_table, $sprint_table, $event_table);
+    return array($chart, $tasks_table, $pie, $history_table, $sprint_table,
+        $event_table);
   }
 
   private function buildChartDataSet($query) {
@@ -84,9 +93,14 @@ final class SprintDataView extends SprintView
     $this->xactions = mpull($xactions, null, 'getPHID');
 
     $sprint_xaction = id(new SprintTransaction())
-        ->setViewer($this->viewer);
-    $sprint_xaction->buildStatArrays($this->tasks);
-    $dates = $sprint_xaction->buildDailyData($this->events, $this->before, $this->start, $this->end, $dates, $this->xactions, $this->project);
+        ->setViewer($this->viewer)
+        ->setTasks($this->tasks)
+        ->setTaskPoints($this->taskpoints);
+
+    $sprint_xaction->buildStatArrays();
+
+    $dates = $sprint_xaction->buildDailyData($this->events, $this->before,
+        $this->start, $this->end, $dates, $this->xactions, $this->project);
 
     $this->sprint_data = $stats->setSprintData($dates, $this->before);
     $data = $stats->buildDataSet($this->sprint_data);
@@ -143,10 +157,13 @@ final class SprintDataView extends SprintView
     return $chart;
   }
 
-  private function buildC3Pie($tasks_table) {
-    $tasks_table->setStatusPoints();
-    $task_open_status_sum = $tasks_table->getOpenStatusSum();
-    $task_closed_status_sum = $tasks_table->getClosedStatusSum();
+  private function buildC3Pie() {
+    $sprintpoints = id(new SprintPoints())
+        ->setTaskPoints($this->taskpoints)
+        ->setTasks($this->tasks);
+
+    list($task_open_status_sum, $task_closed_status_sum) = $sprintpoints
+        ->getStatusSums();
 
     require_celerity_resource('d3', 'sprint');
     require_celerity_resource('c3-css', 'sprint');

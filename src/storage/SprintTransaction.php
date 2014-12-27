@@ -4,6 +4,7 @@ final class SprintTransaction  {
 
   private $viewer;
   private $task_points = array();
+  private $tasks;
   private $task_statuses = array();
   private $task_in_sprint = array();
 
@@ -12,30 +13,30 @@ final class SprintTransaction  {
     return $this;
   }
 
-  public function buildDailyData($events, $before, $start, $end, $dates, $xactions, $project) {
+  public function setTasks ($tasks) {
+    $this->tasks = $tasks;
+    return $this;
+  }
 
-    $query = id(new SprintQuery());
+  public function setTaskPoints ($taskpoints) {
+    $this->taskpoints = $taskpoints;
+    return $this;
+  }
+
+  public function buildDailyData($events, $before, $start, $end, $dates, $xactions) {
+
+    $sprintpoints = id(new SprintPoints())
+        ->setTaskPoints($this->taskpoints);
 
     foreach ($events as $event) {
       $date = null;
       $xaction = $xactions[$event['transactionPHID']];
       $xaction_date = $xaction->getDateCreated();
       $task_phid = $xaction->getObjectPHID();
-      $project_phid = $project->getPHID();
 
-      $task = id(new ManiphestTaskQuery())
-          ->setViewer($this->viewer)
-          ->withPHIDs(array($task_phid))
-          ->needProjectPHIDs(true)
-          ->executeOne();
-      $project_phids = $task->getProjectPHIDs();
-
-      if (in_array($project_phid, $project_phids)) {
-        $points = $query->getStoryPointsForTask($task_phid);
+      $points = $sprintpoints->getTaskPoints($task_phid);
 
         $date = phabricator_format_local_time($xaction_date, $this->viewer, 'D M j');
-
-
 
         if ($xaction_date < $start) {
 
@@ -102,12 +103,11 @@ final class SprintTransaction  {
           }
         }
       }
-    }
   return $dates;
 }
 
-  public function buildStatArrays($tasks) {
-    foreach ($tasks as $task) {
+  public function buildStatArrays() {
+    foreach ($this->tasks as $task) {
       $this->task_points[$task->getPHID()] = 0;
       $this->task_statuses[$task->getPHID()] = null;
       $this->task_in_sprint[$task->getPHID()] = 0;

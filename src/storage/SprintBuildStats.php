@@ -235,14 +235,4 @@ final class SprintBuildStats {
     }
     return $data;
   }
-
-  public function setTaskOpenStatusSum ($task_open_status_sum, $points) {
-    $task_open_status_sum += $points;
-    return $task_open_status_sum;
-  }
-
-  public function setTaskClosedStatusSum ($task_closed_status_sum, $points) {
-    $task_closed_status_sum += $points;
-    return $task_closed_status_sum;
-  }
 }
