@@ -10,8 +10,8 @@ final class SprintBuildStats {
 
   public function setSprintData($dates, $before) {
     $dates = $this->sumSprintStats($dates, $before);
-    $sprint_data = $this->computeIdealPoints($dates, $before);
-    return $sprint_data;
+    $dates = $this->computeIdealPoints($dates);
+    return $dates;
   }
 
   public function buildDateArray($start, $end, DateTimeZone $timezone) {
@@ -188,7 +188,7 @@ final class SprintBuildStats {
     return $dates;
   }
 
-  public function computeIdealPoints($dates, $before) {
+  public function computeIdealPoints($dates) {
     $total_business_days = 0;
     foreach ($dates as $key => $date) {
       $day_of_week = id(new DateTime($date->getDate()))->format('w');
@@ -220,16 +220,12 @@ final class SprintBuildStats {
         pht('Points Closed Today'),
     ));
 
-    $future = false;
     foreach ($dates as $key => $date) {
-        $now = id(new DateTime('now', $this->timezone));
-        $future = new DateTime($date->getDate(), $this->timezone) > $now;
-
       $data[] = array(
-          $future ? null : $date->getPointsTotal(),
-          $future ? null : $date->getPointsRemaining(),
+          $date->getPointsTotal(),
+          $date->getPointsRemaining(),
           $date->getPointsIdealRemaining(),
-          $future ? null : $date->getPointsClosedToday(),
+          $date->getPointsClosedToday(),
       );
 
     }
