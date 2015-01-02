@@ -15,7 +15,7 @@ final class SprintBuildStats {
   }
 
   public function buildDateArray($start, $end, DateTimeZone $timezone) {
-
+    $dates = array();
     $period = new DatePeriod(
         id(new DateTime("@" . $start, $timezone))->setTime(2, 0),
         new DateInterval('P1D'), // 1 day interval
@@ -122,13 +122,6 @@ final class SprintBuildStats {
   public function calcPointsRemaining($dates, $before) {
     $first = true;
     $previous = new BurndownDataDate($date=null);
-    $points_added_before = null;
-    $points_closed_before = null;
-    $points_reopened_before = null;
-    $points_added_today = null;
-    $points_closed_today = null;
-    $points_reopened_today = null;
-    $points_remaining = null;
     foreach ($dates as $date) {
       $points_added_today = $date->getPointsAddedToday();
       $points_closed_today = $date->getPointsClosedToday();
@@ -159,12 +152,6 @@ final class SprintBuildStats {
   public function calcTasksRemaining($dates, $before) {
     $first = true;
     $previous = new BurndownDataDate($date=null);
-    $tasks_added_before = null;
-    $tasks_closed_before = null;
-    $tasks_reopened_before = null;
-    $tasks_added_today = null;
-    $tasks_closed_today = null;
-    $tasks_reopened_today = null;
     foreach ($dates as $date) {
       $tasks_added_today = $date->getTasksAddedToday();
       $tasks_closed_today = $date->getTasksClosedToday();
