@@ -1,7 +1,7 @@
 <?php
 
 final class SprintBoardMoveController
-  extends SprintController {
+  extends PhabricatorProjectController {
 
   private $id;
 

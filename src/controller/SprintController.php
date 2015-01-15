@@ -112,4 +112,44 @@ abstract class SprintController extends PhabricatorController {
     return $view;
   }
 
+  public function buildIconNavView(PhabricatorProject $project) {
+    $id = $project->getID();
+    $nav = $this->buildSprintIconNavView($project);
+    $nav->selectFilter("board/{$id}/");
+    return $nav;
+  }
+
+  public function buildSprintIconNavView(PhabricatorProject $project) {
+    $user = $this->getRequest()->getUser();
+    $id = $project->getID();
+    $picture = $project->getProfileImageURI();
+    $name = $project->getName();
+
+    $columns = id(new PhabricatorProjectColumnQuery())
+        ->setViewer($user)
+        ->withProjectPHIDs(array($project->getPHID()))
+        ->execute();
+    if ($columns) {
+      $board_icon = 'fa-columns';
+    } else {
+      $board_icon = 'fa-columns grey';
+    }
+
+    $nav = new AphrontSideNavFilterView();
+    $nav->setIconNav(true);
+    $nav->setBaseURI(new PhutilURI($this->getProjectApplicationURI()));
+    $nav->addIcon("profile/{$id}/", $name, null, $picture);
+    $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire');
+    $nav->addIcon("sboard/{$id}/", pht('Sprint Board'), $board_icon);
+    $nav->addIcon("feed/{$id}/", pht('Feed'), 'fa-newspaper-o');
+    $nav->addIcon("members/{$id}/", pht('Members'), 'fa-group');
+    $nav->addIcon("edit/{$id}/", pht('Edit'), 'fa-pencil');
+
+    return $nav;
+  }
+
+  public function getProjectApplicationURI() {
+    return '/project/';
+  }
+
 }

@@ -30,12 +30,14 @@ final class SprintDataViewController extends SprintController {
     $can_create = $this->hasApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY);
     $crumbs = $this->getCrumbs($project, $can_create);
+    $nav = $this->buildIconNavView($project);
+    $nav->appendChild($crumbs);
+    $nav->appendChild($error_box);
+    $nav->appendChild($burndown_view);
 
     return $this->buildApplicationPage(
         array(
-            $crumbs,
-            $error_box,
-            $burndown_view,
+            $nav,
         ),
         array(
             'title' => array(pht('Burndown'), $project->getName()),
@@ -48,6 +50,7 @@ final class SprintDataViewController extends SprintController {
     $project = id(new PhabricatorProjectQuery())
         ->setViewer($viewer)
         ->withIDs(array($pid))
+        ->needImages(true)
         ->executeOne();
    return $project;
   }
