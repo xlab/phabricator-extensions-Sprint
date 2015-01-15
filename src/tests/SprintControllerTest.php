@@ -41,4 +41,31 @@ final class SprintControllerTest extends SprintTestCase {
     $errorbox = $dv->getErrorBox($e);
     $this->assertInstanceOf('AphrontErrorView', $errorbox);
   }
+
+  public function testprocessRequestFail() {
+    $dvcontroller = new SprintDataViewController();
+    $sprint = new SprintApplication();
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/sprint/view/18');
+    $data['id'] =  3;
+    $request->setRequestdata($data);
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $dvcontroller->willProcessRequest($data);
+    $dvcontroller->setRequest($request);
+    $response = $dvcontroller->processRequest();
+    $this->assertInstanceOf('Aphront404Response', $response);
+  }
+
+  public function testprocessRequestListController() {
+    $lcontroller = new SprintListController();
+    $sprint = new SprintApplication();
+    $lcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/sprint/view/18');
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $lcontroller->setRequest($request);
+    $response = $lcontroller->processRequest();
+    $this->assertInstanceOf('AphrontWebpageResponse', $response);
+  }
 }
