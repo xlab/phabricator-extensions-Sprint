@@ -128,19 +128,28 @@ final class TasksTableView {
     $output = array();
     $rows = array();
     foreach ($this->tasks as $task) {
-      if (isset($map[$task->getPHID()]['independent'])) {
-        $blocked = false;
-      } elseif (isset($map[$task->getPHID()]['parent']))  {
-        $blocked = false;
-      } else {
+      if (isset($map[$task->getPHID()]['child'])) {
         $blocked = true;
+      } else {
+        $blocked = false;
+      }
+
+      $parentphid = null;
+      if (isset($map[$task->getPHID()]['parent'])) {
+        $blocker = true;
+        $parentphid = $map[$task->getPHID()]['parent'];
+      } else {
+        $blocker = false;
       }
 
       $points = $sprintpoints->getTaskPoints($task->getPHID());
 
-      $row = $this->addTaskToTree($output, $blocked, $task, $handles, $points);
-      list ($task, $cdate,, $udate,, $owner_link, $numpriority,, $points, $status) = $row[0];
-      $row['sort'] = $this->setSortOrder($row, $order, $task, $cdate, $udate, $owner_link, $numpriority, $points, $status);
+      $row = $this->addTaskToTree($output, $blocked, $parentphid, $blocker,
+          $task, $handles, $points);
+      list ($task, $cdate, , $udate, , $owner_link, $numpriority, , $points,
+          $status) = $row[0];
+      $row['sort'] = $this->setSortOrder($row, $order, $task, $cdate, $udate,
+          $owner_link, $numpriority, $points, $status);
       $rows[] = $row;
     }
     $rows = isort($rows, 'sort');
@@ -156,8 +165,8 @@ final class TasksTableView {
     return $rows;
   }
 
-  private function setSortOrder ($row, $order, $task, $cdate, $udate, $owner_link, $numpriority,
-                                 $points, $status) {
+  private function setSortOrder ($row, $order, $task, $cdate, $udate,
+                                 $owner_link, $numpriority, $points, $status) {
     switch ($order) {
       case 'Task':
         $row['sort'] = $task;
@@ -194,20 +203,16 @@ final class TasksTableView {
       if ($parents =
           $edges[$task->getPHID()][ ManiphestTaskDependedOnByTaskEdgeType::EDGECONST]) {
         foreach ($parents as $parent) {
-          // Make sure this task is in this sprint.
-          if (isset($tasks[$parent['dst']]))
+            if (isset($tasks[$parent['dst']]))
             $map[$task->getPHID()]['parent'][] = $parent['dst'];
         }
       } elseif ($children =
           $edges[$task->getPHID()][ManiphestTaskDependsOnTaskEdgeType::EDGECONST]) {
           foreach ($children as $child) {
-          // Make sure this task is in this sprint.
             if (isset($tasks[$child['dst']])) {
               $map[$task->getPHID()]['child'][] = $child['dst'];
             }
           }
-      } else {
-          $map[$task->getPHID()]['independent'][] = $task->getPHID();
       }
     }
     return $map;
@@ -244,7 +249,8 @@ final class TasksTableView {
     return $task->getPriority();
   }
 
-  private function addTaskToTree($output, $blocked, $task, $handles, $points) {
+  private function addTaskToTree($output, $blocked, $parentphid, $blocker,
+                                 $task, $handles, $points) {
 
     $cdate = $this->getTaskCreatedDate($task);
     $date_created = phabricator_datetime($cdate, $this->viewer);
@@ -257,6 +263,18 @@ final class TasksTableView {
     $priority = $this->getPriority($task);
     $priority_name = $this->getPriorityName($task);
 
+    if ($blocker === true) {
+      $blockericon = $this->getIconforBlocker($parentphid);
+    } else {
+      $blockericon = '';
+    }
+
+    if ($blocked === true) {
+      $blockedicon = $this->getIconforBlocked();
+    } else {
+      $blockedicon = '';
+    }
+
     $output[] = array(
         phutil_safe_html(phutil_tag(
                 'a',
@@ -266,8 +284,7 @@ final class TasksTableView {
                         ? 'phui-tag-core-closed'
                         : '',
                 ),
-                $task->getMonogram() . ': ' . $task->getTitle()
-            ) . ($blocked ? '&nbsp;&nbsp;<em title="This task is a parent of another task.">[BLOCKED]</em>' : '')),
+                array ($this->buildTaskLink($task), $blockericon, $blockedicon))),
         $cdate,
         $date_created,
         $udate,
@@ -282,4 +299,47 @@ final class TasksTableView {
     return $output;
   }
 
+  private function getIconforBlocker($parentphid) {
+      $ptask = $this->getTaskforPHID(array_shift($parentphid));
+      $task = array_shift($ptask);
+      $linktask = $this->buildTaskLink($task);
+      $sigil = 'has-tooltip';
+      $meta  = array(
+        'tip' => pht('Blocks: '.$linktask),
+        'size' => 500,
+        'align' => 'E',);
+      $image = id(new PHUIIconView())
+          ->addSigil($sigil)
+          ->setMetadata($meta)
+          ->setSpriteSheet(PHUIIconView::SPRITE_PROJECTS)
+          ->setIconFont('fa-wrench', 'green')
+          ->setText('Blocker');
+      return $image;
+  }
+
+  private function getIconforBlocked() {
+      $image = id(new PHUIIconView())
+          ->setSpriteSheet(PHUIIconView::SPRITE_PROJECTS)
+          ->setIconFont('fa-lock', 'red')
+          ->setText('Blocked');
+     return $image;
+  }
+
+  private function buildTaskLink($task) {
+    $linktext = $task->getMonogram().': '.$task->getTitle().'  ';
+    return $linktext;
+  }
+
+  private function buildTaskMonogram($task) {
+    $monogram = '/'.$task->getMonogram().'/';
+    return $monogram;
+  }
+
+  private function getTaskforPHID($parentphid) {
+    $task = id(new ManiphestTaskQuery())
+        ->setViewer($this->viewer)
+        ->withPHIDs(array($parentphid))
+        ->execute();
+    return $task;
+  }
 }
