@@ -117,11 +117,10 @@ final class TasksTableView {
     $sprintpoints = id(new SprintPoints())
         ->setTaskPoints($this->taskpoints);
 
-        // We also collect the phids we need to fetch owner information
+    // We also collect the phids we need to fetch owner information
     $handle_phids = array();
     foreach ($this->tasks as $task) {
-      // Get the owner (assigned to) phid
-      $handle_phids[$task->getOwnerPHID()] = $task->getOwnerPHID();
+       $handle_phids[$task->getOwnerPHID()] = $task->getOwnerPHID();
     }
     $handles = $this->query->getViewerHandles($this->request, $handle_phids);
 
@@ -134,17 +133,21 @@ final class TasksTableView {
         $blocked = false;
       }
 
+      $ptasks = array();
       $parentphid = null;
       if (isset($map[$task->getPHID()]['parent'])) {
         $blocker = true;
-        $parentphid = $map[$task->getPHID()]['parent'];
+        foreach (($map[$task->getPHID()]['parent']) as $parentphid) {
+          $ptask = $this->getTaskforPHID($parentphid);
+          $ptasks = array_merge($ptasks, $ptask);
+        }
       } else {
         $blocker = false;
       }
 
       $points = $sprintpoints->getTaskPoints($task->getPHID());
 
-      $row = $this->addTaskToTree($output, $blocked, $parentphid, $blocker,
+      $row = $this->addTaskToTree($output, $blocked, $ptasks, $blocker,
           $task, $handles, $points);
       list ($task, $cdate, , $udate, , $owner_link, $numpriority, , $points,
           $status) = $row[0];
@@ -249,7 +252,7 @@ final class TasksTableView {
     return $task->getPriority();
   }
 
-  private function addTaskToTree($output, $blocked, $parentphid, $blocker,
+  private function addTaskToTree($output, $blocked, $ptasks, $blocker,
                                  $task, $handles, $points) {
 
     $cdate = $this->getTaskCreatedDate($task);
@@ -264,7 +267,7 @@ final class TasksTableView {
     $priority_name = $this->getPriorityName($task);
 
     if ($blocker === true) {
-      $blockericon = $this->getIconforBlocker($parentphid);
+      $blockericon = $this->getIconforBlocker($ptasks);
     } else {
       $blockericon = '';
     }
@@ -299,13 +302,16 @@ final class TasksTableView {
     return $output;
   }
 
-  private function getIconforBlocker($parentphid) {
-      $ptask = $this->getTaskforPHID(array_shift($parentphid));
-      $task = array_shift($ptask);
-      $linktask = $this->buildTaskLink($task);
+  private function getIconforBlocker($ptasks) {
+      $linktasks = array();
+      foreach ($ptasks as $task) {
+        $linktasks[] = $this->buildTaskLink($task);
+        $links = implode('|  ', $linktasks);
+      }
+
       $sigil = 'has-tooltip';
       $meta  = array(
-        'tip' => pht('Blocks: '.$linktask),
+        'tip' => pht('Blocks: '.$links),
         'size' => 500,
         'align' => 'E',);
       $image = id(new PHUIIconView())
