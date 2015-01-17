@@ -1,7 +1,7 @@
 <?php
 
-final class PhabricatorProjectProfileController
-  extends PhabricatorProjectController {
+final class SprintProjectProfileController
+  extends SprintController {
 
   public function shouldAllowPublic() {
     return true;

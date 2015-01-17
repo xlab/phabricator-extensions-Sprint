@@ -57,7 +57,7 @@ final class SprintApplication extends PhabricatorApplication {
               'picture/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectEditPictureController',
               'profile/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectProfileController',
+              => 'SprintProjectProfileController',
               'icon/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectEditIconController',
               'board/task/edit/(?P<id>[1-9]\d*)/'
@@ -84,6 +84,7 @@ final class SprintApplication extends PhabricatorApplication {
           '/tag/' => array(
               '(?P<slug>[^/]+)/sboard/' => 'SprintBoardViewController',
           ),
+
           '/project/' => array(
               'sboard/(?P<id>[1-9]\d*)/'.
               '(?P<filter>filter/)?'.
