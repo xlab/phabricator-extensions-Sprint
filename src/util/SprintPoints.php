@@ -23,9 +23,7 @@ private $tasks;
     if (!empty($taskpoints)) {
       foreach ($taskpoints as $key=>$value) {
         if ($key == $task_phid) {
-          if ($value->getfieldIndex() == SprintConstants::CUSTOMFIELD_INDEX) {
             $points = $value->getfieldValue();
-          }
         }
       }
       if (!isset($points)) {

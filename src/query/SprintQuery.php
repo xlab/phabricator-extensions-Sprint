@@ -167,9 +167,11 @@ final class SprintQuery extends SprintDAO {
     $task_dao = new ManiphestCustomFieldStorage();
     $data = queryfx_all(
         $this->getCustomFieldConn(),
-        'SELECT f.* FROM %T f %Q',
+        'SELECT f.* FROM %T f %Q
+        WHERE fieldIndex = %s',
         $this->getCustomFieldObj()->getTableName(),
-        $this->getCustomFieldJoins());
+        $this->getCustomFieldJoins(),
+        SprintConstants::CUSTOMFIELD_INDEX);
 
     $task_data = $task_dao->loadAllFromArray($data);
     return $task_data;
