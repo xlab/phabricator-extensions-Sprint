@@ -83,4 +83,3 @@ private $tasks;
     return $this->task_closed_status_sum;
   }
 }
-

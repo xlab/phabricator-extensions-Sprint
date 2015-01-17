@@ -28,7 +28,7 @@ final class SprintListController extends SprintController {
     $can_create = $this->hasApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY);
     $crumbs = $this->buildSprintApplicationCrumbs($can_create);
-    $crumbs->addTextCrumb(pht('Burndown List'));
+    $crumbs->addTextCrumb(pht('Sprint Burndown List'));
 
 
     $help = id(new PHUIBoxView())

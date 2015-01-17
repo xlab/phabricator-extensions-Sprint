@@ -28,7 +28,7 @@ abstract class SprintController extends PhabricatorController {
 
   public function buildNavMenu() {
     $nav = id(new AphrontSideNavFilterView())
-        ->setBaseURI(new PhutilURI('/sprint/report/'))
+        ->setBaseURI(new PhutilURI($this->getApplicationURI().'report/'))
         ->addLabel(pht('Sprint Projects'))
         ->addFilter('list', pht('List'))
         ->addLabel(pht('Open Tasks'))
@@ -83,7 +83,7 @@ abstract class SprintController extends PhabricatorController {
     return $crumbs;
   }
   protected function buildSprintApplicationCrumbs($can_create) {
-    $crumbs = $this->buildCrumbs('slowvote', '/sprint/');
+    $crumbs = $this->buildCrumbs('slowvote', $this->getApplicationURI());
 
     $crumbs->addAction(
         id(new PHUIListItemView())
@@ -137,7 +137,7 @@ abstract class SprintController extends PhabricatorController {
 
     $nav = new AphrontSideNavFilterView();
     $nav->setIconNav(true);
-    $nav->setBaseURI(new PhutilURI($this->getProjectApplicationURI()));
+    $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
     $nav->addIcon("profile/{$id}/", $name, null, $picture);
     $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire');
     $nav->addIcon("sboard/{$id}/", pht('Sprint Board'), $board_icon);
@@ -147,9 +147,4 @@ abstract class SprintController extends PhabricatorController {
 
     return $nav;
   }
-
-  public function getProjectApplicationURI() {
-    return '/project/';
-  }
-
 }
