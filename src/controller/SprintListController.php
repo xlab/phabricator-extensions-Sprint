@@ -57,7 +57,7 @@ final class SprintListController extends SprintController {
 
   // Load all projects with "§" in the name.
   private function loadAllProjects($viewer) {
-    $projects = id(new PhabricatorProjectQuery())
+    $projects = id(new SprintProjectQuery())
       ->setViewer($viewer)
       ->withDatasourceQuery(SprintConstants::MAGIC_WORD)
       ->execute();
