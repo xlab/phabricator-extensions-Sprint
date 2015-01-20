@@ -269,6 +269,7 @@ final class SprintBoardViewController
         }
         $can_edit = idx($task_can_edit_map, $task->getPHID(), false);
         $cards->addItem(id(new SprintBoardTaskCard())
+          ->setProject($project)
           ->setViewer($viewer)
           ->setTask($task)
           ->setOwner($owner)

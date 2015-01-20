@@ -137,14 +137,27 @@ abstract class SprintController extends PhabricatorController {
 
     $nav = new AphrontSideNavFilterView();
     $nav->setIconNav(true);
-    $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
-    $nav->addIcon("profile/{$id}/", $name, null, $picture);
-    $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire');
-    $nav->addIcon("sboard/{$id}/", pht('Sprint Board'), $board_icon);
+    if ($this->isSprint($project) !== false) {
+      $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
+      $nav->addIcon("profile/{$id}/", $name, null, $picture);
+      $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire');
+      $nav->addIcon("sboard/{$id}/", pht('Sprint Board'), $board_icon);
+    } else {
+      $nav->setBaseURI(new PhutilURI($this->getProjectsURI()));
+      $nav->addIcon("profile/{$id}/", $name, null, $picture);
+      $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
+    }
     $nav->addIcon("feed/{$id}/", pht('Feed'), 'fa-newspaper-o');
     $nav->addIcon("members/{$id}/", pht('Members'), 'fa-group');
     $nav->addIcon("edit/{$id}/", pht('Edit'), 'fa-pencil');
 
     return $nav;
+  }
+
+  protected function isSprint($object) {
+    $validator = new SprintValidator();
+    $issprint = call_user_func(array($validator, 'checkForSprint'),
+        array($validator, 'isSprint'), $object->getPHID());
+    return $issprint;
   }
 }
