@@ -9,6 +9,7 @@ final class TasksTableView {
   private $taskpoints;
   private $query;
 
+
   public function setProject ($project) {
     $this->project = $project;
     return $this;
@@ -164,7 +165,9 @@ final class TasksTableView {
     if ($reverse) {
       $rows = array_reverse($rows);
     }
-    $rows = array_map( function( $a ) { return $a['0']; }, $rows );
+
+    $a = array();
+    $rows = array_map(function($a) { return $a['0']; }, $rows);
     return $rows;
   }
 
@@ -287,7 +290,8 @@ final class TasksTableView {
                         ? 'phui-tag-core-closed'
                         : '',
                 ),
-                array ($this->buildTaskLink($task), $blockericon, $blockedicon))),
+                array ($this->buildTaskLink($task), $blockericon,
+                    $blockedicon,))),
         $cdate,
         $date_created,
         $udate,

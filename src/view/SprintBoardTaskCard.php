@@ -134,7 +134,8 @@ final class SprintBoardTaskCard {
                 ->setName(pht('Edit'))
                 ->setIcon('fa-pencil')
                 ->addSigil('edit-project-card')
-                ->setHref('/project/sprint/board/task/edit/'.$task->getID().'/'))
+                ->setHref('/project/sprint/board/task/edit/'.$task->getID()
+                    .'/'))
       ->setBarColor($bar_color);
 
      $card->addAttribute($this->getPointList());

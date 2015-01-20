@@ -49,6 +49,7 @@ final class SprintControllerTest extends SprintTestCase {
     $sprint = new SprintApplication();
     $dvcontroller->setCurrentApplication($sprint);
     $request = new AphrontRequest('phab.wmde.de', '/project/sprint/view/18');
+    $data = array();
     $data['id'] =  3;
     $request->setRequestdata($data);
     $viewer = $this->generateNewTestUser();

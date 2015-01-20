@@ -9,8 +9,8 @@ final class SprintApplicationTest extends SprintTestCase {
 
   public function testBaseURI () {
     $burndown_application = new SprintApplication;
-    $baseURI = $burndown_application->getBaseURI();
-    $this->assertEquals('/project/sprint/', $baseURI);
+    $baseuri = $burndown_application->getBaseURI();
+    $this->assertEquals('/project/sprint/', $baseuri);
   }
 
   public function testgetIconName() {

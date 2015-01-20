@@ -15,17 +15,24 @@ final class SprintUIEventListener
     }
   }
 
-  private function filterSprints ($phandles, $value){
+  private function filterSprints ($phandles) {
     $handles = array();
-    if(is_array($phandles) && count($phandles)>0)
-    {
+    if (is_array($phandles) && count($phandles) > 0) {
       foreach($phandles as $handle) {
-        if (stripos($handle->getName(), $value) !== false) {
+        $phid = $handle->getPHID();
+        if ($this->isSprint($phid) == true) {
             $handles[$handle->getPHID()] = $phandles[$handle->getPHID()];
         }
       }
     }
     return $handles;
+  }
+
+  protected function isSprint($phid) {
+    $validator = new SprintValidator();
+    $issprint = call_user_func(array($validator, 'checkForSprint'),
+        array($validator, 'isSprint'), $phid);
+    return $issprint;
   }
 
   private function handlePropertyEvent($event)
@@ -53,7 +60,7 @@ final class SprintUIEventListener
           ->setViewer($user)
           ->withPHIDs($project_phids)
           ->execute();
-      $handles = $this->filterSprints($phandles, SprintConstants::MAGIC_WORD);
+      $handles = $this->filterSprints($phandles);
     }
 
     // If this object can appear on boards, build the workboard annotations.
