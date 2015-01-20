@@ -8,5 +8,4 @@ final class SprintConstants {
   const ROOT_DIR = '/srv/phab';
   const POINTFIELD_INDEX = 'yERhvoZPNPtM';
   const SPRINTFIELD_INDEX = 'scsOmkpB9Tqi';
-} 
-
+}
