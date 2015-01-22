@@ -39,6 +39,7 @@ final class SprintApplication extends PhabricatorApplication {
 
     return array(
           '/project/sprint/' => array(
+              '' => 'SprintListController',
               'archive/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectArchiveController',
               'board/(?P<projectID>[1-9]\d*)/' => array(
@@ -80,6 +81,8 @@ final class SprintApplication extends PhabricatorApplication {
               'report/' => 'SprintListController',
               'report/list/' => 'SprintListController',
               'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
+              'update/(?P<id>[1-9]\d*)/(?P<action>[^/]+)/'
+              => 'PhabricatorProjectUpdateController',
               'view/(?P<id>\d+)/' => 'SprintDataViewController',
           ),
           '/tag/' => array(

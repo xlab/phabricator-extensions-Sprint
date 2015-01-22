@@ -141,7 +141,7 @@ abstract class SprintController extends PhabricatorController {
       $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
       $nav->addIcon("profile/{$id}/", $name, null, $picture);
       $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire');
-      $nav->addIcon("sboard/{$id}/", pht('Sprint Board'), $board_icon);
+      $nav->addIcon("board/{$id}/", pht('Sprint Board'), $board_icon);
     } else {
       $nav->setBaseURI(new PhutilURI($this->getProjectsURI()));
       $nav->addIcon("profile/{$id}/", $name, null, $picture);
