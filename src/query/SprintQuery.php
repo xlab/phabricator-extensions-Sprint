@@ -6,7 +6,6 @@ final class SprintQuery extends SprintDAO {
   private $project;
   private $project_phid;
 
-
   public function setProject ($project) {
     $this->project = $project;
     return $this;
