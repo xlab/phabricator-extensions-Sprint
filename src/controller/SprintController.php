@@ -120,13 +120,13 @@ abstract class SprintController extends PhabricatorController {
   }
 
   public function buildSprintIconNavView(PhabricatorProject $project) {
-    $user = $this->getRequest()->getUser();
+    $viewer = $this->getViewer();
     $id = $project->getID();
     $picture = $project->getProfileImageURI();
     $name = $project->getName();
 
     $columns = id(new PhabricatorProjectColumnQuery())
-        ->setViewer($user)
+        ->setViewer($viewer)
         ->withProjectPHIDs(array($project->getPHID()))
         ->execute();
     if ($columns) {
@@ -147,6 +147,16 @@ abstract class SprintController extends PhabricatorController {
       $nav->addIcon("profile/{$id}/", $name, null, $picture);
       $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
     }
+    $class = 'PhabricatorManiphestApplication';
+    if (PhabricatorApplication::isClassInstalledForViewer($class, $viewer)) {
+      $phid = $project->getPHID();
+      $query_uri = urisprintf(
+          '/maniphest/?statuses=%s&allProjects=%s#R',
+          implode(',', ManiphestTaskStatus::getOpenStatusConstants()),
+          $phid);
+      $nav->addIcon(null, pht('Open Tasks'), 'fa-anchor', null, $query_uri);
+    }
+
     $nav->addIcon("feed/{$id}/", pht('Feed'), 'fa-newspaper-o');
     $nav->addIcon("members/{$id}/", pht('Members'), 'fa-group');
     $nav->addIcon("edit/{$id}/", pht('Edit'), 'fa-pencil');
