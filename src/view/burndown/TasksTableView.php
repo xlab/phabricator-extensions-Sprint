@@ -262,20 +262,19 @@ final class TasksTableView {
     $date_created = phabricator_datetime($cdate, $this->viewer);
     $udate = $this->getTaskModifiedDate($task);
     $last_updated = phabricator_datetime($udate, $this->viewer);
-    $sprintpoints = id(new SprintPoints());
-    $status = $sprintpoints->getTaskStatus($task);
+    $status = $task->getStatus();
 
     $owner_link = $this->setOwnerLink($handles, $task);
     $priority = $this->getPriority($task);
     $priority_name = $this->getPriorityName($task);
 
-    if ($blocker === true) {
+    if ($blocker === true && $task->getStatus() == 'open') {
       $blockericon = $this->getIconforBlocker($ptasks);
     } else {
       $blockericon = '';
     }
 
-    if ($blocked === true) {
+    if ($blocked === true && $task->getStatus() == 'open') {
       $blockedicon = $this->getIconforBlocked();
     } else {
       $blockedicon = '';
