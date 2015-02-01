@@ -83,7 +83,7 @@ abstract class SprintController extends PhabricatorController {
     return $crumbs;
   }
   protected function buildSprintApplicationCrumbs($can_create) {
-    $crumbs = $this->buildCrumbs('slowvote', $this->getApplicationURI());
+    $crumbs = $this->buildCrumbs('fa-bar-chart', $this->getApplicationURI());
 
     $crumbs->addAction(
         id(new PHUIListItemView())
@@ -98,13 +98,13 @@ abstract class SprintController extends PhabricatorController {
     $crumbs = array();
 
 
-      $crumbs[] = id(new PhabricatorCrumbView())
+      $crumbs[] = id(new PHUICrumbView())
           ->setHref($uri)
           ->setAural($sprite)
           ->setIcon($sprite);
 
 
-    $view = new PhabricatorCrumbsView();
+    $view = new PHUICrumbsView();
     foreach ($crumbs as $crumb) {
       $view->addCrumb($crumb);
     }
@@ -115,7 +115,7 @@ abstract class SprintController extends PhabricatorController {
   public function buildIconNavView(PhabricatorProject $project) {
     $id = $project->getID();
     $nav = $this->buildSprintIconNavView($project);
-    $nav->selectFilter("board/{$id}/");
+    $nav->selectFilter(null);
     return $nav;
   }
 

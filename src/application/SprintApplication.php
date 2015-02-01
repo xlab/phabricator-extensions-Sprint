@@ -16,7 +16,7 @@ final class SprintApplication extends PhabricatorApplication {
   }
 
   public function getIconName() {
-    return 'slowvote';
+    return 'fa-puzzle-piece';
   }
 
   public function getShortDescription() {
