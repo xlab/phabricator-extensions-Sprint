@@ -78,7 +78,7 @@ abstract class SprintController extends PhabricatorController {
             ->setHref($this->getProjectsURI().'create/')
             ->setIcon('fa-plus-square')
             ->setDisabled(!$can_create)
-            ->setAppIcon('projects'));
+            ->setIcon('projects'));
 
     return $crumbs;
   }
