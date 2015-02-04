@@ -38,10 +38,10 @@ final class SprintApplication extends PhabricatorApplication {
   public function getRoutes() {
 
     return array(
+            // this is the default application route controller
           '/project/sprint/' => array(
               '' => 'SprintListController',
-              'archive/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectArchiveController',
+            // these are forked controllers for the Sprint Board
               'board/(?P<projectID>[1-9]\d*)/' => array(
                   'edit/(?:(?P<id>\d+)/)?'
                   => 'SprintBoardColumnEditController',
@@ -54,15 +54,26 @@ final class SprintApplication extends PhabricatorApplication {
                   'reorder/'
                   => 'SprintBoardReorderController',
               ),
+            // these allow task creation and editing from a Sprint Board
               'board/task/edit/(?P<id>[1-9]\d*)/'
               => 'SprintBoardTaskEditController',
               'board/task/create/'
               => 'SprintBoardTaskEditController',
+            // these are for board filters and column queries
               'board/(?P<id>[1-9]\d*)/'.
               '(?P<filter>filter/)?'.
               '(?:query/(?P<queryKey>[^/]+)/)?'
               => 'SprintBoardViewController',
+            // these are native Sprint application controllers
               'burn/(?P<id>\d+)/' => 'SprintDataViewController',
+              'profile/(?P<id>[1-9]\d*)/'
+              => 'SprintProjectProfileController',
+              'report/list/' => 'SprintListController',
+              'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
+              'view/(?P<id>\d+)/' => 'SprintDataViewController',
+              // all routes following point to default controllers
+              'archive/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectArchiveController',
               'details/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectEditDetailsController',
               'feed/(?P<id>[1-9]\d*)/'
@@ -76,15 +87,10 @@ final class SprintApplication extends PhabricatorApplication {
               'move/(?P<id>[1-9]\d*)/' => 'SprintBoardMoveController',
               'picture/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectEditPictureController',
-              'profile/(?P<id>[1-9]\d*)/'
-              => 'SprintProjectProfileController',
-              'report/' => 'SprintListController',
-              'report/list/' => 'SprintListController',
-              'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
               'update/(?P<id>[1-9]\d*)/(?P<action>[^/]+)/'
               => 'PhabricatorProjectUpdateController',
-              'view/(?P<id>\d+)/' => 'SprintDataViewController',
           ),
+          // primary tag route override
           '/tag/' => array(
               '(?P<slug>[^/]+)/' => 'SprintBoardViewController',
               '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',

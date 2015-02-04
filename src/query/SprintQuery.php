@@ -112,13 +112,16 @@ final class SprintQuery extends SprintDAO {
     return $xactions;
   }
 
-  public function checkNull($start, $end, $tasks) {
+  public function checkNull($start, $end, $project, $tasks) {
     if (!$start OR !$end) {
-      throw new BurndownException("This project is not set up for Sprints.  "
-          .'Check that it has a start date and end date.');
+      $projhelp = 'To do this go to the Project Edit Details Page';
+      throw new BurndownException("The project \"".$project->getName()
+          ."\" is not set up for Sprints because "
+          ."it has not been assigned a start date and end date. \n", $projhelp);
     }
     if (!$tasks) {
-      throw new BurndownException("This project has no tasks.");
+      $taskhelp = 'To add a task go to the Maniphest Query Page';
+      throw new BurndownException('This project has no tasks.', $taskhelp);
     }
   }
 

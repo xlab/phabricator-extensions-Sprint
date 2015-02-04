@@ -88,7 +88,7 @@ final class SprintDataView extends SprintView
     $aux_fields = $query->getAuxFields($field_list);
     $this->start = $query->getStartDate($aux_fields);
     $this->end = $query->getEndDate($aux_fields);
-    $query->checkNull($this->start, $this->end, $this->tasks);
+    $query->checkNull($this->start, $this->end, $this->project, $this->tasks);
 
     $stats = id(new SprintBuildStats());
     $timezone = $stats->setTimezone($this->viewer);
