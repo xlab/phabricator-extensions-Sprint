@@ -219,6 +219,38 @@ final class SprintQuery extends SprintDAO {
     return $events;
   }
 
+  public function getProjectColumns() {
+    $columns = id(new PhabricatorProjectColumnQuery())
+        ->setViewer($this->viewer)
+        ->withProjectPHIDs(array($this->project_phid))
+        ->execute();
+    return $columns;
+  }
+
+  public function getColumnforPHID($column_phid) {
+    $column = id(new PhabricatorProjectColumnQuery())
+        ->setViewer($this->viewer)
+        ->withPHIDs(array($column_phid))
+        ->execute();
+    return $column;
+  }
+
+  public function getProjectColumnPositionforTask($tasks, $columns) {
+    if ($tasks) {
+        $positions = id(new PhabricatorProjectColumnPositionQuery())
+            ->setViewer($this->viewer)
+            ->withBoardPHIDs(array($this->project_phid))
+            ->withObjectPHIDs(mpull($tasks, 'getPHID'))
+            ->withColumns($columns)
+            ->needColumns(true)
+            ->execute();
+        $positions = mpull($positions, null, 'getObjectPHID');
+     } else {
+        $positions = array();
+    }
+    return $positions;
+  }
+
   private function setXActionEventType ($xaction, $old, $new, $scope_phid) {
     switch ($xaction->getTransactionType()) {
       case ManiphestTransaction::TYPE_STATUS:
@@ -266,7 +298,7 @@ final class SprintQuery extends SprintDAO {
         $in_old_scope = array_key_exists($scope_phid, $old);
         $in_new_scope = array_key_exists($scope_phid, $new);
 
-        if ($in_new_scope) {
+        if ($in_new_scope ) {
           return 'task-add';
         } else if ($in_old_scope && !$in_new_scope) {
           // NOTE: We will miss some of these events, becuase we are only
