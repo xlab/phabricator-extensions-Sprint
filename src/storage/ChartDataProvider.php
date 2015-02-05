@@ -70,9 +70,11 @@ final class ChartDataProvider {
 
   public function buildChartDataSet() {
 
-    $this->query->checkNull($this->start, $this->end, $this->project, $this->tasks);
+    $this->query->checkNull($this->start, $this->end, $this->project,
+        $this->tasks);
 
-    $date_array = $this->stats->buildDateArray($this->start, $this->end, $this->timezone);
+    $date_array = $this->stats->buildDateArray($this->start, $this->end,
+        $this->timezone);
     $xactions = $this->query->getXactions($this->tasks);
     $xaction_map = mpull($xactions, null, 'getPHID');
 

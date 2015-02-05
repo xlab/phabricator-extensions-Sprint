@@ -526,7 +526,7 @@ final class SprintBoardTaskEditController extends ManiphestController {
 
     $error_view = null;
     if ($errors) {
-      $error_view = new AphrontErrorView();
+      $error_view = new PHUIErrorView();
       $error_view->setErrors($errors);
     }
 
@@ -696,7 +696,7 @@ final class SprintBoardTaskEditController extends ManiphestController {
 
     $field_list->appendFieldsToForm($form);
 
-    require_celerity_resource('aphront-error-view-css');
+    require_celerity_resource('phui-error-view-css');
 
     Javelin::initBehavior('project-create', array(
       'tokenizerID' => $project_tokenizer_id,

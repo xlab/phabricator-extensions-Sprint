@@ -56,7 +56,6 @@ abstract class SprintController extends PhabricatorController {
         ->addNavigationItems($nav->getMenu());
 
     if ($user->isLoggedIn()) {
-      // For now, don't give logged-out users access to reports.
       $nav->addLabel(pht('Reports'));
       $nav->addFilter('report', pht('Reports'));
     }
@@ -66,23 +65,7 @@ abstract class SprintController extends PhabricatorController {
     return $nav;
   }
 
-  protected function buildApplicationCrumbs() {
-    $crumbs = $this->buildCrumbs('projects', '/project/');
-
-    $can_create = $this->hasApplicationCapability(
-        ProjectCreateProjectsCapability::CAPABILITY);
-
-    $crumbs->addAction(
-        id(new PHUIListItemView())
-            ->setName(pht('Create Project'))
-            ->setHref($this->getProjectsURI().'create/')
-            ->setIcon('fa-plus-square')
-            ->setDisabled(!$can_create)
-            ->setIcon('projects'));
-
-    return $crumbs;
-  }
-  protected function buildSprintApplicationCrumbs($can_create) {
+   protected function buildSprintApplicationCrumbs($can_create) {
     $crumbs = $this->buildCrumbs('fa-bar-chart', $this->getApplicationURI());
 
     $crumbs->addAction(

@@ -3,13 +3,25 @@
 
 final class BoardDataProvider {
 
+  private $start;
+  private $end;
   private $project;
   private $viewer;
   private $request;
   private $tasks;
   private $taskpoints;
   private $query;
+  private $stats;
 
+  public function setStart ($start) {
+    $this->start = $start;
+    return $this;
+  }
+
+  public function setEnd ($end) {
+    $this->end = $end;
+    return $this;
+  }
 
   public function setProject ($project) {
     $this->project = $project;
@@ -26,6 +38,11 @@ final class BoardDataProvider {
     return $this;
   }
 
+  public function setTimezone ($timezone) {
+    $this->timezone = $timezone;
+    return $this;
+  }
+
   public function setTasks ($tasks) {
     $this->tasks = $tasks;
     return $this;
@@ -36,14 +53,21 @@ final class BoardDataProvider {
     return $this;
   }
 
+  public function setStats ($stats) {
+    $this->stats = $stats;
+    return $this;
+  }
+
   public function setQuery ($query) {
     $this->query = $query;
     return $this;
   }
 
   public function buildBoardDataSet() {
+    $board_columns = array();
     $columns = $this->query->getProjectColumns();
-    $positions = $this->query->getProjectColumnPositionforTask($this->tasks, $columns);
+    $positions = $this->query->getProjectColumnPositionforTask($this->tasks,
+        $columns);
     $task_map = array();
 
     foreach ($this->tasks as $task) {
@@ -58,8 +82,8 @@ final class BoardDataProvider {
     foreach ($columns as $column) {
       $board_column = $this->buildColumnTasks($column, $task_map);
       $board_columns[$column->getPHID()] = $board_column;
-    }
 
+    }
     return $board_columns;
   }
 
@@ -93,4 +117,54 @@ final class BoardDataProvider {
     return $points_sum;
   }
 
+  public function getProjectColumnXactions() {
+    $xactions = array();
+    $scope_phid = $this->project->getPHID();
+    $query = new PhabricatorFeedQuery();
+    $query->setFilterPHIDs(
+        array(
+            $scope_phid,
+        ));
+    $query->setViewer($this->viewer);
+    $stories = $query->execute();
+    foreach ($stories as $xaction) {
+      $xaction_date = $xaction->getEpoch();
+      if ($xaction_date >= $this->start && $xaction_date <= $this->end) {
+        $xaction = $xaction->getPrimaryTransaction();
+        switch ($xaction->getTransactionType()) {
+          case ManiphestTransaction::TYPE_PROJECT_COLUMN:
+            $xactions[] = $xaction;
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    return $xactions;
+  }
+
+  public function buildChartfromBoardData() {
+
+    $this->query->checkNull($this->start, $this->end, $this->project,
+        $this->tasks);
+
+    $date_array = $this->stats->buildDateArray($this->start, $this->end,
+        $this->timezone);
+    $xactions = $this->getProjectColumnXactions();
+    $xaction_map = mpull($xactions, null, 'getPHID');
+
+    $sprint_xaction = id(new SprintColumnTransaction())
+        ->setViewer($this->viewer)
+        ->setTaskPoints($this->taskpoints)
+        ->setQuery($this->query)
+        ->setProject($this->project)
+        ->setEvents($xactions);
+
+    $dates = $sprint_xaction->parseEvents($date_array, $xaction_map);
+    $this->stats->setTaskPoints($this->taskpoints);
+    $sprint_data = $this->stats->setSprintData($dates);
+    $data = $this->stats->buildDataSet($sprint_data);
+    $data = $this->stats->transposeArray($data);
+    return $data;
+  }
 }

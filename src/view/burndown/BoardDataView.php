@@ -10,7 +10,7 @@ final class BoardDataView {
   }
 
   public function buildBoardDataTable() {
-
+    $coldata = array();
     $board_columns = $this->board_data->buildBoardDataSet();
     foreach ($board_columns as $column_phid => $tasks) {
       $colname = $this->board_data->getColumnName($column_phid);

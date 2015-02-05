@@ -109,7 +109,7 @@ final class SprintBoardViewController
 
     $query_key = $request->getURIData('queryKey');
     if (!$query_key) {
-      $query_key = 'open';
+      $query_key = 'all';
     }
     $this->queryKey = $query_key;
 

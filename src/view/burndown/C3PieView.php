@@ -41,7 +41,8 @@ final class C3PieView {
     ), 'sprint');
 
     $pie = id(new PHUIObjectBoxView())
-        ->setHeaderText(pht('Task Status Report for '.$this->project->getName()))
+        ->setHeaderText(pht('Task Status Report for '.
+            $this->project->getName()))
         ->appendChild(phutil_tag('div',
             array(
                 'id' => 'pie',

@@ -47,26 +47,28 @@ final class SprintDataView extends SprintView
     $this->setTimeSeries($stats);
     $this->setEvents($query);
 
-    $chart_model = id(new ChartDataProvider())
+    $board_model = id(new BoardDataProvider())
         ->setStart($this->start)
         ->setEnd($this->end)
         ->setProject($this->project)
-        ->setEvents($this->events)
         ->setViewer($this->viewer)
+        ->setRequest($this->request)
         ->setTasks($this->tasks)
         ->setTimezone($this->timezone)
         ->setTaskPoints($this->taskpoints)
-        ->setBefore($this->before)
-        ->setQuery($query)
-        ->setStats($stats);
+        ->setStats($stats)
+        ->setQuery($query);
 
-    $chart_data = $chart_model->buildChartDataSet();
+    $board_data_table_view = id(new BoardDataView())
+        ->setBoardData($board_model);
+    $board_table = $board_data_table_view->buildBoardDataTable();
+    $board_chart_data = $board_model->buildChartfromBoardData();
 
-    $chart_view = id(new C3ChartView())
-        ->setChartData($chart_data)
+    $board_chart_view = id(new C3ChartView())
+        ->setChartData($board_chart_data)
         ->setProject($this->project)
         ->setTimeSeries($this->timeseries);
-    $chart = $chart_view->buildC3Chart();
+    $board_chart = $board_chart_view->buildC3Chart();;
 
     $tasks_table_view = id(new TasksTableView())
         ->setProject($this->project)
@@ -83,25 +85,6 @@ final class SprintDataView extends SprintView
         ->setProject($this->project);
     $pie_chart = $pie_chart_view->buildC3Pie();
 
-    $history_table_view = new HistoryTableView();
-    $history_table = $history_table_view->buildHistoryTable($this->before);
-
-    $board_data = id(new BoardDataProvider())
-        ->setProject($this->project)
-        ->setViewer($this->viewer)
-        ->setRequest($this->request)
-        ->setTasks($this->tasks)
-        ->setTaskPoints($this->taskpoints)
-        ->setQuery($query);
-
-    $board_data_table_view = id(new BoardDataView())
-        ->setBoardData($board_data);
-    $board_table = $board_data_table_view->buildBoardDataTable();
-
-    // $sprint_table_view = new SprintTableView();
-    // $sprint_table = $sprint_table_view->buildSprintTable($this->sprint_data,
-    //    $this->before);
-
     $event_table_view = id(new EventTableView())
         ->setProject($this->project)
         ->setViewer($this->viewer)
@@ -111,8 +94,8 @@ final class SprintDataView extends SprintView
     $event_table = $event_table_view->buildEventTable(
         $this->start, $this->end);
 
-    return array($chart, $tasks_table, $pie_chart, $history_table,
-        $board_table, $event_table,);
+    return array($board_chart, $board_table, $pie_chart, $tasks_table,
+     $event_table,);
   }
 
   private function setStartandEndDates($query) {
