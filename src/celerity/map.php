@@ -7,7 +7,7 @@
  */
 return array(
   'names' => array(
-    'behavior-c3-chart.js' => '89d978a3',
+    'behavior-c3-chart.js' => '4bd6b4ca',
     'behavior-c3-pie.js' => '4731bdd9',
     'behavior-sprint-boards.js' => 'b2754b95',
     'c3.css' => '93642428',
@@ -19,7 +19,7 @@ return array(
     'c3' => '4b517cca',
     'c3-css' => '93642428',
     'd3' => '1595fbde',
-    'javelin-behavior-c3-chart' => '89d978a3',
+    'javelin-behavior-c3-chart' => '4bd6b4ca',
     'javelin-behavior-c3-pie' => '4731bdd9',
     'javelin-behavior-sprint-boards' => 'b2754b95',
     'phui-workboard-view-css' => '24307748',
