@@ -224,6 +224,7 @@ final class SprintQuery extends SprintDAO {
         ->setViewer($this->viewer)
         ->withProjectPHIDs(array($this->project_phid))
         ->execute();
+    $columns = msort($columns, 'getSequence');
     return $columns;
   }
 

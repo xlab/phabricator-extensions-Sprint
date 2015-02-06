@@ -10,6 +10,7 @@ phutil_register_library_map(array(
   '__library_version__' => 2,
   'class' => array(
     'AutoLoader' => 'tests/Autoloader.php',
+    'BoardDataPieView' => 'view/burndown/BoardDataPieView.php',
     'BoardDataProvider' => 'storage/BoardDataProvider.php',
     'BoardDataView' => 'view/burndown/BoardDataView.php',
     'BurndownActionMenuEventListener' => 'events/BurndownActionMenuEventListener.php',

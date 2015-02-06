@@ -59,11 +59,22 @@ final class SprintDataView extends SprintView
         ->setStats($stats)
         ->setQuery($query);
 
+    $pie_chart_view = id(new C3PieView())
+        ->setTasks($this->tasks)
+        ->setTaskPoints($this->taskpoints)
+        ->setProject($this->project);
+    $task_pie = $pie_chart_view->buildC3Pie();
+
+    $board_data_pie_view = id(new BoardDataPieView())
+        ->setBoardData($board_model)
+        ->setProject($this->project);
+    $pies = $board_data_pie_view->buildBoardDataPie();
+
     $board_data_table_view = id(new BoardDataView())
         ->setBoardData($board_model);
     $board_table = $board_data_table_view->buildBoardDataTable();
-    $board_chart_data = $board_model->buildChartfromBoardData();
 
+    $board_chart_data = $board_model->buildChartfromBoardData();
     $board_chart_view = id(new C3ChartView())
         ->setChartData($board_chart_data)
         ->setProject($this->project)
@@ -79,12 +90,6 @@ final class SprintDataView extends SprintView
         ->setQuery($query);
     $tasks_table = $tasks_table_view->buildTasksTable();
 
-    $pie_chart_view = id(new C3PieView())
-        ->setTasks($this->tasks)
-        ->setTaskPoints($this->taskpoints)
-        ->setProject($this->project);
-    $pie_chart = $pie_chart_view->buildC3Pie();
-
     $event_table_view = id(new EventTableView())
         ->setProject($this->project)
         ->setViewer($this->viewer)
@@ -94,7 +99,7 @@ final class SprintDataView extends SprintView
     $event_table = $event_table_view->buildEventTable(
         $this->start, $this->end);
 
-    return array($board_chart, $board_table, $pie_chart, $tasks_table,
+    return array($board_chart, $board_table, $pies, $tasks_table,
      $event_table,);
   }
 
