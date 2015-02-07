@@ -41,7 +41,7 @@ phutil_register_library_map(array(
     'SprintBoardTaskCard' => 'view/SprintBoardTaskCard.php',
     'SprintBoardTaskEditController' => 'controller/board/SprintBoardTaskEditController.php',
     'SprintBoardViewController' => 'controller/board/SprintBoardViewController.php',
-    'SprintBuildStatsTest' => 'tests/SprintBuildStatsTest.php',
+    'SprintBuildStatsTest' => 'tests/SprintStatsTest.php',
     'SprintColumnTransaction' => 'storage/SprintColumnTransaction.php',
     'SprintConstants' => 'constants/SprintConstants.php',
     'SprintController' => 'controller/SprintController.php',
