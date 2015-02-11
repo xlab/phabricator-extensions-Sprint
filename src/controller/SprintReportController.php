@@ -26,7 +26,7 @@ final class SprintReportController extends SprintController {
 
     $nav = $this->buildNavMenu();
     $this->view = $nav->selectFilter($this->view, 'List');
-    require_celerity_resource('sprint-report-css', 'sprint');
+
 
     switch ($this->view) {
       case 'list':
