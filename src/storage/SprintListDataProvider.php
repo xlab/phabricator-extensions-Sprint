@@ -90,7 +90,7 @@ final class SprintListDataProvider {
       $project_name = $project->getName();
 
       $row = $this->buildRowSet($project_id, $project_name, $start, $end);
-      list ($project_id, $project_name, $start, $end) = $row[0];
+      list (, , $start, $end) = $row[0];
       $row['sort'] = $this->setSortOrder($row, $order, $project_id,
           $project_name, $start, $end);
       $rows[] = $row;
