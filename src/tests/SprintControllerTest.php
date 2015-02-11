@@ -1,7 +1,7 @@
 <?php
 final class SprintControllerTest extends SprintTestCase {
 
-  public function testshouldAllowPublic()  {
+  public function testshouldAllowPublic() {
     $stub = $this->getMockForAbstractClass('SprintController');
 
     $this->assertTrue($stub->shouldAllowPublic());
@@ -22,6 +22,20 @@ final class SprintControllerTest extends SprintTestCase {
     $dv = new SprintDataViewController();
     $burndownview = $dv->getSprintDataView($request, $projectobj, $viewer);
     $this->assertInstanceOf('SprintDataView', $burndownview);
+  }
+
+  public function testgetSprintDataViewRender() {
+    $projectobj = new PhabricatorProject();
+    $viewer = $this->generateNewTestUser();
+    $request = new AphrontRequest('phab.wmde.de', '/project/sprint/view/18');
+    $objectboxes = id(new SprintDataViewController())
+        ->setRequest($request)
+        ->setProject($projectobj)
+        ->setViewer($viewer)
+        ->render();
+    foreach ($objectboxes as $objectbox) {
+      $this->assertInstanceOf('PHUIObjectBox', $objectbox);
+    };
   }
 
   public function testgetErrorBox() {
