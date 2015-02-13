@@ -34,7 +34,6 @@ final class SprintDataViewController extends SprintController {
     $nav->appendChild($crumbs);
     $nav->appendChild($error_box);
     $nav->appendChild($sprintdata_view);
-
     return $this->buildApplicationPage(
         array(
             $nav,

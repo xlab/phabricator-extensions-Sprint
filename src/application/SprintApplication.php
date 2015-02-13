@@ -41,7 +41,37 @@ final class SprintApplication extends PhabricatorApplication {
             // this is the default application route controller
           '/project/sprint/' => array(
               '' => 'SprintListController',
+<<<<<<< HEAD
             // these are forked controllers for the Sprint Board
+=======
+              'report/' => 'SprintListController',
+              'report/list/' => 'SprintListController',
+              'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
+              'view/(?P<id>\d+)/' => 'SprintDataViewController',
+              'details/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectEditDetailsController',
+              'archive/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectArchiveController',
+              'members/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectMembersEditController',
+              'members/(?P<id>[1-9]\d*)/remove/'
+              => 'PhabricatorProjectMembersRemoveController',
+              'move/(?P<id>[1-9]\d*)/' => 'SprintBoardMoveController',
+              'picture/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectEditPictureController',
+              'profile/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectProfileController',
+              'icon/(?P<id>[1-9]\d*)/'
+              => 'PhabricatorProjectEditIconController',
+              'board/task/edit/(?P<id>[1-9]\d*)/'
+              =>  'SprintBoardTaskEditController',
+              'board/task/create/'
+              => 'SprintBoardTaskEditController',
+              'board/(?P<id>[1-9]\d*)/' .
+              '(?P<filter>filter/)?' .
+              '(?:query/(?P<queryKey>[^/]+)/)?'
+              => 'SprintBoardViewController',
+>>>>>>> d1cf93f00fd019cf2f0d191e99637b63f5a1cf50
               'board/(?P<projectID>[1-9]\d*)/' => array(
                   'edit/(?:(?P<id>\d+)/)?'
                   => 'SprintBoardColumnEditController',
@@ -95,6 +125,13 @@ final class SprintApplication extends PhabricatorApplication {
               '(?P<slug>[^/]+)/' => 'SprintBoardViewController',
               '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',
           ),
+          '/project/' => array(
+              'sboard/(?P<id>[1-9]\d*)/'.
+              '(?P<filter>filter/)?'.
+              '(?:query/(?P<queryKey>[^/]+)/)?'
+              => 'SprintBoardViewController',
+              'burn/(?P<id>\d+)/' => 'SprintDataViewController',
+              ),
       );
   }
 
