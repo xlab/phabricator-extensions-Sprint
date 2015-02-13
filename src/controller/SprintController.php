@@ -23,7 +23,8 @@ abstract class SprintController extends PhabricatorController {
   }
 
   public function buildApplicationMenu() {
-    return $this->buildSideNavView(true, $this->getUser(),$this->setApplicationURI())->getMenu();
+    return $this->buildSideNavView(true, $this->getUser(),
+        $this->setApplicationURI())->getMenu();
   }
 
   public function buildNavMenu() {
@@ -34,8 +35,8 @@ abstract class SprintController extends PhabricatorController {
         ->addLabel(pht('Open Tasks'))
         ->addFilter('project', pht('By Project'))
         ->addFilter('user', pht('By User'))
-        ->addLabel(pht('Burndown'))
-        ->addFilter('burn', pht('Burndown Rate'));
+        ->addLabel(pht('Burn Up'))
+        ->addFilter('burn', pht('Burn Up Rate'));
     return $nav;
   }
 
@@ -77,15 +78,14 @@ abstract class SprintController extends PhabricatorController {
 
     return $crumbs;
   }
+
   protected function buildCrumbs($sprite, $uri) {
     $crumbs = array();
-
 
       $crumbs[] = id(new PHUICrumbView())
           ->setHref($uri)
           ->setAural($sprite)
           ->setIcon($sprite);
-
 
     $view = new PHUICrumbsView();
     foreach ($crumbs as $crumb) {
@@ -96,7 +96,6 @@ abstract class SprintController extends PhabricatorController {
   }
 
   public function buildIconNavView(PhabricatorProject $project) {
-    $id = $project->getID();
     $nav = $this->buildSprintIconNavView($project);
     $nav->selectFilter(null);
     return $nav;
@@ -151,5 +150,12 @@ abstract class SprintController extends PhabricatorController {
     $issprint = call_user_func(array($validator, 'checkForSprint'),
         array($validator, 'isSprint'), $object->getPHID());
     return $issprint;
+  }
+
+  public function getErrorBox($e) {
+    $error_box = id(new PHUIErrorView())
+        ->setTitle(pht('Burndown could not be rendered for this project'))
+        ->setErrors(array($e->getMessage()));
+    return $error_box;
   }
 }

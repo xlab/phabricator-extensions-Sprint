@@ -1,6 +1,6 @@
 <?php
 
-final class SprintReportBurndownView extends SprintView {
+final class SprintReportBurnUpView extends SprintView {
 
   private $request;
 
@@ -15,6 +15,7 @@ final class SprintReportBurndownView extends SprintView {
   }
 
   public function render() {
+    require_celerity_resource('sprint-report-css', 'sprint');
     $filter = $this->BuildFilter();
     $chart = $this->buildBurnDownChart();
     $table = $this->buildStatsTable();
@@ -33,13 +34,14 @@ final class SprintReportBurndownView extends SprintView {
     $project_phid = $this->request->getStr('project');
     if ($project_phid) {
       $phids = array($project_phid);
-      $handle = $this->getProjectHandle ($phids,$project_phid);
+      $handle = $this->getProjectHandle ($phids, $project_phid);
     }
     $tokens = array();
     if ($handle) {
       $tokens = $this->getTokens($handle);
     }
-    $filter = parent::renderReportFilters($tokens, $has_window = false);
+    $filter = parent::renderReportFilters($tokens, $has_window = false,
+        $this->request, $this->user);
     return $filter;
   }
 
@@ -48,7 +50,7 @@ final class SprintReportBurndownView extends SprintView {
     return $tokens;
   }
 
-  private function getProjectHandle($phids,$project_phid) {
+  private function getProjectHandle($phids, $project_phid) {
     $query = id(new SprintQuery())
         ->setPHID($project_phid);
 
@@ -160,7 +162,7 @@ final class SprintReportBurndownView extends SprintView {
       if ($week_bucket != $last_week) {
         if ($week) {
           $rows[] = $this->formatBurnRow(
-              'Week of ' . phabricator_date($last_week_epoch, $this->user),
+              'Week of '.phabricator_date($last_week_epoch, $this->user),
               $week);
           $rowc[] = 'week';
         }
@@ -174,7 +176,8 @@ final class SprintReportBurndownView extends SprintView {
       if ($month_bucket != $last_month) {
         if ($month) {
           $rows[] = $this->formatBurnRow(
-              phabricator_format_local_time($last_month_epoch, $this->user, 'F, Y'),
+              phabricator_format_local_time($last_month_epoch,
+                  $this->user, 'F, Y'),
               $month);
           $rowc[] = 'month';
         }
@@ -183,7 +186,8 @@ final class SprintReportBurndownView extends SprintView {
         $last_month_epoch = $epoch;
       }
 
-      $rows[] = $this->formatBurnRow(phabricator_date($epoch, $this->user), $info);
+      $rows[] = $this->formatBurnRow(phabricator_date($epoch, $this->user),
+          $info);
       $rowc[] = null;
       $week['open'] += $info['open'];
       $week['close'] += $info['close'];
@@ -192,23 +196,24 @@ final class SprintReportBurndownView extends SprintView {
       $period['open'] += $info['open'];
       $period['close'] += $info['close'];
     }
-    return array ($rows,$rowc, $week, $month, $period);
+    return array ($rows, $rowc, $week, $month, $period);
   }
 
   private function renderCaption ($handle) {
       $inst = pht(
-          'NOTE: This table reflects tasks currently in ' .
-          'the project. If a task was opened in the past but added to ' .
-          'the project recently, it is counted on the day it was ' .
-          'opened, not the day it was categorized. If a task was part ' .
-          'of this project in the past but no longer is, it is not ' .
+          'NOTE: This table reflects tasks currently in '.
+          'the project. If a task was opened in the past but added to '.
+          'the project recently, it is counted on the day it was '.
+          'opened, not the day it was categorized. If a task was part '.
+          'of this project in the past but no longer is, it is not '.
           'counted at all.');
       $header = pht('Task Burn Rate for Project %s', $handle->renderLink());
       $caption = phutil_tag('p', array(), $inst);
    return array ($caption, $header);
   }
 
-  private function formatStatsTableHeaders($week, $month, $period, $rows,$rowc) {
+  private function formatStatsTableHeaders($week, $month, $period, $rows,
+                                           $rowc) {
      if ($week) {
       $rows[] = $this->formatBurnRow(
           pht('Week To Date'),
@@ -239,7 +244,7 @@ final class SprintReportBurndownView extends SprintView {
 
     if ($project_phid) {
       $phids = array($project_phid);
-      $handle = $this->getProjectHandle ($phids,$project_phid);
+      $handle = $this->getProjectHandle ($phids, $project_phid);
     }
 
     $data = $this->getXactionData($project_phid);
@@ -247,16 +252,18 @@ final class SprintReportBurndownView extends SprintView {
     $stats = $this->buildStatsfromEvents($data);
     $day_buckets = $this->buildDayBucketsfromEvents($data);
 
-    list ($rows,$rowc, $week, $month, $period) = $this->formatBucketRows ($stats, $day_buckets);
-    list ($rows, $rowc) = $this->formatStatsTableHeaders($week, $month, $period, $rows,$rowc);
+    list ($rows, $rowc, $week, $month, $period) =
+        $this->formatBucketRows($stats, $day_buckets);
+    list ($rows, $rowc) = $this->formatStatsTableHeaders($week, $month, $period,
+        $rows, $rowc);
 
-    $table = $this->StatsTableView($rows, $rowc);
+    $table = $this->statsTableView($rows, $rowc);
 
   if ($handle) {
     list ($caption, $header) = $this->renderCaption ($handle);
-    $caption = id(new AphrontErrorView())
+    $caption = id(new PHUIErrorView())
         ->appendChild($caption)
-        ->setSeverity(AphrontErrorView::SEVERITY_NOTICE);
+        ->setSeverity(PHUIErrorView::SEVERITY_NOTICE);
   } else {
     $header = pht('Task Burn Rate for All Tasks');
     $caption = null;
@@ -275,7 +282,7 @@ final class SprintReportBurndownView extends SprintView {
   /**
    * @param string[] $rowc
    */
-  private function StatsTableView($rows, $rowc) {
+  private function statsTableView($rows, $rowc) {
     $table = new AphrontTableView($rows);
     $table->setRowClasses($rowc);
     $table->setHeaders(
@@ -299,55 +306,53 @@ final class SprintReportBurndownView extends SprintView {
   private function buildBurnDownChart() {
     $project_phid = $this->request->getStr('project');
     $data = $this->getXactionData($project_phid);
-      $id = celerity_generate_unique_node_id();
-      $chart = phutil_tag(
-          'div',
-          array(
-              'id' => $id,
-              'style' => 'border: 1px solid #BFCFDA; '.
-                  'background-color: #fff; '.
-                  'margin: 8px 16px; '.
-                  'height: 400px; ',
-          ),
-          '');
+      $id = 'burnup chart';
+      $data = $this->buildSeries($data);
+      $stats = new SprintStats();
+      $data = $stats->transposeArray($data);
+    require_celerity_resource('d3', 'sprint');
+    require_celerity_resource('c3-css', 'sprint');
+    require_celerity_resource('c3', 'sprint');
 
-      list($burn_x, $burn_y) = $this->buildSeries($data);
-
-      require_celerity_resource('raphael-core');
-      require_celerity_resource('raphael-g');
-      require_celerity_resource('raphael-g-line');
-
-      Javelin::initBehavior('line-chart', array(
+      Javelin::initBehavior('burndown-report-chart', array(
           'hardpoint' => $id,
-          'x' => array(
-              $burn_x,
-          ),
-          'y' => array(
-              $burn_y,
-          ),
-          'xformat' => 'epoch',
-          'yformat' => 'int',
-      ));
+          'x' => $data[0],
+          'y' => $data[1],
+      ), 'sprint');
+
+    $chart = id(new PHUIObjectBoxView())
+        ->setHeaderText(pht('Burn Up Report'))
+        ->appendChild(phutil_tag('div',
+            array(
+                'id' => $id,
+                'style' => 'border: 1px solid #BFCFDA; '.
+                    'background-color: #fff; '.
+                    'margin: 8px 16px; '.
+                    'height: 400px; ',
+            ), ''));
 
       return $chart;
     }
 
-   private function buildSeries(array $data) {
-      $out = array();
-      $data = $this->addTaskStatustoData ($data);
+  private function buildSeries(array $data) {
+    $output = array(array(
+        pht('Dates'),
+        pht('Tasks'),
+    ),);
+      $tdata = $this->addTaskStatustoData ($data);
       $counter = 0;
-      foreach ($data as $key => $row) {
-        $t = (int)$row['dateCreated'];
+      foreach ($tdata as $key => $row) {
+        $t = (int)$row['dateCreated'] * 1000;
         if ($row['_is_close']) {
           --$counter;
-          $out[$t] = $counter;
         } else if ($row['_is_open']) {
           ++$counter;
-          $out[$t] = $counter;
         }
-      }
+        $output[] = array(
+        $t, $counter,);
 
-      return array(array_keys($out), array_values($out));
+      }
+      return $output;
     }
 
     /**

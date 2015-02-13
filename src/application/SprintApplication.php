@@ -10,8 +10,7 @@ final class SprintApplication extends PhabricatorApplication {
     return pht('Sprint');
   }
 
-  public function getBaseURI()
-  {
+  public function getBaseURI() {
       return '/project/sprint/';
   }
 
@@ -92,16 +91,9 @@ final class SprintApplication extends PhabricatorApplication {
           ),
           // primary tag route override
           '/tag/' => array(
-              '(?P<slug>[^/]+)/' => 'SprintBoardViewController',
+              '(?P<slug>[^/]+)/' => 'SprintProjectViewController',
               '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',
           ),
-          '/project/' => array(
-              'sboard/(?P<id>[1-9]\d*)/'.
-              '(?P<filter>filter/)?'.
-              '(?:query/(?P<queryKey>[^/]+)/)?'
-              => 'SprintBoardViewController',
-              'burn/(?P<id>\d+)/' => 'SprintDataViewController',
-              ),
       );
   }
 

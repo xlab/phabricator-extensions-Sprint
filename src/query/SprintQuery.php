@@ -45,7 +45,7 @@ final class SprintQuery extends SprintDAO {
       $start = idx($aux_fields, 'isdc:sprint:startdate')
           ->getProxy()->getFieldValue();
     if (is_null($start)) {
-      $help = 'To do this, go to the Project Edit Details Page';
+      $help = pht('To do this, go to the Project Edit Details Page');
       throw new BurndownException("The project \"".$this->project->getName()
           ."\" is not set up for Sprint because "
           ."it has not been assigned a start date\n", $help);
@@ -58,7 +58,7 @@ final class SprintQuery extends SprintDAO {
     $end = idx($aux_fields, 'isdc:sprint:enddate')
         ->getProxy()->getFieldValue();
     if (is_null($end)) {
-      $help = 'To do this, go to the Project Edit Details Page';
+      $help = pht('To do this, go to the Project Edit Details Page');
       throw new BurndownException("The project \"".$this->project->getName()
           ."\" is not set up for Sprint because "
           ."it has not been assigned an end date\n", $help);
@@ -74,8 +74,8 @@ final class SprintQuery extends SprintDAO {
         ->needProjectPHIDs(true)
         ->execute();
     if (empty($tasks)) {
-      $help = "To Create a Task, go to the Sprint Board and select the "
-      ."column header menu";
+      $help = pht('To Create a Task, go to the Sprint Board and select the '
+      .'column header menu');
       throw new BurndownException("The project \"".$this->project->getName()
           ."\" is not set up for Sprint because "
           ."it has no tasks\n", $help);
@@ -84,7 +84,7 @@ final class SprintQuery extends SprintDAO {
     }
   }
 
-  public function getStoryPointsForTask($task_phid)  {
+  public function getStoryPointsForTask($task_phid) {
     $points = null;
     $object = new ManiphestCustomFieldStorage();
     $corecustomfield = $object->loadRawDataWhere('objectPHID= %s AND
@@ -100,6 +100,7 @@ final class SprintQuery extends SprintDAO {
   }
 
   public function getIsSprint() {
+    $issprint = null;
     $object = new PhabricatorProjectCustomFieldStorage();
     $boolfield = $object->loadRawDataWhere('objectPHID= %s AND
     fieldIndex=%s', $this->project_phid, SprintConstants::SPRINTFIELD_INDEX);
@@ -107,8 +108,6 @@ final class SprintQuery extends SprintDAO {
       foreach ($boolfield as $array) {
         $issprint = idx($array, 'fieldValue');
       }
-    } else {
-      $issprint = null;
     }
     return $issprint;
   }
@@ -122,7 +121,13 @@ final class SprintQuery extends SprintDAO {
     foreach ($sprintfields as $key => $value) {
         $sprint_phids[] = $value->getObjectPHID();
       }
-    return $sprint_phids;
+    if (empty($sprint_phids)) {
+      $help = pht('To Create a Sprint, go to /project/create/ and make sure that'
+          .' the "Is Sprint" box has been checked');
+      throw new BurndownException("There are no Sprints to show yet\n", $help);
+    } else {
+      return $sprint_phids;
+    }
   }
 
   public function getXactions($tasks) {
@@ -217,14 +222,13 @@ final class SprintQuery extends SprintDAO {
     $edges = id(new PhabricatorEdgeQuery())
         ->withSourcePHIDs(array_keys($tasks))
         ->withEdgeTypes(array( ManiphestTaskDependsOnTaskEdgeType::EDGECONST,
-            ManiphestTaskDependedOnByTaskEdgeType::EDGECONST))
+            ManiphestTaskDependedOnByTaskEdgeType::EDGECONST,))
         ->execute();
     return $edges;
   }
 
   public function getEvents($xactions) {
-    $scope_phid = $this->project->getPHID();
-    $events = $this->extractEvents($xactions, $scope_phid);
+    $events = $this->extractEvents($xactions);
     return $events;
   }
 
@@ -234,7 +238,13 @@ final class SprintQuery extends SprintDAO {
         ->withProjectPHIDs(array($this->project_phid))
         ->execute();
     $columns = msort($columns, 'getSequence');
-    return $columns;
+    if (!$columns) {
+      $help = pht('To Create a Sprint Board, go to the Project profile page'
+          .' and select the Sprint Board icon from the left side bar');
+      throw new BurndownException("There is no Sprint Board yet\n", $help);
+    } else {
+      return $columns;
+    }
   }
 
   public function getColumnforPHID($column_phid) {
@@ -261,100 +271,18 @@ final class SprintQuery extends SprintDAO {
     return $positions;
   }
 
-  private function setXActionEventType ($xaction, $old, $new, $scope_phid) {
-    switch ($xaction->getTransactionType()) {
-      case ManiphestTransaction::TYPE_STATUS:
-        $old_is_closed = ($old === null) ||
-            ManiphestTaskStatus::isClosedStatus($old);
-        $new_is_closed = ManiphestTaskStatus::isClosedStatus($new);
-
-        if ($old_is_closed == $new_is_closed) {
-          // This was just a status change from one open status to another,
-          // or from one closed status to another, so it's not an events we
-          // care about.
-          break;
-        }
-        if ($old === null) {
-          // This would show as "reopened" even though it's when the task was
-          // created so we skip it. Instead we will use the title for created
-          // events
-          break;
-        }
-
-        if ($new_is_closed) {
-          return 'close';
-        } else {
-          return 'reopen';
-        }
-
-      case ManiphestTransaction::TYPE_TITLE:
-        if ($old === null)
-        {
-          return 'create';
-        }
-        break;
-
-      // Project changes are "core:edge" transactions
-      case PhabricatorTransactions::TYPE_EDGE:
-
-        // We only care about ProjectEdgeType
-        if (idx($xaction->getMetadata(), 'edge:type') !==
-            PhabricatorProjectObjectHasProjectEdgeType::EDGECONST)
-          break;
-
-        $old = ipull($old, 'dst');
-        $new = ipull($new, 'dst');
-
-        $in_old_scope = array_key_exists($scope_phid, $old);
-        $in_new_scope = array_key_exists($scope_phid, $new);
-
-        if ($in_new_scope ) {
-          return 'task-add';
-        } else if ($in_old_scope && !$in_new_scope) {
-          // NOTE: We will miss some of these events, becuase we are only
-          // examining tasks that are currently in the project. If a task
-          // is removed from the project and not added again later, it will
-          // just vanish from the chart completely, not show up as a
-          // scope contraction. We can't do better until the Facts application
-          // is available without examining *every* task.
-          return 'task-remove';
-        }
-        break;
-
-      case PhabricatorTransactions::TYPE_CUSTOMFIELD:
-        if ($xaction->getMetadataValue('customfield:key') == 'isdc:sprint:storypoints') {
-          // POINTS!
-          return 'points';
-        }
-        break;
-
-      default:
-        // This is something else (comment, subscription change, etc) that
-        // we don't care about for now.
-        break;
-    }
-  }
-
-  public function extractEvents($xactions, $scope_phid) {
+  public function extractEvents($xactions) {
     assert_instances_of($xactions, 'ManiphestTransaction');
 
     $events = array();
     foreach ($xactions as $xaction) {
-      $old = $xaction->getOldValue();
-      $new = $xaction->getNewValue();
-
-      $event_type = $this->setXActionEventType ($xaction, $old, $new, $scope_phid);
-
-      if ($event_type !== null) {
         $events[] = array(
             'transactionPHID' => $xaction->getPHID(),
             'objectPHID' => $xaction->getObjectPHID(),
             'epoch' => $xaction->getDateCreated(),
             'key'   => $xaction->getMetadataValue('customfield:key'),
-            'type'  => $event_type,
             'title' => $xaction->getTitle(),
         );
-      }
     }
 
     $events = isort($events, 'epoch');
@@ -362,4 +290,3 @@ final class SprintQuery extends SprintDAO {
     return $events;
   }
 }
-

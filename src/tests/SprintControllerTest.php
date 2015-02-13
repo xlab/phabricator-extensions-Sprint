@@ -1,7 +1,7 @@
 <?php
 final class SprintControllerTest extends SprintTestCase {
 
-  public function testshouldAllowPublic()  {
+  public function testshouldAllowPublic() {
     $stub = $this->getMockForAbstractClass('SprintController');
 
     $this->assertTrue($stub->shouldAllowPublic());
@@ -13,16 +13,6 @@ final class SprintControllerTest extends SprintTestCase {
     $uri = new PhutilURI('/project/sprint/');
     $nav = $stub->buildSideNavView($for_app = false, $user, $uri);
     $this->assertInstanceOf('AphrontSideNavFilterView', $nav);
-  }
-
-  public function testgetCrumbs() {
-    $projectobj = new PhabricatorProject();
-    $dv = new SprintDataViewController();
-    $app = new SprintApplication();
-    $dv->setCurrentApplication($app);
-    $can_create = true;
-    $crumbs = $dv->getCrumbs($projectobj, $can_create);
-    $this->assertInstanceOf('PHUICrumbsView', $crumbs);
   }
 
   public function testgetSprintDataView() {
@@ -41,50 +31,99 @@ final class SprintControllerTest extends SprintTestCase {
     $this->assertInstanceOf('PHUIErrorView', $errorbox);
   }
 
-  public function testprocessRequestFail() {
+  public function testhandleRequestDataViewController() {
     $dvcontroller = new SprintDataViewController();
     $sprint = new SprintApplication();
     $dvcontroller->setCurrentApplication($sprint);
-<<<<<<< HEAD
     $request = new AphrontRequest('phab.wmde.de', '/project/sprint/view/18');
+    $dvcontroller->setRequest($request);
     $data = array();
-=======
-    $request = new AphrontRequest('phab.wmde.de', '/sprint/view/18');
->>>>>>> d1cf93f00fd019cf2f0d191e99637b63f5a1cf50
-    $data['id'] =  3;
-    $request->setRequestdata($data);
+    $data['id'] =  18;
+    $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
     $request->setUser($viewer);
     $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
+    $this->assertInstanceOf('AphrontResponse', $response);
+  }
+
+  public function testhandleRequestDataViewControllerFail() {
+    $dvcontroller = new SprintDataViewController();
+    $sprint = new SprintApplication();
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/project/sprint/view/18');
     $dvcontroller->setRequest($request);
-    $response = $dvcontroller->processRequest();
+    $data = array();
+    $data['id'] =  3;
+    $request->setURIMap($data);
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('Aphront404Response', $response);
   }
 
-<<<<<<< HEAD
-//  public function testprocessRequestListController() {
-//     $this->willRunTests();
-//     $lcontroller = new SprintListController();
-//     $sprint = new SprintApplication();
-//     $lcontroller->setCurrentApplication($sprint);
-//     $request = new AphrontRequest('phab.wmde.de', '/project/sprint/view/18');
-//     $viewer = $this->generateNewTestUser();
-//     $request->setUser($viewer);
-//     $lcontroller->setRequest($request);
-//     $response = $lcontroller->processRequest();
-//     $this->assertInstanceOf('AphrontWebpageResponse', $response);
-//   }
-=======
-  public function testprocessRequestListController() {
-    $lcontroller = new SprintListController();
+  public function testhandleRequestProjectProfileController() {
+    $dvcontroller = new SprintProjectProfileController();
     $sprint = new SprintApplication();
-    $lcontroller->setCurrentApplication($sprint);
-    $request = new AphrontRequest('phab.wmde.de', '/sprint/view/18');
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/project/profile/18');
+    $dvcontroller->setRequest($request);
+    $data = array();
+    $data['id'] =  18;
+    $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
     $request->setUser($viewer);
-    $lcontroller->setRequest($request);
-    $response = $lcontroller->processRequest();
-    $this->assertInstanceOf('AphrontWebpageResponse', $response);
+    $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
+    $this->assertInstanceOf('AphrontResponse', $response);
   }
->>>>>>> d1cf93f00fd019cf2f0d191e99637b63f5a1cf50
+
+  public function testhandleRequestProjectProfileControllerFail() {
+    $dvcontroller = new SprintProjectProfileController();
+    $sprint = new SprintApplication();
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/project/profile/18');
+    $dvcontroller->setRequest($request);
+    $data = array();
+    $data['id'] =  3;
+    $request->setURIMap($data);
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
+    $this->assertInstanceOf('Aphront404Response', $response);
+  }
+
+  public function testhandleRequestProjectViewController() {
+    $dvcontroller = new SprintProjectViewController();
+    $sprint = new SprintApplication();
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/project/tag/null_project');
+    $dvcontroller->setRequest($request);
+    $data = array();
+    $data['slug'] =  'null_project';
+    $request->setURIMap($data);
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
+    $this->assertInstanceOf('AphrontResponse', $response);
+  }
+
+  public function testhandleRequestProjectViewControllerFail() {
+    $dvcontroller = new SprintProjectViewController();
+    $sprint = new SprintApplication();
+    $dvcontroller->setCurrentApplication($sprint);
+    $request = new AphrontRequest('phab.wmde.de', '/project/tag/null_project');
+    $dvcontroller->setRequest($request);
+    $data = array();
+    $data['slug'] =  'fail_project';
+    $request->setURIMap($data);
+    $viewer = $this->generateNewTestUser();
+    $request->setUser($viewer);
+    $dvcontroller->willProcessRequest($data);
+    $response = $dvcontroller->handleRequest($request);
+    $this->assertInstanceOf('Aphront404Response', $response);
+  }
 }

@@ -281,7 +281,6 @@ final class SprintBoardViewController
           $owner = $this->handles[$task->getOwnerPHID()];
         }
         $can_edit = idx($task_can_edit_map, $task->getPHID(), false);
-<<<<<<< HEAD
         if ($is_sprint == true) {
           $cards->addItem(id(new SprintBoardTaskCard())
               ->setProject($project)
@@ -298,15 +297,6 @@ final class SprintBoardViewController
               ->setCanEdit($can_edit)
               ->getItem());
         }
-
-=======
-        $cards->addItem(id(new SprintBoardTaskCard())
-          ->setViewer($viewer)
-          ->setTask($task)
-          ->setOwner($owner)
-          ->setCanEdit($can_edit)
-          ->getItem());
->>>>>>> d1cf93f00fd019cf2f0d191e99637b63f5a1cf50
       }
       $panel->setCards($cards);
       $board->addPanel($panel);

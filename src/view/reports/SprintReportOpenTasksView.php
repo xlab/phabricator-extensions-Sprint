@@ -52,17 +52,17 @@ final class SprintReportOpenTasksView extends SprintView {
 
     $date = phabricator_date(time(), $this->user);
 
+    $user_task_view = new UserOpenTasksView();
+    $project_task_view = new ProjectOpenTasksView();
 
     if (($this->view) == 'user') {
        list($leftover, $leftover_closed, $base_link, $leftover_name,
            $col_header, $header, $result_closed, $result ) =
-           (new UserOpenTasksView())
-               ->execute($tasks, $recently_closed, $date);
-    } elseif (($this->view) == 'project') {
+           ($user_task_view->execute($tasks, $recently_closed, $date));
+    } else if (($this->view) == 'project') {
         list($leftover, $base_link, $leftover_name, $col_header, $header,
             $result_closed, $leftover_closed, $result ) =
-           (new ProjectOpenTasksView())
-                ->execute($tasks, $recently_closed, $date);
+           ($project_task_view->execute($tasks, $recently_closed, $date));
     } else {
       $result = array();
       $result_closed = array();
@@ -95,7 +95,8 @@ final class SprintReportOpenTasksView extends SprintView {
     if ($project_handle) {
       $tokens = array($project_handle);
     }
-    $filter = parent::renderReportFilters($tokens, $order, $reverse);
+    $filter = $this->renderReportFilters($tokens, $has_window = false,
+        $this->request, $this->user);
 
     return array($filter, $panel);
   }
@@ -285,7 +286,7 @@ final class SprintReportOpenTasksView extends SprintView {
         pht('Oldest (Pri)'));
     $cclass[] = 'center narrow';
 
-    list($window_epoch) = $this->getWindow();
+    list($window_epoch) = $this->getWindow($this->request);
     $edate = phabricator_datetime($window_epoch, $this->user);
     $cname[] = javelin_tag(
         'span',
@@ -293,7 +294,7 @@ final class SprintReportOpenTasksView extends SprintView {
             'sigil' => 'has-tooltip',
             'meta'  => array(
                 'tip'  => pht('Closed after %s', $edate),
-                'size' => 260
+                'size' => 260,
             ),
         ),
         pht('Recently Closed'));
@@ -336,7 +337,7 @@ final class SprintReportOpenTasksView extends SprintView {
    * Load all the tasks that have been recently closed.
    */
   private function loadRecentlyClosedTasks() {
-    list(,, $window_epoch) = $this->getWindow();
+    list(, , $window_epoch) = $this->getWindow($this->request);
 
     $table = new ManiphestTask();
     $xtable = new ManiphestTransaction();
@@ -404,36 +405,7 @@ final class SprintReportOpenTasksView extends SprintView {
     return $query;
   }
 
-  private function getWindow() {
-    $window_str = $this->request->getStr('window', '12 AM 7 days ago');
-
-    $error = null;
-
-    // Do locale-aware parsing so that the user's timezone is assumed for
-    // time windows like "3 PM", rather than assuming the server timezone.
-
-    $window_epoch = PhabricatorTime::parseLocalTime($window_str, $this->user);
-    if (!$window_epoch) {
-      $error = 'Invalid';
-      $window_epoch = time() - (60 * 60 * 24 * 7);
-    }
-
-    // If the time ends up in the future, convert it to the corresponding time
-    // and equal distance in the past. This is so users can type "6 days" (which
-    // means "6 days from now") and get the behavior of "6 days ago", rather
-    // than no results (because the window epoch is in the future). This might
-    // be a little confusing because it casues "tomorrow" to mean "yesterday"
-    // and "2022" (or whatever) to mean "ten years ago", but these inputs are
-    // nonsense anyway.
-
-    if ($window_epoch > time()) {
-      $window_epoch = time() - ($window_epoch - time());
-    }
-
-    return array($window_str, $window_epoch, $error);
-  }
-
-  private function getProjectHandle($phids,$project_phid) {
+  private function getProjectHandle($phids, $project_phid) {
     $handles = $this->loadViewerHandles($phids);
     $project_handle = $handles[$project_phid];
     return $project_handle;
