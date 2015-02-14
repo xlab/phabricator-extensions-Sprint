@@ -23,4 +23,3 @@ JX.behavior('priority-pie', function(config) {
         }
     });
 });
-

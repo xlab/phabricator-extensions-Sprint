@@ -6,7 +6,7 @@ private $taskpoints;
 private $task_open_status_sum;
 private $task_closed_status_sum;
 private $tasks;
-private $taskPrioritySum;
+private $taskPrioritySum = array();
 
   public function setTaskPoints ($taskpoints) {
     $this->taskpoints = $taskpoints;
@@ -85,16 +85,24 @@ private $taskPrioritySum;
     $priority_name = $this->getPriorityName($task);
     $points = $this->getTaskPoints($task->getPHID());
     if ($priority_name) {
-      $this->taskPrioritySum =
-          $this->setTaskPrioritySum($this->taskPrioritySum, $priority_name,
-              $points);
+      $this->taskPrioritySum = $this->setTaskPrioritySum($this->taskPrioritySum,
+          $priority_name,
+          $points);
     }
     return;
   }
 
   private function setTaskPrioritySum ($task_priority_sum, $priority_name,
                                       $points) {
-    $task_priority_sum[$priority_name] += $points;
+        if (empty($task_priority_sum)) {
+          $task_priority_sum[$priority_name] = $points;
+        } else {
+            if (isset($task_priority_sum[$priority_name])) {
+              $task_priority_sum[$priority_name] += $points;
+            } else {
+              $task_priority_sum[$priority_name] = $points;
+            }
+        }
     return $task_priority_sum;
   }
 
