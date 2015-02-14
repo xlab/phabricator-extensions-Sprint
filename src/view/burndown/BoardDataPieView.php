@@ -116,12 +116,18 @@ final class BoardDataPieView {
     $id = 'priority-pie';
     Javelin::initBehavior('priority-pie', array(
         'hardpoint' => $id,
-        'Wishlist' => $task_priority_sum['Wishlist'],
-        'Normal' => $task_priority_sum['Normal'],
-        'High' => $task_priority_sum['High'],
-        'Unbreak' => $task_priority_sum['Unbreak Now!'],
-        'Triage' => $task_priority_sum['Needs Triage'],
-        'Low' => $task_priority_sum['Low'],
+        'Wishlist' => (isset($task_priority_sum['Wishlist'])) ?
+            $task_priority_sum['Wishlist'] : null,
+        'Normal' => (isset($task_priority_sum['Normal'])) ?
+            $task_priority_sum['Normal']: null,
+        'High' => (isset($task_priority_sum['High'])) ?
+            $task_priority_sum['High']: null,
+        'Unbreak' => (isset($task_priority_sum['Unbreak Now!'])) ?
+            $task_priority_sum['Unbreak Now!']: null,
+        'Triage' => (isset($task_priority_sum['Needs Triage'])) ?
+            $task_priority_sum['Needs Triage']: null,
+        'Low' => (isset($task_priority_sum['Low'])) ?
+            $task_priority_sum['Low']: null,
     ), 'sprint');
   }
 }
