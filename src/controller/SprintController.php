@@ -146,7 +146,6 @@ abstract class SprintController extends PhabricatorController {
 
     return $nav;
   }
-
   protected function isSprint($object) {
     $validator = new SprintValidator();
     $issprint = call_user_func(array($validator, 'checkForSprint'),

@@ -297,7 +297,6 @@ final class SprintBoardViewController
               ->setCanEdit($can_edit)
               ->getItem());
         }
-
       }
       $panel->setCards($cards);
       $board->addPanel($panel);
