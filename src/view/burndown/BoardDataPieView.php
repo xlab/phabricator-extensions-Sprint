@@ -109,6 +109,14 @@ final class BoardDataPieView {
     $task_priority_sum = $sprintpoints
         ->getPrioritySums();
 
+    if (isset($task_priority_sum['Wishlist'])) {
+      $lowest_priority = $task_priority_sum['Wishlist'];
+    } else if (isset($task_priority_sum['Needs Volunteer'])) {
+      $lowest_priority = $task_priority_sum['Needs Volunteer'];
+    } else {
+      $lowest_priority = null;
+    }
+
     require_celerity_resource('d3', 'sprint');
     require_celerity_resource('c3-css', 'sprint');
     require_celerity_resource('c3', 'sprint');
@@ -116,8 +124,7 @@ final class BoardDataPieView {
     $id = 'priority-pie';
     Javelin::initBehavior('priority-pie', array(
         'hardpoint' => $id,
-        'Wishlist' => (isset($task_priority_sum['Wishlist'])) ?
-            $task_priority_sum['Wishlist'] : null,
+        'Wishlist' => $lowest_priority,
         'Normal' => (isset($task_priority_sum['Normal'])) ?
             $task_priority_sum['Normal']: null,
         'High' => (isset($task_priority_sum['High'])) ?

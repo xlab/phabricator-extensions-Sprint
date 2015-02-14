@@ -9,17 +9,17 @@ JX.behavior('priority-pie', function(config) {
         bindto: h,
         data: {
             columns: [
-                ['Wishlist', config.Wishlist],
-                ['Low', config.Low],
-                ['Normal', config.Normal],
-                ['High', config.High],
+                ['Needs Triage', config.Triage],
                 ['Unbreak Now!', config.Unbreak],
-                ['Needs Triage', config.Triage]
+                ['High', config.High],
+                ['Normal', config.Normal],
+                ['Low', config.Low],
+                ['Wishlist', config.Wishlist]
             ],
             type: 'pie'
         },
         color: {
-            pattern: ['#3498db', '#f1c40f', '#e67e22', '#c0392b', '#6e5cb6', '#8e44ad' ]
+            pattern: ['#8e44ad', '#6e5cb6', '#c0392b', '#e67e22', '#f1c40f', '#3498db']
         }
     });
 });
