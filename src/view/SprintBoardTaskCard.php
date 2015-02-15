@@ -94,12 +94,19 @@ final class SprintBoardTaskCard {
         ->setViewer($this->viewer);
     $task = $this->getTask();
     $task_phid = $task->getPHID();
+    $can_edit = $this->getCanEdit();
     $this->points = $query->getStoryPointsForTask($task_phid);
 
-    $can_edit = $this->getCanEdit();
 
     $color_map = ManiphestTaskPriority::getColorMap();
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
+
+    if (!(is_null($this->owner))) {
+      $label = $this->owner->getName();
+      $ownerimage = $this->renderHandleIcon($this->owner, $label);
+    } else {
+      $ownerimage = null;
+    }
 
     $card = id(new PHUIObjectItemView())
       ->setObjectName('T'.$task->getID())
@@ -122,15 +129,8 @@ final class SprintBoardTaskCard {
                 ->setHref('/project/sprint/board/task/edit/'.$task->getID()
                     .'/'))
       ->setBarColor($bar_color)
-      ->addAttribute($this->getCardAttributes());
-
-    if (!(is_null($this->owner))) {
-      $label = $this->owner->getName();
-      $ownerimage = $this->renderHandleIcon($this->owner, $label);
-    } else {
-      $ownerimage = null;
-    }
-    $card->setImageIcon($ownerimage);
+      ->addAttribute($this->getCardAttributes())
+      ->setImageIcon($ownerimage);
 
     return $card;
   }
@@ -148,7 +148,7 @@ final class SprintBoardTaskCard {
       $options['meta']  = array('tip' => $label);
     }
 
-    return javelin_tag(
+    return phutil_tag(
         'span',
         $options,
         '');
