@@ -55,26 +55,6 @@ final class SprintBoardTaskCard {
     return $this->canEdit;
   }
 
-  private function getUserImage() {
-    $ownername = $this->owner->getName();
-    $ownerlink = '/p/'.$ownername.'/';
-    $image_uri = $this->owner->getImageURI();
-
-    $sigil = 'has-tooltip';
-    $meta  = array(
-        'tip' => pht($ownername),
-        'size' => 200,
-        'align' => 'E',);
-    $image = id(new PHUIIconView())
-        ->addSigil($sigil)
-        ->setMetadata($meta)
-        ->setHref($ownerlink)
-        ->setImage($image_uri)
-        ->setHeadSize(PHUIIconView::HEAD_SMALL);
-
-  return $image;
-  }
-
   private function getCardAttributes() {
       $tokens = id(new SprintBoardCardToken())
         ->setViewer($this->viewer)
@@ -113,17 +93,10 @@ final class SprintBoardTaskCard {
         ->setProject($this->project)
         ->setViewer($this->viewer);
     $task = $this->getTask();
-    $owner = $this->getOwner();
-    if ($owner) {
-      $ownerimage = $this->getUserImage();
-    } else {
-      $ownerimage = null;
-    }
-
     $task_phid = $task->getPHID();
-    $can_edit = $this->getCanEdit();
     $this->points = $query->getStoryPointsForTask($task_phid);
 
+    $can_edit = $this->getCanEdit();
 
     $color_map = ManiphestTaskPriority::getColorMap();
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
@@ -149,9 +122,35 @@ final class SprintBoardTaskCard {
                 ->setHref('/project/sprint/board/task/edit/'.$task->getID()
                     .'/'))
       ->setBarColor($bar_color)
-      ->setImageIcon($ownerimage)
       ->addAttribute($this->getCardAttributes());
+
+    if (!(is_null($this->owner))) {
+      $label = $this->owner->getName();
+      $ownerimage = $this->renderHandleIcon($this->owner, $label);
+    } else {
+      $ownerimage = null;
+    }
+    $card->setImageIcon($ownerimage);
+
     return $card;
   }
 
+  private function renderHandleIcon(PhabricatorObjectHandle $handle, $label) {
+    Javelin::initBehavior('phabricator-tooltips');
+
+    $options = array(
+        'class' => 'phui-object-item-handle-icon',
+        'style' => 'background-image: url('.$handle->getImageURI().')',
+    );
+
+    if (strlen($label)) {
+      $options['sigil'] = 'has-tooltip';
+      $options['meta']  = array('tip' => $label);
+    }
+
+    return javelin_tag(
+        'span',
+        $options,
+        '');
+  }
 }
