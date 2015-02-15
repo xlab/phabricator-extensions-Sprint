@@ -55,7 +55,7 @@ final class SprintBoardTaskCard {
     return $this->canEdit;
   }
 
-  public function getUserImage() {
+  private function getUserImage() {
     $ownername = $this->owner->getName();
     $ownerlink = '/p/'.$ownername.'/';
     $image_uri = $this->owner->getImageURI();
@@ -75,7 +75,11 @@ final class SprintBoardTaskCard {
   return $image;
   }
 
-  public function getPointList() {
+  private function getCardAttributes() {
+      $tokens = id(new SprintBoardCardToken())
+        ->setViewer($this->viewer)
+        ->getTokensForTask($this->task);
+
       $pointslabel = 'Points:';
       $pointsvalue = phutil_tag(
           'dd',
@@ -98,15 +102,9 @@ final class SprintBoardTaskCard {
           array(
               $pointskey,
               $pointsvalue,
+              $tokens,
           ));
     }
-
-  protected function isSprint($object) {
-    $validator = new SprintValidator();
-    $issprint = call_user_func(array($validator, 'checkForSprint'),
-        array($validator, 'isSprint'), $object->getPHID());
-    return $issprint;
-  }
 
   public function getItem() {
     require_celerity_resource('phui-workboard-view-css', 'sprint');
@@ -116,6 +114,12 @@ final class SprintBoardTaskCard {
         ->setViewer($this->viewer);
     $task = $this->getTask();
     $owner = $this->getOwner();
+    if ($owner) {
+      $ownerimage = $this->getUserImage();
+    } else {
+      $ownerimage = null;
+    }
+
     $task_phid = $task->getPHID();
     $can_edit = $this->getCanEdit();
     $this->points = $query->getStoryPointsForTask($task_phid);
@@ -144,15 +148,9 @@ final class SprintBoardTaskCard {
                 ->addSigil('edit-project-card')
                 ->setHref('/project/sprint/board/task/edit/'.$task->getID()
                     .'/'))
-      ->setBarColor($bar_color);
-
-    if ($this->isSprint($this->project) !== false) {
-      $card->addAttribute($this->getPointList());
-      if ($owner) {
-        $card->setImageIcon($this->getUserImage());
-      }
-    }
-
+      ->setBarColor($bar_color)
+      ->setImageIcon($ownerimage)
+      ->addAttribute($this->getCardAttributes());
     return $card;
   }
 

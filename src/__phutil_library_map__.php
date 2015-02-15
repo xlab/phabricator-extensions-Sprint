@@ -25,6 +25,7 @@ phutil_register_library_map(array(
     'SprintApplication' => 'application/SprintApplication.php',
     'SprintApplicationTest' => 'tests/SprintApplicationTest.php',
     'SprintBeginDateField' => 'customfield/SprintBeginDateField.php',
+    'SprintBoardCardToken' => 'util/SprintBoardCardToken.php',
     'SprintBoardColumnDetailController' => 'controller/board/SprintBoardColumnDetailController.php',
     'SprintBoardColumnEditController' => 'controller/board/SprintBoardColumnEditController.php',
     'SprintBoardColumnHideController' => 'controller/board/SprintBoardColumnHideController.php',
@@ -49,6 +50,7 @@ phutil_register_library_map(array(
     'SprintListController' => 'controller/SprintListController.php',
     'SprintListDataProvider' => 'storage/SprintListDataProvider.php',
     'SprintListTableView' => 'view/SprintListTableView.php',
+    'SprintObjectItemView' => 'view/SprintObjectItemView.php',
     'SprintPoints' => 'util/SprintPoints.php',
     'SprintProjectCustomField' => 'customfield/SprintProjectCustomField.php',
     'SprintProjectProfileController' => 'controller/SprintProjectProfileController.php',
@@ -98,6 +100,7 @@ phutil_register_library_map(array(
     'SprintEndDateField' => 'SprintProjectCustomField',
     'SprintIsSprintField' => 'SprintProjectCustomField',
     'SprintListController' => 'SprintController',
+    'SprintObjectItemView' => 'AphrontTagView',
     'SprintProjectCustomField' => array(
       'PhabricatorProjectCustomField',
       'PhabricatorStandardCustomFieldInterface',
