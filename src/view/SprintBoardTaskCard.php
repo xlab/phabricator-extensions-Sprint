@@ -56,10 +56,6 @@ final class SprintBoardTaskCard {
   }
 
   private function getCardAttributes() {
-      $tokens = id(new SprintBoardCardToken())
-        ->setViewer($this->viewer)
-        ->getTokensForTask($this->task);
-
       $pointslabel = 'Points:';
       $pointsvalue = phutil_tag(
           'dd',
@@ -82,7 +78,6 @@ final class SprintBoardTaskCard {
           array(
               $pointskey,
               $pointsvalue,
-              $tokens,
           ));
     }
 
