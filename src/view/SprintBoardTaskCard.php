@@ -97,8 +97,7 @@ final class SprintBoardTaskCard {
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
 
     if (!(is_null($this->owner))) {
-      $label = $this->owner->getName();
-      $ownerimage = $this->renderHandleIcon($this->owner, $label);
+      $ownerimage = $this->renderHandleIcon($this->owner);
     } else {
       $ownerimage = null;
     }
@@ -110,6 +109,7 @@ final class SprintBoardTaskCard {
       ->setHref('/T'.$task->getID())
       ->addSigil('project-card')
       ->setDisabled($task->isClosed())
+      ->setImageIcon($ownerimage)
       ->setMetadata(
         array(
           'objectPHID' => $task_phid,
@@ -124,28 +124,26 @@ final class SprintBoardTaskCard {
                 ->setHref('/project/sprint/board/task/edit/'.$task->getID()
                     .'/'))
       ->setBarColor($bar_color)
-      ->addAttribute($this->getCardAttributes())
-      ->setImageIcon($ownerimage);
+      ->addAttribute($this->getCardAttributes());
 
     return $card;
   }
 
-  private function renderHandleIcon(PhabricatorObjectHandle $handle, $label) {
-    Javelin::initBehavior('phabricator-tooltips');
+  private function renderHandleIcon(PhabricatorObjectHandle $handle) {
+    $ownername = $handle->getName();
+    $ownerlink = '/p/'.$ownername.'/';
+    $image_uri = 'background-image: url('.$handle->getImageURI().')';
+    $sigil = 'has-tooltip';
+    $meta  = array(
+        'tip' => pht($ownername),
+        'size' => 200,
+        'align' => 'E',);
+    $image = id(new SprintHandleIconView())
+        ->addSigil($sigil)
+        ->setMetadata($meta)
+        ->setHref($ownerlink)
+        ->setIconStyle($image_uri);
 
-    $options = array(
-        'class' => 'phui-object-item-handle-icon',
-        'style' => 'background-image: url('.$handle->getImageURI().')',
-    );
-
-    if (strlen($label)) {
-      $options['sigil'] = 'has-tooltip';
-      $options['meta']  = array('tip' => $label);
-    }
-
-    return phutil_tag(
-        'span',
-        $options,
-        '');
+    return $image;
   }
 }
