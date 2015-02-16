@@ -97,8 +97,7 @@ final class SprintBoardTaskCard {
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
 
     if (!(is_null($this->owner))) {
-      $label = $this->owner->getName();
-      $ownerimage = $this->renderHandleIcon($this->owner, $label);
+      $ownerimage = $this->renderHandleIcon($this->owner);
     } else {
       $ownerimage = null;
     }
