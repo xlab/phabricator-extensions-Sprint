@@ -73,7 +73,7 @@ abstract class SprintController extends PhabricatorController {
     $crumbs->addAction(
         id(new PHUIListItemView())
             ->setName(pht('Create Sprint'))
-            ->setHref($this->getProjectsURI().'create/')
+            ->setHref('/conduit/method/sprint.create/')
             ->setIcon('fa-calendar')
             ->setDisabled(!$can_create));
 
