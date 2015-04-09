@@ -37,8 +37,7 @@ final class SprintEndDateField extends SprintProjectCustomField {
   }
 
   // == Search
-  public function shouldAppearInApplicationSearch()
-  {
+  public function shouldAppearInApplicationSearch() {
     return true;
   }
 }
