@@ -155,7 +155,7 @@ abstract class SprintController extends PhabricatorController {
   }
 
   public function getErrorBox($e) {
-    $error_box = id(new PHUIErrorView())
+    $error_box = id(new PHUIInfoView())
         ->setTitle(pht('Burndown could not be rendered for this project'))
         ->setErrors(array($e->getMessage()));
     return $error_box;
