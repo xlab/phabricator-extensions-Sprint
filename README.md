@@ -25,6 +25,8 @@ Only tasks in Sprints have "Story Points".
 
 **INSTALLATION**
 
+Requirements: PHP: You need PHP 5.4 or newer.
+
 To install the Sprint extension:
 
 1. update your phabricator and libphutil to HEAD
