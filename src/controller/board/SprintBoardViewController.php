@@ -254,8 +254,11 @@ final class SprintBoardViewController
 
       $batch_ids = mpull($batch_tasks, 'getID');
       $batch_ids = implode(',', $batch_ids);
-
-      $batch_uri = new PhutilURI('/maniphest/batch/');
+      if ($is_sprint == true) {
+        $batch_uri = new PhutilURI('/project/sprint/board/batch/');
+      } else {
+        $batch_uri = new PhutilURI('/maniphest/batch/');
+      }
       $batch_uri->setQueryParam('board', $this->id);
       $batch_uri->setQueryParam('batch', $batch_ids);
       return id(new AphrontRedirectResponse())
