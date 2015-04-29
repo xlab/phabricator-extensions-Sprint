@@ -36,4 +36,3 @@ JX.behavior('c3-chart', function(config) {
             }
         });
 });
-
