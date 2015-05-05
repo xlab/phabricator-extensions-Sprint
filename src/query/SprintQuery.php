@@ -45,10 +45,11 @@ final class SprintQuery extends SprintDAO {
       $start = idx($aux_fields, 'isdc:sprint:startdate')
           ->getProxy()->getFieldValue();
     if (is_null($start)) {
-      $help = pht('To do this, go to the Project Edit Details Page');
-      throw new BurndownException("The project \"".$this->project->getName()
-          ."\" is not set up for Sprint because "
-          ."it has not been assigned a start date\n", $help);
+ //     $help = pht('To do this, go to the Project Edit Details Page');
+ //     throw new BurndownException("The project \"".$this->project->getName()
+ //         ."\" is not set up for Sprint because "
+ //         ."it has not been assigned a start date\n", $help);
+    return PhabricatorTime::getNow() - 1209600;
     } else {
       return $start;
     }
@@ -58,10 +59,11 @@ final class SprintQuery extends SprintDAO {
     $end = idx($aux_fields, 'isdc:sprint:enddate')
         ->getProxy()->getFieldValue();
     if (is_null($end)) {
-      $help = pht('To do this, go to the Project Edit Details Page');
-      throw new BurndownException("The project \"".$this->project->getName()
-          ."\" is not set up for Sprint because "
-          ."it has not been assigned an end date\n", $help);
+//      $help = pht('To do this, go to the Project Edit Details Page');
+//      throw new BurndownException("The project \"".$this->project->getName()
+//          ."\" is not set up for Sprint because "
+//          ."it has not been assigned an end date\n", $help);
+      return PhabricatorTime::getNow() + 1209600;
     } else {
       return $end;
     }
@@ -70,7 +72,10 @@ final class SprintQuery extends SprintDAO {
   public function getTasks() {
     $tasks = id(new ManiphestTaskQuery())
         ->setViewer($this->viewer)
-        ->withAnyProjects(array($this->project->getPHID()))
+        ->withEdgeLogicPHIDs(
+            PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
+            PhabricatorQueryConstraint::OPERATOR_OR,
+            array($this->project->getPHID()))
         ->needProjectPHIDs(true)
         ->execute();
     if (empty($tasks)) {
