@@ -72,7 +72,10 @@ final class SprintQuery extends SprintDAO {
   public function getTasks() {
     $tasks = id(new ManiphestTaskQuery())
         ->setViewer($this->viewer)
-        ->withAnyProjects(array($this->project->getPHID()))
+        ->withEdgeLogicPHIDs(
+            PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
+            PhabricatorQueryConstraint::OPERATOR_OR,
+            array($this->project->getPHID()))
         ->needProjectPHIDs(true)
         ->execute();
     if (empty($tasks)) {
