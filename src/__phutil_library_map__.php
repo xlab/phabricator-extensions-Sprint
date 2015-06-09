@@ -49,7 +49,7 @@ phutil_register_library_map(array(
     'SprintDataViewController' => 'controller/SprintDataViewController.php',
     'SprintDefaultViewCapability' => 'capability/SprintDefaultViewCapability.php',
     'SprintEndDateField' => 'customfield/SprintEndDateField.php',
-    'SprintGetTaskProjectHistoryConduitAPIMethod' => 'conduit/SprintGetTaskProjectHistoryAPIMethod.php',
+    'SprintGetTaskProjectHistoryConduitAPIMethod' => 'conduit/SprintGetTaskProjectHistoryConduitAPIMethod.php',
     'SprintHandleIconView' => 'view/SprintHandleIconView.php',
     'SprintHistoryController' => 'controller/SprintHistoryController.php',
     'SprintHistoryDataProvider' => 'storage/SprintHistoryDataProvider.php',

@@ -303,9 +303,8 @@ final class SprintQuery extends SprintDAO {
 
   public function getProjectNamefromPHID ($phid) {
       $project = id(new PhabricatorProjectQuery())
-          ->setViewer($this->viewer)
+          ->setViewer(PhabricatorUser::getOmnipotentUser())
           ->withPHIDs(array($phid))
-          ->needImages(true)
           ->executeOne();
         $name = $project->getName();
       return $name;
@@ -313,7 +312,7 @@ final class SprintQuery extends SprintDAO {
 
   public function getTaskNamefromPHID ($phid) {
     $task = id(new ManiphestTaskQuery())
-        ->setViewer($this->viewer)
+        ->setViewer(PhabricatorUser::getOmnipotentUser())
         ->withPHIDs(array($phid))
         ->executeOne();
     $name = $task->getMonogram();
