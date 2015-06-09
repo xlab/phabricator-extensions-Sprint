@@ -65,6 +65,7 @@ final class SprintApplication extends PhabricatorApplication {
               'profile/(?P<id>[1-9]\d*)/'
               => 'SprintProjectProfileController',
               'report/list/' => 'SprintListController',
+              'report/history/' => 'SprintHistoryController',
               'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
               'view/(?P<id>\d+)/' => 'SprintDataViewController',
               // all routes following point to default controllers
