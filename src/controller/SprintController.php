@@ -38,7 +38,7 @@ abstract class SprintController extends PhabricatorController {
         ->addFilter('user', pht('By User'))
         ->addLabel(pht('Burn Up'))
         ->addFilter('burn', pht('Burn Up Rate'))
-        ->addFilter('history', pht('Project Task History'));
+        ->addFilter('history', pht('Task Project History'));
     return $nav;
   }
 

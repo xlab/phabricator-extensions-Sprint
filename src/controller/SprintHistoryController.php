@@ -26,7 +26,7 @@ final class SprintHistoryController extends SprintController {
     $can_create = $this->hasApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY);
     $crumbs = $this->buildSprintApplicationCrumbs($can_create);
-    $crumbs->addTextCrumb(pht('Sprint Burndown List'));
+    $crumbs->addTextCrumb(pht('Task Project History'));
 
     $help = id(new PHUIBoxView())
         ->appendChild(phutil_tag('p', array(),
@@ -45,7 +45,7 @@ final class SprintHistoryController extends SprintController {
     return $this->buildApplicationPage(
         $nav,
         array(
-            'title' => array(pht('Sprint List')),
+            'title' => array(pht('Task Project History')),
             'device' => true,
         ));
   }

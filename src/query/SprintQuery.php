@@ -152,7 +152,7 @@ final class SprintQuery extends SprintDAO {
     return $xactions;
   }
 
-  public function getAllXactions($tasks) {
+  public function getEdgeXactions($tasks) {
     $xactions = id(new ManiphestTransactionQuery())
         ->setViewer($this->viewer)
         ->withTransactionTypes(array(PhabricatorTransactions::TYPE_EDGE))
@@ -343,7 +343,7 @@ final class SprintQuery extends SprintDAO {
     foreach ($all_tasks as $task) {
       $all_task_phids[] = $task->getPHID();
     }
-    $all_xactions = $this->getAllXactions($all_task_phids);
+    $all_xactions = $this->getEdgeXactions($all_task_phids);
 
     foreach ($all_xactions as $xaction) {
       $new = $xaction->getNewValue();
