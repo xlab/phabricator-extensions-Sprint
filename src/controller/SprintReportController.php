@@ -42,6 +42,11 @@ final class SprintReportController extends SprintController {
             ->setUser($user)
             ->setRequest($request);
         break;
+      case 'history':
+        $core = id(new ProjectTaskHistoryView())
+            ->setUser($user)
+            ->setRequest($request);
+        break;
       default:
         return new Aphront404Response();
     }
