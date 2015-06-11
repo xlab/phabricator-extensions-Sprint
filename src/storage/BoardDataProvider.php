@@ -174,15 +174,10 @@ final class BoardDataProvider {
   private function getProjectColumnXactions() {
     $xactions = array();
     $scope_phid = $this->project->getPHID();
-<<<<<<< HEAD
-    $query = new ManiphestTransactionQuery();
-    $query->withTransactionTypes(array(ManiphestTransaction::TYPE_PROJECT_COLUMN));
-=======
     $task_phids = mpull($this->tasks, 'getPHID');
     $query = new ManiphestTransactionQuery();
     $query->withTransactionTypes(array(ManiphestTransaction::TYPE_PROJECT_COLUMN));
     $query->withObjectPHIDs($task_phids);
->>>>>>> 04f624f... changes BoardDataProvider source from FeedQuery to Maniphest Transaction Query
     $query->setViewer($this->viewer);
     $col_xactions = $query->execute();
     foreach ($col_xactions as $xaction) {
