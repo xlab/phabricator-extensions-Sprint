@@ -1,8 +1,32 @@
 <?php
 
-final class SprintHistoryTableView {
+final class SprintHistoryTableView extends SprintView {
 
+  private $request;
   private $tableData;
+  protected $user;
+
+  public function setViewer (PhabricatorUser $user) {
+    $this->user = $user;
+    return $this;
+  }
+
+  public function setRequest ($request) {
+    $this->request = $request;
+    return $this;
+  }
+
+  public function render() {
+    require_celerity_resource('sprint-report-css', 'sprint');
+    $filter = parent::BuildFilter($this->request);
+    if ($this->request->getStr('project')) {
+      $table = $this->buildProjectsTable();
+    } else {
+      $table = null;
+    }
+
+    return array($filter, $table);
+  }
 
   public function setTableData ($table_data) {
     $this->tableData = $table_data;

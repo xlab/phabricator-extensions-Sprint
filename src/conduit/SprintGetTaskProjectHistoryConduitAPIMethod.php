@@ -7,11 +7,13 @@ final class SprintGetTaskProjectHistoryConduitAPIMethod extends SprintConduitAPI
   }
 
   public function getMethodDescription() {
-    return pht('Get History of Tasks Added and Removed from Projects ');
+    return pht('Get History of Task Project Assignment');
   }
 
   public function defineParamTypes() {
-    return array();
+    return array(
+        'project'       => 'required string ("PHID")',
+    );
   }
 
   public function defineReturnType() {
@@ -31,7 +33,7 @@ final class SprintGetTaskProjectHistoryConduitAPIMethod extends SprintConduitAPI
 
     $history = id(new SprintQuery())
         ->setViewer($user)
-        ->getTaskHistory();
+        ->getTaskHistory($request->getValue('project'));
     return $history;
   }
 

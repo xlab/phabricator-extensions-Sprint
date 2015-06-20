@@ -43,7 +43,7 @@ final class SprintReportController extends SprintController {
             ->setRequest($request);
         break;
       case 'history':
-        $core = id(new ProjectTaskHistoryView())
+        $core = id(new SprintHistoryTableView())
             ->setUser($user)
             ->setRequest($request);
         break;
