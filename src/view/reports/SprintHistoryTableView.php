@@ -34,28 +34,35 @@ final class SprintHistoryTableView extends SprintView {
   }
 
   public function buildProjectsTable () {
-    $id = 'history-table';
-    Javelin::initBehavior('sprint-history-table', array(
-        'hardpoint' => $id,
-    ), 'sprint');
-    $projects_table = id(new SprintTableView($this->tableData->getRows()))
-        ->setHeaders(
-            array(
-                'projectremoved',
-                'projectadded',
-                'projName',
-                'taskName',
-                'createdEpoch',
-                'created',
-            ))
-        ->setTableId('sprint-history')
-        ->setClassName('display');
+    if ($this->tableData) {
+      $id = 'history-table';
+      Javelin::initBehavior('sprint-history-table', array(
+          'hardpoint' => $id,
+      ), 'sprint');
+        $projects_table = id(new SprintTableView($this->tableData->getRows()))
+            ->setHeaders(
+                array(
+                    'projectremoved',
+                    'projectadded',
+                    'projName',
+                    'taskName',
+                    'createdEpoch',
+                    'created',
+                ))
+            ->setTableId('sprint-history')
+            ->setClassName('display');
 
-    $projects_table = id(new PHUIBoxView())
-        ->appendChild($projects_table)
-        ->addMargin(PHUI::MARGIN_LARGE);
+        $projects_table = id(new PHUIBoxView())
+            ->appendChild($projects_table)
+            ->addMargin(PHUI::MARGIN_LARGE);
 
-    return $projects_table;
+        return $projects_table;
+    } else {
+      return
+          phutil_tag(
+              'p',
+              array(), pht('No data available.'));
+    }
   }
 
 }

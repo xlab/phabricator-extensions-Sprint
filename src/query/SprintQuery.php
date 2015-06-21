@@ -357,36 +357,41 @@ final class SprintQuery extends SprintDAO {
     $project_removed_map = null;
     $task_added_proj_log = null;
     $task_removed_proj_log = null;
+    $task_proj_log = null;
 
     if ($project_phid) {
       $tasks = $this->getTasksforProject($project_phid);
 
-      foreach ($tasks as $task) {
-        $all_task_phids[] = $task->getPHID();
-      }
-      $all_xactions = $this->getEdgeXactions($all_task_phids);
+      if ($tasks) {
+        foreach ($tasks as $task) {
+          $all_task_phids[] = $task->getPHID();
+        }
+        $all_xactions = $this->getEdgeXactions($all_task_phids);
 
-      foreach ($all_xactions as $xaction) {
-        $new = $xaction->getNewValue();
-        $old = $xaction->getOldValue();
-        $oldtype = ipull($old, 'type');
-        $newtype = ipull($new, 'type');
-        $add_diff = array_diff_key($newtype, $oldtype);
-        $rem_diff = array_diff_key($oldtype, $newtype);
-        if (!$rem_diff && $add_diff) {
-          foreach ($add_diff as $key => $value) {
-            if ($value == '41') {
-              $project_added_map[$key][] = $xaction;
+        foreach ($all_xactions as $xaction) {
+          $new = $xaction->getNewValue();
+          $old = $xaction->getOldValue();
+          $oldtype = ipull($old, 'type');
+          $newtype = ipull($new, 'type');
+          $add_diff = array_diff_key($newtype, $oldtype);
+          $rem_diff = array_diff_key($oldtype, $newtype);
+          if (!$rem_diff && $add_diff) {
+            foreach ($add_diff as $key => $value) {
+              if ($value == '41') {
+                $project_added_map[$key][] = $xaction;
+              }
             }
-          }
-        } else {
-          foreach ($rem_diff as $key => $value) {
-            if ($value == '41') {
-              $project_removed_map[$key][] = $xaction;
+          } else {
+            foreach ($rem_diff as $key => $value) {
+              if ($value == '41') {
+                $project_removed_map[$key][] = $xaction;
+              }
             }
           }
         }
       }
+
+      if ($project_added_map) {
         $distinct_projects = array_unique($project_added_map, SORT_REGULAR);
         foreach ($distinct_projects as $project => $proj_xactions) {
           foreach ($proj_xactions as $proj_xaction) {
@@ -402,7 +407,9 @@ final class SprintQuery extends SprintDAO {
             );
           }
         }
+      }
 
+      if ($project_removed_map) {
         $distinct_removed = array_unique($project_removed_map, SORT_REGULAR);
         foreach ($distinct_removed as $project => $proj_xactions) {
           foreach ($proj_xactions as $proj_xaction) {
@@ -418,8 +425,11 @@ final class SprintQuery extends SprintDAO {
             );
           }
         }
+      }
 
-      $task_proj_log = array_merge($task_added_proj_log, $task_removed_proj_log);
+      if ($task_added_proj_log && $task_removed_proj_log) {
+        $task_proj_log = array_merge($task_added_proj_log, $task_removed_proj_log);
+      }
       return $task_proj_log;
     } else {
       return null;
