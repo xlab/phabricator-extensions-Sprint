@@ -32,8 +32,11 @@ To install the Sprint extension:
 1. update your phabricator and libphutil to HEAD
 2. run git clone https://github.com/wikimedia/phabricator-extensions-Sprint.git /srv/phab/libext/sprint
 3. from the /srv/phab/phabricator/bin directory run:
+
         ./config set load-libraries '{"sprint":"/srv/phab/libext/sprint/src"}'
+
 4. create a symlink to link static files from the Sprint extension in the phabricator /webroot/rsrc directory:
+
         ln -s /srv/phab/libext/sprint/rsrc/webroot-static /srv/phab/phabricator/webroot/rsrc/sprint
 
 **BUGS**
