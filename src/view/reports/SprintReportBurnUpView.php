@@ -250,7 +250,7 @@ final class SprintReportBurnUpView extends SprintView {
     if ($caption) {
       $panel->setInfoView($caption);
     }
-    $panel->appendChild($table);
+    $panel->setTable($table);
 
     return $panel;
   }

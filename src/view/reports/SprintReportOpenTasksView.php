@@ -89,7 +89,7 @@ final class SprintReportOpenTasksView extends SprintView {
         $reverse);
     $panel = new PHUIObjectBoxView();
     $panel->setHeaderText($header);
-    $panel->appendChild($table);
+    $panel->setTable($table);
 
     $tokens = array();
     if ($project_handle) {
