@@ -5,6 +5,7 @@ final class SprintHistoryDataProvider {
   private $request;
   private $rows;
   private $history;
+  private $project;
 
   public function setViewer ($viewer) {
     $this->viewer = $viewer;
@@ -16,7 +17,7 @@ final class SprintHistoryDataProvider {
     return $this;
   }
 
-  public function getRequest () {
+   public function getRequest () {
     return $this->request;
   }
 
@@ -27,14 +28,16 @@ final class SprintHistoryDataProvider {
   public function execute() {
     $this->history = id(new SprintQuery())
         ->setViewer($this->viewer)
-        ->getTaskHistory();
-    $this->buildSprintHistoryData();
-    return $this;
+        ->getTaskHistory($this->request->getStr('project'));
+    if ($this->history) {
+      $this->buildSprintHistoryData();
+      return $this;
+    } else {
+      return null;
+    }
   }
 
   private function buildSprintHistoryData() {
-    $query = id(new SprintQuery())
-        ->setViewer($this->viewer);
 
     $rows = array();
     foreach ($this->history as $project) {

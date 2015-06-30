@@ -4,7 +4,7 @@ final class SprintQuery extends SprintDAO {
 
   private $viewer;
   private $project;
-  private $project_phid;
+  private $projectPHID;
 
   public function setProject ($project) {
     $this->project = $project;
@@ -17,7 +17,7 @@ final class SprintQuery extends SprintDAO {
   }
 
   public function setPHID ($project_phid) {
-    $this->project_phid = $project_phid;
+    $this->projectPHID = $project_phid;
     return $this;
   }
 
@@ -89,6 +89,18 @@ final class SprintQuery extends SprintDAO {
     }
   }
 
+  public function getTasksforProject($project) {
+    $tasks = id(new ManiphestTaskQuery())
+        ->setViewer($this->viewer)
+        ->withEdgeLogicPHIDs(
+            PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
+            PhabricatorQueryConstraint::OPERATOR_OR,
+            array($project))
+        ->needProjectPHIDs(true)
+        ->execute();
+    return $tasks;
+  }
+
   public function getAllTasks() {
     $tasks = id(new ManiphestTaskQuery())
         ->setViewer($this->viewer)
@@ -116,7 +128,7 @@ final class SprintQuery extends SprintDAO {
     $issprint = null;
     $object = new PhabricatorProjectCustomFieldStorage();
     $boolfield = $object->loadRawDataWhere('objectPHID= %s AND
-    fieldIndex=%s', $this->project_phid, SprintConstants::SPRINTFIELD_INDEX);
+    fieldIndex=%s', $this->projectPHID, SprintConstants::SPRINTFIELD_INDEX);
     if (!empty($boolfield)) {
       foreach ($boolfield as $array) {
         $issprint = idx($array, 'fieldValue');
@@ -161,10 +173,10 @@ final class SprintQuery extends SprintDAO {
     return $xactions;
   }
 
-  public function getXactionsforProject($projectPHID) {
+  public function getXactionsforProject($project_phid) {
     $xactions = id(new ManiphestTransactionQuery())
         ->setViewer($this->viewer)
-        ->withObjectPHIDs($projectPHID)
+        ->withObjectPHIDs($project_phid)
         ->execute();
     return $xactions;
   }
@@ -192,7 +204,7 @@ final class SprintQuery extends SprintDAO {
   public function getJoins() {
 
     $joins = '';
-    if ($this->project_phid) {
+    if ($this->projectPHID) {
       $joins = qsprintf(
           $this->getXactionConn(),
           'JOIN %T t ON x.objectPHID = t.phid
@@ -200,7 +212,7 @@ final class SprintQuery extends SprintDAO {
           id(new ManiphestTask())->getTableName(),
           PhabricatorEdgeConfig::TABLE_NAME_EDGE,
           PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
-          $this->project_phid);
+          $this->projectPHID);
     }
     return $joins;
   }
@@ -208,7 +220,7 @@ final class SprintQuery extends SprintDAO {
   public function getCustomFieldJoins() {
 
     $joins = '';
-    if ($this->project_phid) {
+    if ($this->projectPHID) {
       $joins = qsprintf(
           $this->getCustomFieldConn(),
           'JOIN %T t ON f.objectPHID = t.phid
@@ -216,7 +228,7 @@ final class SprintQuery extends SprintDAO {
           id(new ManiphestTask())->getTableName(),
           PhabricatorEdgeConfig::TABLE_NAME_EDGE,
           PhabricatorProjectObjectHasProjectEdgeType::EDGECONST,
-          $this->project_phid);
+          $this->projectPHID);
     }
     return $joins;
   }
@@ -252,7 +264,8 @@ final class SprintQuery extends SprintDAO {
     $edges = id(new PhabricatorEdgeQuery())
         ->withSourcePHIDs(array_keys($tasks))
         ->withEdgeTypes(array( ManiphestTaskDependsOnTaskEdgeType::EDGECONST,
-            ManiphestTaskDependedOnByTaskEdgeType::EDGECONST,))
+            ManiphestTaskDependedOnByTaskEdgeType::EDGECONST,
+        ))
         ->execute();
     return $edges;
   }
@@ -265,15 +278,15 @@ final class SprintQuery extends SprintDAO {
   public function getProjectColumns() {
     $columns = id(new PhabricatorProjectColumnQuery())
         ->setViewer($this->viewer)
-        ->withProjectPHIDs(array($this->project_phid))
+        ->withProjectPHIDs(array($this->projectPHID))
         ->execute();
-    $columns = msort($columns, 'getSequence');
-    if (!$columns) {
+    if (!empty($columns)) {
+      $columns = msort($columns, 'getSequence');
+      return $columns;
+    } else {
       $help = pht('To Create a Sprint Board, go to the Project profile page'
           .' and select the Sprint Board icon from the left side bar');
       throw new BurndownException("There is no Sprint Board yet\n", $help);
-    } else {
-      return $columns;
     }
   }
 
@@ -289,7 +302,7 @@ final class SprintQuery extends SprintDAO {
     if ($tasks) {
         $positions = id(new PhabricatorProjectColumnPositionQuery())
             ->setViewer($this->viewer)
-            ->withBoardPHIDs(array($this->project_phid))
+            ->withBoardPHIDs(array($this->projectPHID))
             ->withObjectPHIDs(mpull($tasks, 'getPHID'))
             ->withColumns($columns)
             ->needColumns(true)
@@ -338,66 +351,89 @@ final class SprintQuery extends SprintDAO {
     return $events;
   }
 
-  public function getTaskHistory() {
-    $all_tasks = $this->getAllTasks();
-    foreach ($all_tasks as $task) {
-      $all_task_phids[] = $task->getPHID();
-    }
-    $all_xactions = $this->getEdgeXactions($all_task_phids);
+  public function getTaskHistory($project_phid) {
+    $all_task_phids = null;
+    $project_added_map = null;
+    $project_removed_map = null;
+    $task_added_proj_log = null;
+    $task_removed_proj_log = null;
 
-    foreach ($all_xactions as $xaction) {
-      $new = $xaction->getNewValue();
-      $old = $xaction->getOldValue();
-      $oldtype = ipull($old, 'type');
-      $newtype = ipull($new, 'type');
-      $add_diff = array_diff_key($newtype, $oldtype);
-      $rem_diff = array_diff_key($oldtype, $newtype);
-      if (!$rem_diff && $add_diff) {
-        foreach ($add_diff as $key => $value) {
-          if ($value == '41') {
-            $project_added_map[$key][] = $xaction;
+    if ($project_phid) {
+      $tasks = $this->getTasksforProject($project_phid);
+
+      if ($tasks) {
+        foreach ($tasks as $task) {
+          $all_task_phids[] = $task->getPHID();
+        }
+        $all_xactions = $this->getEdgeXactions($all_task_phids);
+
+        foreach ($all_xactions as $xaction) {
+          $new = $xaction->getNewValue();
+          $old = $xaction->getOldValue();
+          $oldtype = ipull($old, 'type');
+          $newtype = ipull($new, 'type');
+          $add_diff = array_diff_key($newtype, $oldtype);
+          $rem_diff = array_diff_key($oldtype, $newtype);
+          if (!empty($add_diff)) {
+            foreach ($add_diff as $key => $value) {
+              if ($value == '41') {
+                $project_added_map[$key][] = $xaction;
+              }
+            }
+          } else if (!empty($rem_diff)) {
+            foreach ($rem_diff as $key => $value) {
+              if ($value == '41') {
+                $project_removed_map[$key][] = $xaction;
+              }
+            }
+          } else {}
+        }
+      }
+
+      if (!empty($project_added_map)) {
+        $distinct_projects = array_unique($project_added_map, SORT_REGULAR);
+        foreach ($distinct_projects as $project => $proj_xactions) {
+          foreach ($proj_xactions as $proj_xaction) {
+            $task_added_proj_log[] = array(
+                'projectadded' => true,
+                'projectremoved' => false,
+                'projPHID' => $project,
+                'projName' => $this->getProjectNamefromPHID($project),
+                'transactionPHID' => $proj_xaction->getPHID(),
+                'objectPHID' => $proj_xaction->getObjectPHID(),
+                'taskName' => $this->getTaskNamefromPHID($proj_xaction->getObjectPHID()),
+                'createdEpoch' => $proj_xaction->getDateCreated(),
+            );
           }
         }
-      } else {
-        foreach ($rem_diff as $key => $value) {
-          if ($value == '41') {
-            $project_removed_map[$key][] = $xaction;
+      }
+
+      if (!empty($project_removed_map)) {
+        $distinct_removed = array_unique($project_removed_map, SORT_REGULAR);
+        foreach ($distinct_removed as $project => $proj_xactions) {
+          foreach ($proj_xactions as $proj_xaction) {
+            $task_removed_proj_log[] = array(
+                'projectadded' => false,
+                'projectremoved' => true,
+                'projPHID' => $project,
+                'projName' => $this->getProjectNamefromPHID($project),
+                'transactionPHID' => $proj_xaction->getPHID(),
+                'objectPHID' => $proj_xaction->getObjectPHID(),
+                'taskName' => $this->getTaskNamefromPHID($proj_xaction->getObjectPHID()),
+                'createdEpoch' => $proj_xaction->getDateCreated(),
+            );
           }
         }
       }
-    }
-    $distinct_projects = array_unique($project_added_map, SORT_REGULAR);
-    foreach ($distinct_projects as $project => $proj_xactions) {
-      foreach ($proj_xactions as $proj_xaction) {
-        $task_added_proj_log[] = array(
-            'projectadded' => true,
-            'projectremoved' => false,
-            'projPHID' => $project,
-            'projName' => $this->getProjectNamefromPHID($project),
-            'transactionPHID' => $proj_xaction->getPHID(),
-            'objectPHID' => $proj_xaction->getObjectPHID(),
-            'taskName' => $this->getTaskNamefromPHID($proj_xaction->getObjectPHID()),
-            'createdEpoch' => $proj_xaction->getDateCreated(),
-        );
-      }
-    }
 
-    $distinct_removed = array_unique($project_removed_map, SORT_REGULAR);
-    foreach ($distinct_removed as $project => $proj_xactions) {
-      foreach ($proj_xactions as $proj_xaction) {
-        $task_removed_proj_log[] = array(
-            'projectadded' => false,
-            'projectremoved' => true,
-            'projPHID' => $project,
-            'projName' => $this->getProjectNamefromPHID($project),
-            'transactionPHID' => $proj_xaction->getPHID(),
-            'objectPHID' => $proj_xaction->getObjectPHID(),
-            'taskName' => $this->getTaskNamefromPHID($proj_xaction->getObjectPHID()),
-            'createdEpoch' => $proj_xaction->getDateCreated(),
-        );
-      }
+      if (!empty($task_added_proj_log) && !empty($task_removed_proj_log)) {
+        $task_proj_log = array_merge($task_added_proj_log, $task_removed_proj_log);
+        return $task_proj_log;
+      } else if (!empty($task_added_proj_log) && empty($task_removed_proj_log)) {
+        return $task_added_proj_log;
+      } else {}
+    } else {
+      return null;
     }
-    $task_proj_log = array_merge($task_added_proj_log, $task_removed_proj_log);
-    return $task_proj_log;
   }
 }

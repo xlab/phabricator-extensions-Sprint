@@ -19,13 +19,7 @@ abstract class SprintView extends AphrontView {
       list($window_str, , $window_error) = $this->getWindow($request);
       $form
           ->appendChild(
-              id(new AphrontFormTextControl())
-                  ->setLabel(pht('Recently Means'))
-                  ->setName('set_window')
-                  ->setCaption(
-                      pht('Configure the cutoff for the "Recently Closed" column.'))
-                  ->setValue($window_str)
-                  ->setError($window_error));
+              id(new AphrontFormDividerControl()));
     }
 
     $form
@@ -39,6 +33,7 @@ abstract class SprintView extends AphrontView {
     return $filter;
   }
 
+
   public function getWindow($request) {
     $window_str = $request->getStr('window', '12 AM 7 days ago');
 
@@ -48,7 +43,7 @@ abstract class SprintView extends AphrontView {
     // time windows like "3 PM", rather than assuming the server timezone.
 
     $window_epoch = PhabricatorTime::parseLocalTime($window_str, $this->user);
-    if (!$window_epoch) {
+    if ($window_epoch === null) {
       $error = 'Invalid';
       $window_epoch = time() - (60 * 60 * 24 * 7);
     }
@@ -66,5 +61,35 @@ abstract class SprintView extends AphrontView {
     }
 
     return array($window_str, $window_epoch, $error);
+  }
+
+  public function buildFilter($request) {
+    $handle = null;
+    $project_phid = $request->getStr('project');
+    if ($project_phid) {
+      $phids = array($project_phid);
+      $handle = $this->getProjectHandle ($phids, $project_phid, $request);
+    }
+    $tokens = array();
+    if ($handle) {
+      $tokens = $this->getTokens($handle);
+    }
+    $filter = $this->renderReportFilters($tokens, $has_window = true,
+        $request, $this->user);
+    return $filter;
+  }
+
+  private function getTokens($handle) {
+    $tokens = array($handle);
+    return $tokens;
+  }
+
+  public function getProjectHandle($phids, $project_phid, $request) {
+    $query = id(new SprintQuery())
+        ->setPHID($project_phid);
+
+    $handles = $query->getViewerHandles($request, $phids);
+    $handle = $handles[$project_phid];
+    return $handle;
   }
 }

@@ -110,7 +110,7 @@ final class SprintTableView extends AphrontView {
     $headers = $this->headers;
     $short_headers = $this->shortHeaders;
     $sort_values = $this->sortValues;
-    if ($headers) {
+    if (!empty($headers)) {
       while (count($headers) > count($visibility)) {
         $visibility[] = true;
       }
@@ -140,7 +140,7 @@ final class SprintTableView extends AphrontView {
           $classes[] = 'aphront-table-view-nodevice';
         }
 
-        if ($classes) {
+        if (!empty($classes)) {
           $class = implode(' ', $classes);
         } else {
           $class = null;
@@ -175,7 +175,7 @@ final class SprintTableView extends AphrontView {
     }
 
     $data = $this->data;
-    if ($data) {
+    if (!empty($data)) {
       $row_num = 0;
       foreach ($data as $row) {
         while (count($row) > count($col_classes)) {
@@ -242,7 +242,8 @@ final class SprintTableView extends AphrontView {
     }
 
     $html = phutil_tag('table', array('class' => $table_class,
-        'id' => $table_id,), $table);
+        'id' => $table_id,
+    ), $table);
     return phutil_tag_div('aphront-table-wrap', $html);
   }
 
