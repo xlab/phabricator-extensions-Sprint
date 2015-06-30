@@ -31,7 +31,9 @@ final class BurndownChartView {
         'pointstoday' => $pointstoday,
     ), 'sprint');
 
-    $chart = id(new SprintUIObjectBoxView())->setHeaderText(pht('Burndown for '.$project_name))
+    $chart = id(new PHUIObjectBoxView())
+        ->setHeaderText(pht('Burndown for '.$project_name))
+        ->setColor('blue')
         ->appendChild(phutil_tag('div',
             array(
                 'id' => 'chart',

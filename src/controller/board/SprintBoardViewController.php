@@ -403,12 +403,16 @@ final class SprintBoardViewController
       ->addActionLink($manage_menu)
       ->setPolicyObject($project);
 
+    $header_box = id(new PHUIBoxView())
+        ->appendChild($header)
+        ->addClass('project-board-header');
+
     $board_box = id(new PHUIBoxView())
       ->appendChild($board)
       ->addClass('project-board-wrapper');
 
     $nav = $this->buildIconNavView($project);
-    $nav->appendChild($header);
+    $nav->appendChild($header_box);
     $nav->appendChild($board_box);
 
     return $this->buildApplicationPage(
@@ -416,6 +420,7 @@ final class SprintBoardViewController
       array(
         'title' => pht('%s Board', $project->getName()),
         'showFooter' => false,
+        'pageObjects' => array($project->getPHID()),
       ));
   }
 

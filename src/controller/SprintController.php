@@ -71,8 +71,8 @@ abstract class SprintController extends PhabricatorController {
         ->addNavigationItems($nav->getMenu());
 
     if ($viewer->isLoggedIn()) {
-      $nav->addLabel(pht('Reports'));
-      $nav->addFilter('report', pht('Reports'));
+      $nav->addLabel(pht('Sprints'));
+      $nav->addFilter('report/list', pht('Sprint List'));
     }
 
     $nav->selectFilter(null);
