@@ -1,6 +1,6 @@
 <?php
 
-final class BoardDataPieView {
+final class BoardDataPieView extends Phobject{
 
   private $boardData;
 
