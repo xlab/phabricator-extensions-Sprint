@@ -395,7 +395,7 @@ final class SprintBoardViewController
       $project->getName());
 
     $header = id(new PHUIHeaderView())
-      ->setHeader(pht('%s Workboard', $header_link))
+      ->setHeader($header_link)
       ->setUser($viewer)
       ->setNoBackground(true)
       ->addActionLink($sort_menu)
