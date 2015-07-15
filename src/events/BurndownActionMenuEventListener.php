@@ -42,12 +42,13 @@ final class BurndownActionMenuEventListener extends PhabricatorEventListener {
     if (!$this->canUseApplication($event->getUser())) {
       return null;
     }
-
+    $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
     $project = $event->getValue('object');
     $projectid = $project->getId();
 
     $view_uri = '/project/sprint/view/'.$projectid;
     $board_uri = '/project/sprint/board/'.$projectid;
+    $phragile_uri = 'https://phragile.wmflabs.org/sprints/'.$projectid;
 
     $burndown = id(new PhabricatorActionView())
         ->setIcon('fa-bar-chart-o')
@@ -59,7 +60,16 @@ final class BurndownActionMenuEventListener extends PhabricatorEventListener {
         ->setName(pht('View Sprint Board'))
         ->setHref($board_uri);
 
-    return array ($burndown, $board);
+    $phragile = null;
+    if ($enable_phragile) {
+      $phragile = id(new PhabricatorActionView())
+          ->setIcon('fa-pie-chart')
+          ->setName(pht('View in Phragile'))
+          ->setHref($phragile_uri);
+    }
+
+
+    return array ($burndown, $board, $phragile);
   }
 
 
