@@ -25,7 +25,7 @@ abstract class SprintConduitAPIMethod extends ConduitAPIMethod {
 
       $project_slugs = $project->getSlugs();
       $project_slugs = array_values(mpull($project_slugs, 'getSlug'));
-
+      $issprint = $this->isSprint($project->getPHID());
       $project_icon = PhabricatorProjectIcon::getAPIName($project->getIcon());
 
       $result[$project->getPHID()] = array(
@@ -37,6 +37,7 @@ abstract class SprintConduitAPIMethod extends ConduitAPIMethod {
         'color'            => $project->getColor(),
         'members'          => $member_phids,
         'slugs'            => $project_slugs,
+        'issprint'         => $issprint,
         'dateCreated'      => $project->getDateCreated(),
         'dateModified'     => $project->getDateModified(),
       );
@@ -45,4 +46,10 @@ abstract class SprintConduitAPIMethod extends ConduitAPIMethod {
     return $result;
   }
 
+  protected function isSprint($project_phid) {
+    $validator = new SprintValidator();
+    $issprint = call_user_func(array($validator, 'checkForSprint'),
+        array($validator, 'isSprint'), $project_phid);
+    return $issprint;
+  }
 }
