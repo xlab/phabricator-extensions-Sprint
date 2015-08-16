@@ -18,7 +18,7 @@ final class SprintBoardViewController
   }
 
   public function handleRequest(AphrontRequest $request) {
-    $viewer = $request->getUser();
+    $viewer = $request->getViewer();
     $id = $request->getURIData('id');
 
     $show_hidden = $request->getBool('hidden');
@@ -559,7 +559,7 @@ final class SprintBoardViewController
     $show_hidden) {
 
     $request = $this->getRequest();
-    $viewer = $request->getUser();
+    $viewer = $request->getViewer();
 
     $can_edit = PhabricatorPolicyFilter::hasCapability(
       $viewer,
@@ -640,7 +640,7 @@ final class SprintBoardViewController
     PhabricatorProjectColumn $column) {
 
     $request = $this->getRequest();
-    $viewer = $request->getUser();
+    $viewer = $request->getViewer();
 
     $can_edit = PhabricatorPolicyFilter::hasCapability(
       $viewer,

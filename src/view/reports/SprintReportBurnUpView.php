@@ -4,8 +4,8 @@ final class SprintReportBurnUpView extends SprintView {
 
   private $request;
 
-  public function setUser (PhabricatorUser $user) {
-    $this->user = $user;
+  public function setUser (PhabricatorUser $viewer) {
+    $this->user = $viewer;
     return $this;
   }
 

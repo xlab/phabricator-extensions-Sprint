@@ -38,7 +38,7 @@ div.phui-object-box.phui-object-box-flush {
     margin: 0;
     border-radius: 0;
     border: 0;
-border-bottom: 1px solid {$thinblueborder};
+    border-bottom: 1px solid {$thinblueborder};
 }
 
 .device-phone .phui-object-box {
@@ -57,44 +57,44 @@ border-bottom: 1px solid {$thinblueborder};
 /* - Object Box Colors ------------------------------------------------------ */
 
 .phui-box-border.phui-object-box-green {
-border: 1px solid {$green};
+    border: 1px solid {$green};
 }
 
 .phui-box-border.phui-object-box-green .phui-header-view {
-color: {$green};
+    color: {$green};
 }
 
 .phui-box-border.phui-object-box-green .phui-header-shell {
-border-bottom-color: {$lightgreen};
+    border-bottom-color: {$lightgreen};
 }
 
 .phui-box-border.phui-object-box-blue {
-border: 1px solid {$blue};
+    border: 1px solid {$blue};
 }
 
 .phui-box-border.phui-object-box-blue .phui-header-view {
-color: {$blue};
+    color: {$blue};
 }
 
 .phui-box-border.phui-object-box-blue .phui-header-shell {
-border-bottom-color: {$lightblue};
+    border-bottom-color: {$lightblue};
 }
 
 .phui-box-border.phui-object-box-red {
-border: 1px solid {$red};
+    border: 1px solid {$red};
 }
 
 .phui-box-border.phui-object-box-red .phui-header-view {
-color: {$red};
+    color: {$red};
 }
 
 .phui-box-border.phui-object-box-red .phui-header-shell {
-border-bottom-color: {$lightred};
+    border-bottom-color: {$lightred};
 }
 
 .phui-object-box-hidden-content {
-background: {$lightgreybackground};
-border-bottom: 1px solid {$thinblueborder};
+    background: {$lightgreybackground};
+    border-bottom: 1px solid {$thinblueborder};
 }
 
 .phui-object-box.phui-object-box-collapsed .phui-object-box-hidden-content {
@@ -109,11 +109,11 @@ border-bottom: 1px solid {$thinblueborder};
 
 /* eh oh el */
 .phui-object-box .phui-object-box + .phui-object-box {
-border-top: 1px solid {$thinblueborder};
+    border-top: 1px solid {$thinblueborder};
 }
 
 .phui-object-box .phui-object-box .phui-header-shell .phui-header-header {
-font-family: {$fontfamily};
+    font-family: {$fontfamily};
 }
 
 .phui-object-box .phui-box-border {
@@ -124,14 +124,14 @@ font-family: {$fontfamily};
 
 .phui-object-box .phui-object-box .phui-header-shell .phui-header-view {
     padding: 4px 8px;
-background-color: {$lightgreybackground};
+    background-color: {$lightgreybackground};
 }
 
 .phui-object-box .phui-object-box .phui-header-shell .phui-header-header {
     font-size: 13px;
     margin: 0;
-color: {$darkbluetext};
-font-weight: bold;
+    color: {$darkbluetext};
+    font-weight: bold;
 }
 
 .phui-object-box .phui-object-box .phui-header-shell {

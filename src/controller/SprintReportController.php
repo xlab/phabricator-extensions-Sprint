@@ -9,7 +9,7 @@ final class SprintReportController extends SprintController {
   }
 
   public function handleRequest(AphrontRequest $request) {
-    $user = $request->getUser();
+    $viewer = $request->getViewer();
 
     if ($request->isFormPost()) {
       $uri = $request->getRequestURI();
@@ -33,18 +33,18 @@ final class SprintReportController extends SprintController {
       case 'user':
       case 'project':
       $core = id(new SprintReportOpenTasksView())
-          ->setUser($user)
+          ->setUser($viewer)
           ->setRequest($request)
           ->setView($this->view);
         break;
       case 'burn':
         $core = id(new SprintReportBurnUpView())
-            ->setUser($user)
+            ->setUser($viewer)
             ->setRequest($request);
         break;
       case 'history':
         $core = id(new SprintHistoryTableView())
-            ->setUser($user)
+            ->setUser($viewer)
             ->setRequest($request);
         break;
       default:

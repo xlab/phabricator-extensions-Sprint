@@ -3,10 +3,10 @@
 
 abstract class SprintView extends AphrontView {
   public function renderReportFilters(array $tokens, $has_window, $request,
-                                      $user) {
+                                      $viewer) {
 
     $form = id(new AphrontFormView())
-        ->setUser($user)
+        ->setUser($viewer)
         ->appendControl(
             id(new AphrontFormTokenizerControl())
                 ->setDatasource(new PhabricatorProjectDatasource())

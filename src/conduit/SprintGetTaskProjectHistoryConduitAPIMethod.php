@@ -25,7 +25,7 @@ final class SprintGetTaskProjectHistoryConduitAPIMethod extends SprintConduitAPI
   }
 
   protected function execute(ConduitAPIRequest $request) {
-    $user = $request->getUser();
+    $user = $request->getViewer();
 
     $this->requireApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY,
