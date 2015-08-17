@@ -27,7 +27,7 @@ final class SprintSetStartEndDatesConduitAPIMethod extends SprintConduitAPIMetho
   }
 
   protected function execute(ConduitAPIRequest $request) {
-    $user = $request->getViewer();
+    $user = $request->getUser();
 
     $this->requireApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY,

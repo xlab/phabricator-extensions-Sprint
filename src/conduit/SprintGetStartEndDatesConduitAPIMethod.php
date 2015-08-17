@@ -25,7 +25,7 @@ final class SprintGetStartEndDatesConduitAPIMethod extends SprintConduitAPIMetho
   }
 
   protected function execute(ConduitAPIRequest $request) {
-    $user = $request->getViewer();
+    $user = $request->getUser();
     $query = id(new SprintQuery())
         ->setViewer($user);
     $project = id(new PhabricatorProjectQuery())
