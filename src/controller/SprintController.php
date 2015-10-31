@@ -130,7 +130,8 @@ abstract class SprintController extends PhabricatorController {
     $picture = $project->getProfileImageURI();
     $name = $project->getName();
     $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
-    $phragile_uri = new PhutilURI('https://phragile.wmflabs.org/sprints/'.$id);
+    $phragile_base_uri = PhabricatorEnv::getEnvConfig('sprint.phragile-uri');
+    $phragile_uri = new PhutilURI($phragile_base_uri.$id);
     $columns = id(new PhabricatorProjectColumnQuery())
         ->setViewer($viewer)
         ->withProjectPHIDs(array($project->getPHID()))
