@@ -285,7 +285,6 @@ final class SprintBoardViewController
       $this->initSprintBehavior(
           'sprint-boards',
           $behavior_config);
-      $this->addExtraQuickSandConfig(array('boardConfig' => $behavior_config));
     } else {
       $behavior_config = array(
           'boardID' => $board_id,
@@ -297,7 +296,6 @@ final class SprintBoardViewController
       $this->initBehavior(
           'project-boards',
           $behavior_config);
-      $this->addExtraQuickSandConfig(array('boardConfig' => $behavior_config));
     }
 
     $this->handles = ManiphestTaskListView::loadTaskHandles($viewer, $tasks);

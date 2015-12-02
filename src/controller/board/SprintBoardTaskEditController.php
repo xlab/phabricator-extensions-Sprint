@@ -198,7 +198,8 @@ final class SprintBoardTaskEditController extends ManiphestController {
         // in a meaningful way. For now, build User objects. Once the Maniphest
         // objects exist, this will switch over automatically. This is a big
         // hack but shouldn't be long for this world.
-        $placeholder_editor = new PhabricatorUserProfileEditor();
+        $placeholder_editor = id(new PhabricatorUserProfileEditor())
+            ->setActor($viewer);
 
         $field_errors = $aux_field->validateApplicationTransactions(
           $placeholder_editor,
@@ -744,16 +745,17 @@ final class SprintBoardTaskEditController extends ManiphestController {
 
     $crumbs->addTextCrumb($header_name);
 
-    return $this->buildApplicationPage(
-      array(
-        $crumbs,
-        $form_box,
-        $preview,
-      ),
-      array(
-        'title' => $header_name,
-        'pageObjects' => $page_objects,
-      ));
+    $title = $header_name;
+
+    return $this->newPage()
+        ->setTitle($title)
+        ->setCrumbs($crumbs)
+        ->setPageObjectPHIDs($page_objects)
+        ->appendChild(
+            array(
+                $form_box,
+                $preview,
+            ));
   }
 
   private function getSprintProjectforTask($viewer, $projects) {
