@@ -72,8 +72,8 @@ final class SprintApplication extends PhabricatorApplication {
             // all routes following point to default controllers
               'archive/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectArchiveController',
-              'details/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditDetailsController',
+              $this->getEditRoutePattern('edit/')
+              => 'PhabricatorProjectEditController',
               'feed/(?P<id>[1-9]\d*)/'
               => 'PhabricatorProjectFeedController',
               'icon/(?P<id>[1-9]\d*)/'
