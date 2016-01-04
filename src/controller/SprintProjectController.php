@@ -121,6 +121,9 @@ abstract class SprintProjectController extends SprintController {
     $id = $project->getID();
     $picture = $project->getProfileImageURI();
     $name = $project->getName();
+    $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
+    $phragile_base_uri = PhabricatorEnv::getEnvConfig('sprint.phragile-uri');
+    $phragile_uri = new PhutilURI($phragile_base_uri.$id);
 
     $columns = id(new PhabricatorProjectColumnQuery())
         ->setViewer($viewer)
@@ -135,12 +138,24 @@ abstract class SprintProjectController extends SprintController {
     $nav = new AphrontSideNavFilterView();
     $nav->setIconNav(true);
     $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
-    $nav->addIcon("profile/{$id}/", $name, null, $picture);
-
+    if ($this->isSprint($project) !== false) {
+      $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
+      $nav->addIcon("profile/{$id}/", $name, null, $picture, null);
+      $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire', null, null);
+      if ($enable_phragile) {
+        $nav->addIcon("sprints/{$id}/", pht('Phragile'), 'fa-pie-chart', null, $phragile_uri);
+      }
+      $nav->addIcon("board/{$id}/", pht('Sprint Board'), $board_icon, null, null);
+      $nav->addIcon('.', pht('Sprint List'), 'fa-bar-chart', null, null);
+    } else {
+      $nav->setBaseURI(new PhutilURI($this->getProjectsURI()));
+      $nav->addIcon("profile/{$id}/", $name, null, $picture);
+      $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
+    }
     $class = 'PhabricatorManiphestApplication';
     if (PhabricatorApplication::isClassInstalledForViewer($class, $viewer)) {
       $phid = $project->getPHID();
-      $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
+
       $query_uri = urisprintf(
           '/maniphest/?statuses=open()&projects=%s#R',
           $phid);
