@@ -1,7 +1,7 @@
 <?php
 
 abstract class SprintBoardController
-  extends SprintController {
+  extends SprintProjectController {
 
   private $project;
 
@@ -13,11 +13,12 @@ abstract class SprintBoardController
     return $this->project;
   }
 
-  public function buildIconNavView(PhabricatorProject $project) {
-        $id = $project->getID();
-        $nav = parent::buildIconNavView($project);
-        $nav->selectFilter("board/{$id}/");
-        $nav->addClass('project-board-nav');
-        return $nav;
+  protected function getProfileMenu() {
+    $menu = parent::getProfileMenu();
+
+    $menu->selectFilter(PhabricatorProject::PANEL_WORKBOARD);
+    $menu->addClass('project-board-nav');
+
+    return $menu;
   }
 }

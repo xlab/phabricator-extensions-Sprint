@@ -3,6 +3,7 @@
 abstract class SprintProjectController extends SprintController {
 
   private $project;
+  private $profileMenu;
 
   protected function setProject(PhabricatorProject $project) {
     $this->project = $project;
@@ -80,7 +81,33 @@ abstract class SprintProjectController extends SprintController {
   }
 
   public function buildApplicationMenu() {
-    return $this->buildSideNavView(true)->getMenu();
+    $menu = $this->newApplicationMenu();
+
+    $profile_menu = $this->getProfileMenu();
+    if ($profile_menu) {
+      $menu->setProfileMenu($profile_menu);
+    }
+
+    $menu->setSearchEngine(new PhabricatorProjectSearchEngine());
+
+    return $menu;
+  }
+
+  protected function getProfileMenu() {
+    if (!$this->profileMenu) {
+      $project = $this->getProject();
+      if ($project) {
+        $viewer = $this->getViewer();
+
+        $engine = id(new SprintProjectProfilePanelEngine())
+            ->setViewer($viewer)
+            ->setProfileObject($project);
+
+        $this->profileMenu = $engine->buildNavigation();
+      }
+    }
+
+    return $this->profileMenu;
   }
 
   public function buildSideNavView($for_app = false) {
@@ -111,66 +138,6 @@ abstract class SprintProjectController extends SprintController {
     }
 
     $nav->selectFilter(null);
-
-    return $nav;
-  }
-
-  public function buildIconNavView(PhabricatorProject $project) {
-    $this->setProject($project);
-    $viewer = $this->getViewer();
-    $id = $project->getID();
-    $picture = $project->getProfileImageURI();
-    $name = $project->getName();
-    $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
-    $phragile_base_uri = PhabricatorEnv::getEnvConfig('sprint.phragile-uri');
-    $phragile_uri = new PhutilURI($phragile_base_uri.$id);
-
-    $columns = id(new PhabricatorProjectColumnQuery())
-        ->setViewer($viewer)
-        ->withProjectPHIDs(array($project->getPHID()))
-        ->execute();
-    if ($columns) {
-      $board_icon = 'fa-columns';
-    } else {
-      $board_icon = 'fa-columns grey';
-    }
-
-    $nav = new AphrontSideNavFilterView();
-    $nav->setIconNav(true);
-    $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
-    if ($this->isSprint($project) !== false) {
-      $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
-      $nav->addIcon("profile/{$id}/", $name, null, $picture, null);
-      $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire', null, null);
-      if ($enable_phragile) {
-        $nav->addIcon("sprints/{$id}/", pht('Phragile'), 'fa-pie-chart', null, $phragile_uri);
-      }
-      $nav->addIcon("board/{$id}/", pht('Sprint Board'), $board_icon, null, null);
-      $nav->addIcon('.', pht('Sprint List'), 'fa-bar-chart', null, null);
-    } else {
-      $nav->setBaseURI(new PhutilURI($this->getProjectsURI()));
-      $nav->addIcon("profile/{$id}/", $name, null, $picture);
-      $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
-    }
-    $class = 'PhabricatorManiphestApplication';
-    if (PhabricatorApplication::isClassInstalledForViewer($class, $viewer)) {
-      $phid = $project->getPHID();
-
-      $query_uri = urisprintf(
-          '/maniphest/?statuses=open()&projects=%s#R',
-          $phid);
-      $nav->addIcon(null, pht('Open Tasks'), 'fa-anchor', null, $query_uri);
-    }
-
-    $nav->addIcon("feed/{$id}/", pht('Feed'), 'fa-newspaper-o');
-    $nav->addIcon("members/{$id}/", pht('Members'), 'fa-group');
-    $nav->addIcon("details/{$id}/", pht('Edit Details'), 'fa-pencil');
-
-    if (PhabricatorEnv::getEnvConfig('phabricator.show-prototypes')) {
-      $nav->addIcon("subprojects/{$id}/", pht('Subprojects'), 'fa-sitemap');
-      $nav->addIcon("milestones/{$id}/", pht('Milestones'), 'fa-map-marker');
-    }
-
 
     return $nav;
   }

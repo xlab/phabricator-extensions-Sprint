@@ -44,8 +44,8 @@ final class SprintProjectProfileController
         new PhabricatorProjectTransactionQuery());
     $timeline->setShouldTerminate(true);
 
-    $nav = $this->buildIconNavView($project);
-    $nav->selectFilter("profile/{$id}/");
+    $nav = $this->getProfileMenu();
+    $nav->selectFilter(PhabricatorProject::PANEL_PROFILE);
     $crumbs = $this->buildApplicationCrumbs();
 
     return $this->newPage()
@@ -76,7 +76,9 @@ final class SprintProjectProfileController
         id(new PhabricatorActionView())
             ->setName(pht('Edit Details'))
             ->setIcon('fa-pencil')
-            ->setHref($this->getApplicationURI("edit/{$id}/")));
+            ->setHref($this->getApplicationURI("edit/{$id}/"))
+            ->setDisabled(!$can_edit)
+            ->setWorkflow(!$can_edit));
 
     $view->addAction(
         id(new PhabricatorActionView())
@@ -104,6 +106,26 @@ final class SprintProjectProfileController
               ->setWorkflow(true));
     }
 
+    $can_lock = $can_edit && $this->hasApplicationCapability(
+            ProjectCanLockProjectsCapability::CAPABILITY);
+
+    if ($project->getIsMembershipLocked()) {
+      $lock_name = pht('Unlock Project');
+      $lock_icon = 'fa-unlock';
+    } else {
+      $lock_name = pht('Lock Project');
+      $lock_icon = 'fa-lock';
+    }
+
+    $view->addAction(
+        id(new PhabricatorActionView())
+            ->setName($lock_name)
+            ->setIcon($lock_icon)
+            ->setHref($this->getApplicationURI("lock/{$id}/"))
+            ->setDisabled(!$can_lock)
+            ->setWorkflow(true));
+
+    $action = null;
     if (!$project->isUserMember($viewer->getPHID())) {
       $can_join = PhabricatorPolicyFilter::hasCapability(
         $viewer,
@@ -164,7 +186,9 @@ final class SprintProjectProfileController
         ->setName('#'.$slug->getSlug());
     }
 
-    $view->addProperty(pht('Hashtags'), phutil_implode_html(' ', $hashtags));
+    if ($hashtags) {
+      $view->addProperty(pht('Hashtags'), phutil_implode_html(' ', $hashtags));
+    }
 
     $view->addProperty(
       pht('Members'),

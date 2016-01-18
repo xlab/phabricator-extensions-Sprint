@@ -50,15 +50,16 @@ final class SprintBoardColumnDetailController
       ->setHeader($header)
       ->addPropertyList($properties);
 
-    $nav = $this->buildIconNavView($project);
-    $nav->appendChild($box);
-    $nav->appendChild($timeline);
+    $nav = $this->getProfileMenu();
 
-    return $this->buildApplicationPage(
-        $nav,
-      array(
-        'title' => $title,
-      ));
+    return $this->newPage()
+        ->setTitle($title)
+        ->setNavigation($nav)
+        ->appendChild(
+            array(
+                $box,
+                $timeline,
+            ));
   }
 
   private function buildHeaderView(PhabricatorProjectColumn $column) {

@@ -118,62 +118,6 @@ abstract class SprintController extends PhabricatorController {
     return $id;
   }
 
-  public function buildIconNavView(PhabricatorProject $project) {
-    $nav = $this->buildSprintIconNavView($project);
-    $nav->selectFilter(null);
-    return $nav;
-  }
-
-  public function buildSprintIconNavView(PhabricatorProject $project) {
-    $viewer = $this->getViewer();
-    $id = $project->getID();
-    $picture = $project->getProfileImageURI();
-    $name = $project->getName();
-    $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
-    $phragile_base_uri = PhabricatorEnv::getEnvConfig('sprint.phragile-uri');
-    $phragile_uri = new PhutilURI($phragile_base_uri.$id);
-    $columns = id(new PhabricatorProjectColumnQuery())
-        ->setViewer($viewer)
-        ->withProjectPHIDs(array($project->getPHID()))
-        ->execute();
-    if ($columns) {
-      $board_icon = 'fa-columns';
-    } else {
-      $board_icon = 'fa-columns grey';
-    }
-
-    $nav = new AphrontSideNavFilterView();
-    $nav->setIconNav(true);
-    if ($this->isSprint($project) !== false) {
-      $nav->setBaseURI(new PhutilURI($this->getApplicationURI()));
-      $nav->addIcon("profile/{$id}/", $name, null, $picture, null);
-      $nav->addIcon("burn/{$id}/", pht('Burndown'), 'fa-fire', null, null);
-      if ($enable_phragile) {
-        $nav->addIcon("sprints/{$id}/", pht('Phragile'), 'fa-pie-chart', null, $phragile_uri);
-      }
-      $nav->addIcon("board/{$id}/", pht('Sprint Board'), $board_icon, null, null);
-      $nav->addIcon('.', pht('Sprint List'), 'fa-bar-chart', null, null);
-    } else {
-      $nav->setBaseURI(new PhutilURI($this->getProjectsURI()));
-      $nav->addIcon("profile/{$id}/", $name, null, $picture);
-      $nav->addIcon("board/{$id}/", pht('Workboard'), $board_icon);
-    }
-    $class = 'PhabricatorManiphestApplication';
-    if (PhabricatorApplication::isClassInstalledForViewer($class, $viewer)) {
-      $phid = $project->getPHID();
-      $query_uri = urisprintf(
-          '/maniphest/?statuses=open()&projects=%s#R',
-          $phid);
-      $nav->addIcon(null, pht('Open Tasks'), 'fa-anchor', null, $query_uri);
-    }
-
-    $nav->addIcon("feed/{$id}/", pht('Feed'), 'fa-newspaper-o', null, null);
-    $nav->addIcon("members/{$id}/", pht('Members'), 'fa-group', null, null);
-    $nav->addIcon("edit/{$id}/", pht('Edit Details'), 'fa-pencil', null, null);
-
-    return $nav;
-  }
-
   protected function isSprint($object) {
     $validator = new SprintValidator();
     $issprint = call_user_func(array($validator, 'checkForSprint'),

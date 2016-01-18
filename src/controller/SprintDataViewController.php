@@ -6,12 +6,21 @@ final class SprintDataViewController extends SprintController {
   private $request;
   private $viewer;
   private $project;
+  private $profileMenu;
 
-  public function buildIconNavView(PhabricatorProject $project) {
-    $id = $project->getID();
-    $nav = parent::buildIconNavView($project);
-    $nav->selectFilter("burn/{$id}/");
-    return $nav;
+  public function getProfileMenu(PhabricatorProject $project) {
+    if (!$this->profileMenu) {
+      if ($project) {
+        $viewer = $this->getViewer();
+
+        $engine = id(new SprintProjectProfilePanelEngine())
+            ->setViewer($viewer)
+            ->setProfileObject($project);
+
+        $this->profileMenu = $engine->buildNavigation();
+      }
+    }
+    return $this->profileMenu;
   }
 
   public function handleRequest(AphrontRequest $request) {
@@ -35,19 +44,14 @@ final class SprintDataViewController extends SprintController {
     $can_create = $this->hasApplicationCapability(
         ProjectCreateProjectsCapability::CAPABILITY);
     $crumbs = $this->getCrumbs($can_create);
-    $nav = $this->buildIconNavView($this->project);
-    $nav->appendChild(
-        array($crumbs,
-              $error_box,
-              $sprintdata_view,
-        ));
-
-    return $this->buildApplicationPage(
-        $nav,
-        array(
-            'title' => array(pht('Burndown'), $this->project->getName()),
-            'device' => true,
-        ));
+    $nav = $this->getProfileMenu($this->project);
+    return $this->newPage()
+        ->setNavigation($nav)
+        ->setCrumbs($crumbs)
+        ->setTitle($this->project->getName())
+        ->setPageObjectPHIDs(array($this->project->getPHID()))
+        ->appendChild($error_box)
+        ->appendChild($sprintdata_view);
   }
 
   public function loadProject() {

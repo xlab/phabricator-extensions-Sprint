@@ -69,6 +69,13 @@ final class SprintBoardViewController
     // TODO: Expand the checks here if we add the ability
     // to hide the Backlog column
     if (!$columns) {
+      $can_edit = PhabricatorPolicyFilter::hasCapability(
+          $viewer,
+          $project,
+          PhabricatorPolicyCapability::CAN_EDIT);
+      if (!$can_edit) {
+        return $this->noAccessDialog($project);
+      }
       switch ($request->getStr('initialize-type')) {
         case 'backlog-only':
           $unguarded = AphrontWriteGuard::beginScopedUnguardedWrites();
@@ -409,17 +416,22 @@ final class SprintBoardViewController
       ->appendChild($board)
       ->addClass('project-board-wrapper');
 
-    $nav = $this->buildIconNavView($project);
-    $nav->appendChild($header_box);
-    $nav->appendChild($board_box);
+    $nav = $this->getProfileMenu();
 
-    return $this->buildApplicationPage(
-      $nav,
-      array(
-        'title' => pht('%s Board', $project->getName()),
-        'showFooter' => false,
-        'pageObjects' => array($project->getPHID()),
-      ));
+    return $this->newPage()
+        ->setTitle(pht('%s Board', $project->getName()))
+        ->setPageObjectPHIDs(array($project->getPHID()))
+        ->setShowFooter(false)
+        ->setNavigation($nav)
+        ->addQuicksandConfig(
+            array(
+                'boardConfig' => $behavior_config,
+            ))
+        ->appendChild(
+            array(
+                $header_box,
+                $board_box,
+            ));
   }
 
   private function buildSortMenu(
