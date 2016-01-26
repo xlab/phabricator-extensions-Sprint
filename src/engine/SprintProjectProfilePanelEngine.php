@@ -3,6 +3,10 @@
 final class SprintProjectProfilePanelEngine
     extends PhabricatorProfilePanelEngine {
 
+  protected function isPanelEngineConfigurable() {
+    return true;
+  }
+
   protected function getPanelURI($path) {
     $project = $this->getProfileObject();
     $id = $project->getID();
@@ -14,37 +18,19 @@ final class SprintProjectProfilePanelEngine
 
     $panels[] = $this->newPanel()
         ->setBuiltinKey(PhabricatorProject::PANEL_PROFILE)
-        ->setPanelKey(SprintProjectDetailsProfilePanel::PANELKEY);
+        ->setPanelKey(PhabricatorProjectDetailsProfilePanel::PANELKEY);
 
     $panels[] = $this->newPanel()
         ->setBuiltinKey(PhabricatorProject::PANEL_WORKBOARD)
-        ->setPanelKey(SprintProjectWorkboardProfilePanel::PANELKEY);
-
-    $id = $object->getID();
-    // TODO: This is temporary.
-    $uri = urisprintf(
-        '/maniphest/?statuses=open()&projects=%s#R',
-        $object->getPHID());
-
-    $panels[] = $this->newPanel()
-        ->setBuiltinKey('tasks')
-        ->setPanelKey(PhabricatorLinkProfilePanel::PANELKEY)
-        ->setPanelProperty('icon', 'maniphest')
-        ->setPanelProperty('name', pht('Open Tasks'))
-        ->setPanelProperty('uri', $uri);
-
-    // TODO: This is temporary.
-
-    $panels[] = $this->newPanel()
-        ->setBuiltinKey('feed')
-        ->setPanelKey(PhabricatorLinkProfilePanel::PANELKEY)
-        ->setPanelProperty('icon', 'feed')
-        ->setPanelProperty('name', pht('Feed'))
-        ->setPanelProperty('uri', "/project/feed/{$id}/");
+        ->setPanelKey(PhabricatorProjectWorkboardProfilePanel::PANELKEY);
 
     $panels[] = $this->newPanel()
         ->setBuiltinKey(PhabricatorProject::PANEL_MEMBERS)
         ->setPanelKey(PhabricatorProjectMembersProfilePanel::PANELKEY);
+
+    $panels[] = $this->newPanel()
+        ->setBuiltinKey(PhabricatorProject::PANEL_MANAGE)
+        ->setPanelKey(PhabricatorProjectManageProfilePanel::PANELKEY);
 
     return $panels;
   }
