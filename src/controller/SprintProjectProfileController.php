@@ -19,6 +19,13 @@ final class SprintProjectProfileController
     $id = $project->getID();
 
     $picture = $project->getProfileImageURI();
+    $icon = $project->getDisplayIconIcon();
+    $icon_name = $project->getDisplayIconName();
+    $tag = id(new PHUITagView())
+        ->setIcon($icon)
+        ->setName($icon_name)
+        ->addClass('project-view-header-tag')
+        ->setType(PHUITagView::TYPE_SHADE);
 
     $header = id(new PHUIHeaderView())
       ->setHeader($project->getName())

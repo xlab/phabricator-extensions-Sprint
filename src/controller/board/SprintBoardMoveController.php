@@ -19,7 +19,6 @@ final class SprintBoardMoveController
       ->requireCapabilities(
         array(
           PhabricatorPolicyCapability::CAN_VIEW,
-          PhabricatorPolicyCapability::CAN_EDIT,
         ))
       ->withIDs(array($id))
       ->executeOne();
@@ -28,9 +27,10 @@ final class SprintBoardMoveController
     }
     $is_sprint = $this->isSprint($project);
 
-    $object = id(new PhabricatorObjectQuery())
+    $object = id(new ManiphestTaskQuery())
       ->setViewer($viewer)
       ->withPHIDs(array($object_phid))
+      ->needProjectPHIDs(true)
       ->requireCapabilities(
         array(
           PhabricatorPolicyCapability::CAN_VIEW,
@@ -97,6 +97,7 @@ final class SprintBoardMoveController
       $tasks = id(new ManiphestTaskQuery())
         ->setViewer($viewer)
         ->withPHIDs($task_phids)
+        ->needProjectPHIDs(true)
         ->requireCapabilities(
           array(
             PhabricatorPolicyCapability::CAN_VIEW,
@@ -165,8 +166,10 @@ final class SprintBoardMoveController
           ->setTask($object)
           ->setOwner($owner)
           ->setCanEdit(true)
+          ->setProject($project)
           ->getItem();
     }
+    $card->addClass('phui-workcard');
 
     return id(new AphrontAjaxResponse())->setContent(
       array('task' => $card));

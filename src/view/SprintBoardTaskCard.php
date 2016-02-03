@@ -20,6 +20,10 @@ final class SprintBoardTaskCard extends Phobject {
     return $this;
   }
 
+  public function getProject() {
+    return $this->project;
+  }
+
   public function getViewer() {
     return $this->viewer;
   }
@@ -82,34 +86,29 @@ final class SprintBoardTaskCard extends Phobject {
     }
 
   public function getItem() {
-    require_celerity_resource('phui-workboard-view-css', 'sprint');
 
     $query = id(new SprintQuery())
         ->setProject($this->project)
         ->setViewer($this->viewer);
     $task = $this->getTask();
+    $owner = $this->getOwner();
     $task_phid = $task->getPHID();
     $can_edit = $this->getCanEdit();
+    $viewer = $this->getViewer();
     $this->points = $query->getStoryPointsForTask($task_phid);
-
 
     $color_map = ManiphestTaskPriority::getColorMap();
     $bar_color = idx($color_map, $task->getPriority(), 'grey');
 
-    if (!(is_null($this->owner))) {
-      $ownerimage = $this->renderHandleIcon($this->owner);
-    } else {
-      $ownerimage = null;
-    }
-
     $card = id(new PHUIObjectItemView())
+      ->setObject($task)
+      ->setUser($viewer)
       ->setObjectName('T'.$task->getID())
       ->setHeader($task->getTitle())
       ->setGrippable($can_edit)
       ->setHref('/T'.$task->getID())
       ->addSigil('project-card')
       ->setDisabled($task->isClosed())
-      ->setImageIcon($ownerimage)
       ->setMetadata(
         array(
           'objectPHID' => $task_phid,
@@ -123,28 +122,22 @@ final class SprintBoardTaskCard extends Phobject {
                 ->addSigil('edit-project-card')
                 ->setHref('/project/sprint/board/task/edit/'.$task->getID()
                     .'/'))
-      ->setBarColor($bar_color)
-      ->addAttribute($this->getCardAttributes());
+      ->setBarColor($bar_color);
 
+    if ($owner) {
+      $card->addHandleIcon($owner, $owner->getName());
+    }
+    $card->addAttribute($this->getCardAttributes());
+    $project_phids = array_fuse($task->getProjectPHIDs());
+    unset($project_phids[$this->project->getPHID()]);
+
+    if ($project_phids) {
+      $handle_list = $viewer->loadHandles($project_phids);
+      $tag_list = id(new PHUIHandleTagListView())
+          ->setSlim(true)
+          ->setHandles($handle_list);
+      $card->addAttribute($tag_list);
+    }
     return $card;
-  }
-
-  private function renderHandleIcon(PhabricatorObjectHandle $handle) {
-    $ownername = $handle->getName();
-    $ownerlink = '/p/'.$ownername.'/';
-    $image_uri = 'background-image: url('.$handle->getImageURI().')';
-    $sigil = 'has-tooltip';
-    $meta  = array(
-        'tip' => pht($ownername),
-        'size' => 200,
-        'align' => 'E',
-    );
-    $image = id(new SprintHandleIconView())
-        ->addSigil($sigil)
-        ->setMetadata($meta)
-        ->setHref($ownerlink)
-        ->setIconStyle($image_uri);
-
-    return $image;
   }
 }

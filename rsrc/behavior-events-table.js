@@ -10,20 +10,7 @@ JX.behavior('events-table', function (config) {
                 { "bVisible": false, "aTargets": [ 0 ] },
                 { "iDataSort": 0, "aTargets": [ 1 ] }
             ],
-            "dom": 'T<"clear">lfrtip',
-            "tableTools": {
-                "sSwfPath": "/rsrc/sprint/copy_csv_xls.swf",
-                "aButtons": [
-                    {
-                        "sExtends": "copy",
-                        "sButtonText": "Copy to clipboard"
-                    },
-                    {
-                        "sExtends": "csv",
-                        "sButtonText": "Save to CSV"
-                    }
-                ]
-            }
+            "dom": 'T<"clear">lfrtip'
         });
     });
 });

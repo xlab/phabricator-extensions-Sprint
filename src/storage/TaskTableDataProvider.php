@@ -243,14 +243,14 @@ final class TaskTableDataProvider {
     $image = id(new PHUIIconView())
         ->addSigil($sigil)
         ->setMetadata($meta)
-        ->setIconFont('fa-wrench', 'green')
+        ->setIcon('fa-wrench', 'green')
         ->setText('Blocker');
     return $image;
   }
 
   private function getIconforBlocked() {
     $image = id(new PHUIIconView())
-        ->setIconFont('fa-lock', 'red')
+        ->setIcon('fa-lock', 'red')
         ->setText('Blocked');
     return $image;
   }

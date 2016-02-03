@@ -90,7 +90,7 @@ final class SprintListDataProvider {
 
   private function getEditProjectDetailsIcon() {
     $image = id(new PHUIIconView())
-        ->setIconFont('fa-fire', 'orange')
+        ->setIcon('fa-fire', 'orange')
         ->setText('Burndown');
     return $image;
   }

@@ -18,20 +18,7 @@ JX.behavior('tasks-table', function (config) {
                 { "aTargets": [ 8 ], "sWidth": "8%" },
                 { "aTargets": [ 9 ], "sWidth": "10%" }
             ],
-            "dom": 'T<"clear">lfrtip',
-            "tableTools": {
-                "sSwfPath": "/rsrc/sprint/copy_csv_xls.swf",
-                "aButtons": [
-                    {
-                        "sExtends": "copy",
-                        "sButtonText": "Copy to clipboard"
-                    },
-                    {
-                        "sExtends": "csv",
-                        "sButtonText": "Save to CSV"
-                    }
-                ]
-            }
+            "dom": 'T<"clear">lfrtip'
         });
     });
 });

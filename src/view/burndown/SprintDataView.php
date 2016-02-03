@@ -45,7 +45,6 @@ final class SprintDataView extends SprintView {
     $this->setBefore($stats);
     $this->setTimeSeries($stats);
 
-
     $show_burndown = PhabricatorEnv::getEnvConfig('sprint.show-burndown');
     $show_pies = PhabricatorEnv::getEnvConfig('sprint.show-pies');
     $show_board_data = PhabricatorEnv::getEnvConfig('sprint.show-board-data');

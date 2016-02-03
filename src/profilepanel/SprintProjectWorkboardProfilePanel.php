@@ -3,6 +3,7 @@
 final class SprintProjectWorkboardProfilePanel
     extends PhabricatorProfilePanel {
 
+  const PANEL_WORKBOARD = 'project.workboard';
   const PANELKEY = 'sprint.workboard';
 
   public function getPanelTypeName() {

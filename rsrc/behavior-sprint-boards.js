@@ -227,7 +227,9 @@ JX.behavior('sprint-boards', function(config, statics) {
 
         for (ii = 0; ii < cols.length; ii++) {
             var list = new JX.DraggableList('project-card', cols[ii])
-                .setFindItemsHandler(JX.bind(null, finditems, cols[ii]));
+                .setFindItemsHandler(JX.bind(null, finditems, cols[ii]))
+                .setOuterContainer(JX.$(config.boardID))
+                .setCanDragX(true);
 
             list.listen('didSend', JX.bind(list, onupdate, cols[ii]));
             list.listen('didReceive', JX.bind(list, onupdate, cols[ii]));
@@ -245,6 +247,9 @@ JX.behavior('sprint-boards', function(config, statics) {
         for (ii = 0; ii < lists.length; ii++) {
             lists[ii].setGroup(lists);
         }
+    }
+
+    function setup() {
 
         JX.Stratcom.listen(
             'click',
@@ -332,6 +337,9 @@ JX.behavior('sprint-boards', function(config, statics) {
                     statics.boardID = new_config.boardID;
                 }
                 update_statics(new_config);
+                if (data.fromServer) {
+                    init_board();
+                }
             });
         return true;
     }

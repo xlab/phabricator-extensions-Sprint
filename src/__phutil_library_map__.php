@@ -65,7 +65,7 @@ phutil_register_library_map(array(
     'SprintPoints' => 'util/SprintPoints.php',
     'SprintProjectController' => 'controller/SprintProjectController.php',
     'SprintProjectCustomField' => 'customfield/SprintProjectCustomField.php',
-    'SprintProjectDetailsProfilePanel' => 'engine/SprintProjectDetailsProfilePanel.php',
+    'SprintProjectDetailsProfilePanel' => 'profilepanel/SprintProjectDetailsProfilePanel.php',
     'SprintProjectProfileController' => 'controller/SprintProjectProfileController.php',
     'SprintProjectProfilePanelEngine' => 'engine/SprintProjectProfilePanelEngine.php',
     'SprintProjectViewController' => 'controller/SprintProjectViewController.php',

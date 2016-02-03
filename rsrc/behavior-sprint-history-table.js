@@ -16,19 +16,6 @@ JX.behavior('sprint-history-table', function (config) {
                 { "iDataSort": 4, "aTargets": [ 5 ] }
             ],
             "dom": 'T<"clear">lfrtip',
-            "tableTools": {
-                "sSwfPath": "/rsrc/sprint/copy_csv_xls.swf",
-                "aButtons": [
-                    {
-                        "sExtends": "copy",
-                        "sButtonText": "Copy to clipboard"
-                    },
-                    {
-                        "sExtends": "csv",
-                        "sButtonText": "Save to CSV"
-                    }
-                ]
-            }
         });
     });
 });

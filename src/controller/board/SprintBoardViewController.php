@@ -18,53 +18,17 @@ final class SprintBoardViewController
   }
 
   public function handleRequest(AphrontRequest $request) {
-    $viewer = $request->getViewer();
-    $id = $request->getURIData('id');
+    $viewer = $request->getUser();
 
-    $show_hidden = $request->getBool('hidden');
-    $this->showHidden = $show_hidden;
-
-    $project = id(new PhabricatorProjectQuery())
-      ->setViewer($viewer)
-      ->needImages(true);
-    $id = $request->getURIData('id');
-    $slug = $request->getURIData('slug');
-    if ($slug) {
-      $project->withSlugs(array($slug));
-    } else {
-      $project->withIDs(array($id));
-    }
-    $project = $project->executeOne();
-    if (!$project) {
-      return new Aphront404Response();
+    $response = $this->loadProject();
+    if ($response) {
+      return $response;
     }
 
-    $this->setProject($project);
-    $this->id = $project->getID();
-    $is_sprint = $this->isSprint($project);
+    $project = $this->getProject();
 
-    $sort_key = $request->getStr('order');
-    switch ($sort_key) {
-      case PhabricatorProjectColumn::ORDER_NATURAL:
-      case PhabricatorProjectColumn::ORDER_PRIORITY:
-        break;
-      default:
-        $sort_key = PhabricatorProjectColumn::DEFAULT_ORDER;
-        break;
-    }
-    $this->sortKey = $sort_key;
-
-    $column_query = id(new PhabricatorProjectColumnQuery())
-      ->setViewer($viewer)
-      ->withProjectPHIDs(array($project->getPHID()));
-
-    if (!$show_hidden) {
-      $column_query->withStatuses(
-        array(PhabricatorProjectColumn::STATUS_ACTIVE));
-    }
-
-    $columns = $column_query->execute();
-    $columns = mpull($columns, null, 'getSequence');
+    $this->readRequestState();
+    $columns = $this->loadColumns($project);
 
     // TODO: Expand the checks here if we add the ability
     // to hide the Backlog column
@@ -74,33 +38,32 @@ final class SprintBoardViewController
           $project,
           PhabricatorPolicyCapability::CAN_EDIT);
       if (!$can_edit) {
-        return $this->noAccessDialog($project);
+        $content = $this->buildNoAccessContent($project);
+      } else {
+        $content = $this->buildInitializeContent($project);
       }
-      switch ($request->getStr('initialize-type')) {
-        case 'backlog-only':
-          $unguarded = AphrontWriteGuard::beginScopedUnguardedWrites();
-            $column = PhabricatorProjectColumn::initializeNewColumn($viewer)
-              ->setSequence(0)
-              ->setProperty('isDefault', true)
-              ->setProjectPHID($project->getPHID())
-              ->save();
-            $column->attachProject($project);
-            $columns[0] = $column;
-          unset($unguarded);
-          break;
-        case 'import':
-          return id(new AphrontRedirectResponse())
-            ->setURI(
-              $this->getApplicationURI('board/'.$project->getID().'/import/'));
-          break;
-        default:
-          return $this->initializeWorkboardDialog($project);
-          break;
+
+      if ($content instanceof AphrontResponse) {
+        return $content;
       }
+
+      $nav = $this->getProfileMenu();
+      $nav->selectFilter(PhabricatorProject::PANEL_WORKBOARD);
+
+      $crumbs = $this->buildApplicationCrumbs();
+      $crumbs->addTextCrumb(pht('Workboard'));
+
+      return $this->newPage()
+          ->setTitle(
+              array(
+                  pht('Workboard'),
+                  $project->getName(),
+              ))
+          ->setNavigation($nav)
+          ->setCrumbs($crumbs)
+          ->appendChild($content);
     }
-
-    ksort($columns);
-
+    $is_sprint = $this->isSprint($project);
     $board_uri = $this->getApplicationURI('board/'.$project->getID().'/');
 
     $engine = id(new ManiphestTaskSearchEngine())
@@ -297,7 +260,7 @@ final class SprintBoardViewController
           'boardID' => $board_id,
           'projectPHID' => $project->getPHID(),
           'moveURI' => $this->getApplicationURI('move/'.$project->getID().'/'),
-          'createURI' => '/maniphest/task/create/',
+          'createURI' => $this->getCreateURI(),
           'order' => $this->sortKey,
       );
       $this->initBehavior(
@@ -345,6 +308,7 @@ final class SprintBoardViewController
         ->setFlush(true)
         ->setAllowEmptyList(true)
         ->addSigil('project-column')
+        ->setItemClass('phui-workcard')
         ->setMetadata(
           array(
             'columnPHID' => $column->getPHID(),
@@ -370,6 +334,7 @@ final class SprintBoardViewController
         } else {
           $cards->addItem(id(new ProjectBoardTaskCard())
               ->setViewer($viewer)
+              ->setProject($project)
               ->setTask($task)
               ->setOwner($owner)
               ->setCanEdit($can_edit)
@@ -382,7 +347,7 @@ final class SprintBoardViewController
 
     $sort_menu = $this->buildSortMenu(
       $viewer,
-      $sort_key);
+      $this->sortKey);
 
     $filter_menu = $this->buildFilterMenu(
       $viewer,
@@ -390,7 +355,7 @@ final class SprintBoardViewController
       $engine,
       $query_key);
 
-    $manage_menu = $this->buildManageMenu($project, $show_hidden);
+    $manage_menu = $this->buildManageMenu($project, $this->showHidden);
 
     $header_link = phutil_tag(
       'a',
@@ -399,39 +364,72 @@ final class SprintBoardViewController
       ),
       $project->getName());
 
-    $header = id(new PHUIHeaderView())
-      ->setHeader($header_link)
-      ->setUser($viewer)
-      ->setNoBackground(true)
-      ->addActionLink($sort_menu)
-      ->addActionLink($filter_menu)
-      ->addActionLink($manage_menu)
-      ->setPolicyObject($project);
-
-    $header_box = id(new PHUIBoxView())
-      ->appendChild($header)
-      ->addClass('project-board-header');
-
     $board_box = id(new PHUIBoxView())
       ->appendChild($board)
       ->addClass('project-board-wrapper');
 
     $nav = $this->getProfileMenu();
 
+    $crumbs = $this->buildApplicationCrumbs();
+    $crumbs->addTextCrumb(pht('Workboard'));
+    $crumbs->setBorder(true);
+
+    $crumbs->addAction($sort_menu);
+    $crumbs->addAction($filter_menu);
+    $crumbs->addAction($manage_menu);
+
     return $this->newPage()
         ->setTitle(pht('%s Board', $project->getName()))
         ->setPageObjectPHIDs(array($project->getPHID()))
         ->setShowFooter(false)
         ->setNavigation($nav)
+        ->setCrumbs($crumbs)
         ->addQuicksandConfig(
             array(
                 'boardConfig' => $behavior_config,
             ))
         ->appendChild(
             array(
-                $header_box,
                 $board_box,
             ));
+  }
+
+  private function readRequestState() {
+    $request = $this->getRequest();
+    $project = $this->getProject();
+
+    $this->showHidden = $request->getBool('hidden');
+    $this->id = $project->getID();
+
+    $sort_key = $request->getStr('order');
+    switch ($sort_key) {
+      case PhabricatorProjectColumn::ORDER_NATURAL:
+      case PhabricatorProjectColumn::ORDER_PRIORITY:
+        break;
+      default:
+        $sort_key = PhabricatorProjectColumn::DEFAULT_ORDER;
+        break;
+    }
+    $this->sortKey = $sort_key;
+  }
+
+  private function loadColumns(PhabricatorProject $project) {
+    $viewer = $this->getViewer();
+
+    $column_query = id(new PhabricatorProjectColumnQuery())
+        ->setViewer($viewer)
+        ->withProjectPHIDs(array($project->getPHID()));
+
+    if (!$this->showHidden) {
+      $column_query->withStatuses(
+          array(PhabricatorProjectColumn::STATUS_ACTIVE));
+    }
+
+    $columns = $column_query->execute();
+    $columns = mpull($columns, null, 'getSequence');
+    ksort($columns);
+
+    return $columns;
   }
 
   private function buildSortMenu(
@@ -439,7 +437,7 @@ final class SprintBoardViewController
     $sort_key) {
 
     $sort_icon = id(new PHUIIconView())
-      ->setIconFont('fa-sort-amount-asc bluegrey');
+        ->setIcon('fa-sort-amount-asc bluegrey');
 
     $named = array(
       PhabricatorProjectColumn::ORDER_NATURAL => pht('Natural'),
@@ -472,16 +470,15 @@ final class SprintBoardViewController
       $sort_menu->addAction($item);
     }
 
-    $sort_button = id(new PHUIButtonView())
-      ->setText(pht('Sort: %s', $active_order))
-      ->setIcon($sort_icon)
-      ->setTag('a')
-      ->setHref('#')
-      ->addSigil('boards-dropdown-menu')
-      ->setMetadata(
-        array(
-          'items' => hsprintf('%s', $sort_menu),
-        ));
+    $sort_button = id(new PHUIListItemView())
+        ->setName(pht('Sort: %s', $active_order))
+        ->setIcon('fa-sort-amount-asc')
+        ->setHref('#')
+        ->addSigil('boards-dropdown-menu')
+        ->setMetadata(
+            array(
+                'items' => hsprintf('%s', $sort_menu),
+            ));
 
     return $sort_button;
   }
@@ -490,9 +487,6 @@ final class SprintBoardViewController
     $custom_query,
     PhabricatorApplicationSearchEngine $engine,
     $query_key) {
-
-    $filter_icon = id(new PHUIIconView())
-      ->setIconFont('fa-search-plus bluegrey');
 
     $named = array(
       'open' => pht('Open Tasks'),
@@ -550,16 +544,15 @@ final class SprintBoardViewController
       $filter_menu->addAction($item);
     }
 
-    $filter_button = id(new PHUIButtonView())
-      ->setText(pht('Filter: %s', $active_filter))
-      ->setIcon($filter_icon)
-      ->setTag('a')
-      ->setHref('#')
-      ->addSigil('boards-dropdown-menu')
-      ->setMetadata(
-        array(
-          'items' => hsprintf('%s', $filter_menu),
-        ));
+    $filter_button = id(new PHUIListItemView())
+        ->setName(pht('Filter: %s', $active_filter))
+        ->setIcon('fa-search')
+        ->setHref('#')
+        ->addSigil('boards-dropdown-menu')
+        ->setMetadata(
+            array(
+                'items' => hsprintf('%s', $filter_menu),
+            ));
 
     return $filter_button;
   }
@@ -575,9 +568,6 @@ final class SprintBoardViewController
       $viewer,
       $project,
       PhabricatorPolicyCapability::CAN_EDIT);
-
-    $manage_icon = id(new PHUIIconView())
-      ->setIconFont('fa-cog bluegrey');
 
     $manage_items = array();
 
@@ -631,16 +621,15 @@ final class SprintBoardViewController
       $manage_menu->addAction($item);
     }
 
-    $manage_button = id(new PHUIButtonView())
-      ->setText(pht('Manage Board'))
-      ->setIcon($manage_icon)
-      ->setTag('a')
-      ->setHref('#')
-      ->addSigil('boards-dropdown-menu')
-      ->setMetadata(
-        array(
-          'items' => hsprintf('%s', $manage_menu),
-        ));
+    $manage_button = id(new PHUIListItemView())
+        ->setName(pht('Manage Board'))
+        ->setIcon('fa-cog')
+        ->setHref('#')
+        ->addSigil('boards-dropdown-menu')
+        ->setMetadata(
+            array(
+                'items' => hsprintf('%s', $manage_menu),
+            ));
 
     return $manage_button;
   }
@@ -650,7 +639,7 @@ final class SprintBoardViewController
     PhabricatorProjectColumn $column) {
 
     $request = $this->getRequest();
-    $viewer = $request->getViewer();
+    $viewer = $request->getUser();
 
     $can_edit = PhabricatorPolicyFilter::hasCapability(
       $viewer,
@@ -662,13 +651,12 @@ final class SprintBoardViewController
     $column_items[] = id(new PhabricatorActionView())
       ->setIcon('fa-plus')
       ->setName(pht('Create Task...'))
-      ->setHref('/maniphest/task/create/')
+      ->setHref($this->getCreateURI())
       ->addSigil('column-add-task')
       ->setMetadata(
         array(
           'columnPHID' => $column->getPHID(),
-        ))
-      ->setDisabled(!$can_edit);
+        ));
 
     $batch_edit_uri = $request->getRequestURI();
     $batch_edit_uri->setQueryParam('batch', $column->getID());
@@ -683,15 +671,13 @@ final class SprintBoardViewController
       ->setHref($batch_edit_uri)
       ->setDisabled(!$can_batch_edit);
 
-    $edit_uri = $this->getApplicationURI(
-      'board/'.$this->id.'/column/'.$column->getID().'/');
+    $detail_uri = $this->getApplicationURI(
+        'board/'.$this->id.'/column/'.$column->getID().'/');
 
     $column_items[] = id(new PhabricatorActionView())
-      ->setIcon('fa-pencil')
-      ->setName(pht('Edit Column'))
-      ->setHref($edit_uri)
-      ->setDisabled(!$can_edit)
-      ->setWorkflow(!$can_edit);
+        ->setIcon('fa-columns')
+        ->setName(pht('Column Details'))
+        ->setHref($detail_uri);
 
     $can_hide = ($can_edit && !$column->isDefaultColumn());
     $hide_uri = 'board/'.$this->id.'/hide/'.$column->getID().'/';
@@ -721,7 +707,7 @@ final class SprintBoardViewController
     }
 
     $column_button = id(new PHUIIconView())
-      ->setIconFont('fa-caret-down')
+      ->setIcon('fa-caret-down')
       ->setHref('#')
       ->addSigil('boards-dropdown-menu')
       ->setMetadata(
@@ -732,35 +718,7 @@ final class SprintBoardViewController
     return $column_button;
   }
 
-  private function initializeWorkboardDialog(PhabricatorProject $project) {
-
-    $instructions = pht('This workboard has not been setup yet.');
-    $new_selector = id(new AphrontFormRadioButtonControl())
-      ->setName('initialize-type')
-      ->setValue('backlog-only')
-      ->addButton(
-        'backlog-only',
-        pht('New Empty Board'),
-        pht('Create a new board with just a backlog column.'))
-      ->addButton(
-        'import',
-        pht('Import Columns'),
-        pht('Import board columns from another project.'));
-
-    $dialog = id(new AphrontDialogView())
-      ->setUser($this->getRequest()->getUser())
-      ->setTitle(pht('New Workboard'))
-      ->addSubmitButton('Continue')
-      ->addCancelButton($this->getApplicationURI('view/'.$project->getID().'/'))
-      ->appendParagraph($instructions)
-      ->appendChild($new_selector);
-
-    return id(new AphrontDialogResponse())
-      ->setDialog($dialog);
-  }
-
-
-  /**
+   /**
    * Add current state parameters (like order and the visibility of hidden
    * columns) to a URI.
    *
@@ -794,6 +752,118 @@ final class SprintBoardViewController
         $name,
         $config,
         'sprint');
+  }
+
+  private function getCreateURI() {
+    $viewer = $this->getViewer();
+
+    // TODO: This should be cleaned up, but maybe we're going to make options
+    // for each column or board?
+    $edit_config = id(new ManiphestEditEngine())
+        ->setViewer($viewer)
+        ->loadDefaultEditConfiguration();
+    if ($edit_config) {
+      $form_key = $edit_config->getIdentifier();
+      $create_uri = "/maniphest/task/edit/form/{$form_key}/";
+    } else {
+      $create_uri = '/maniphest/task/edit/';
+    }
+
+    return $create_uri;
+  }
+
+
+  private function buildInitializeContent(PhabricatorProject $project) {
+    $request = $this->getRequest();
+    $viewer = $this->getViewer();
+
+    $type = $request->getStr('initialize-type');
+
+    $id = $project->getID();
+
+    $profile_uri = $this->getApplicationURI("profile/{$id}/");
+    $board_uri = $this->getApplicationURI("board/{$id}/");
+    $import_uri = $this->getApplicationURI("board/{$id}/import/");
+
+    $set_default = $request->getBool('default');
+    if ($set_default) {
+      $this
+          ->getProfilePanelEngine()
+          ->adjustDefault(PhabricatorProject::PANEL_WORKBOARD);
+    }
+
+    if ($request->isFormPost()) {
+      if ($type == 'backlog-only') {
+        $column = PhabricatorProjectColumn::initializeNewColumn($viewer)
+            ->setSequence(0)
+            ->setProperty('isDefault', true)
+            ->setProjectPHID($project->getPHID())
+            ->save();
+
+        $project->setHasWorkboard(1)->save();
+
+        return id(new AphrontRedirectResponse())
+            ->setURI($board_uri);
+      } else {
+        return id(new AphrontRedirectResponse())
+            ->setURI($import_uri);
+      }
+    }
+
+    $new_selector = id(new AphrontFormRadioButtonControl())
+        ->setLabel(pht('Columns'))
+        ->setName('initialize-type')
+        ->setValue('backlog-only')
+        ->addButton(
+            'backlog-only',
+            pht('New Empty Board'),
+            pht('Create a new board with just a backlog column.'))
+        ->addButton(
+            'import',
+            pht('Import Columns'),
+            pht('Import board columns from another project.'));
+
+    $default_checkbox = id(new AphrontFormCheckboxControl())
+        ->setLabel(pht('Make Default'))
+        ->addCheckbox(
+            'default',
+            1,
+            pht('Make the workboard the default view for this project.'),
+            true);
+
+    $form = id(new AphrontFormView())
+        ->setUser($viewer)
+        ->appendRemarkupInstructions(
+            pht('The workboard for this project has not been created yet.'))
+        ->appendControl($new_selector)
+        ->appendControl($default_checkbox)
+        ->appendControl(
+            id(new AphrontFormSubmitControl())
+                ->addCancelButton($profile_uri)
+                ->setValue(pht('Create Workboard')));
+
+    $box = id(new PHUIObjectBoxView())
+        ->setHeaderText(pht('Create Workboard'))
+        ->setForm($form);
+
+    return $box;
+  }
+
+  private function buildNoAccessContent(PhabricatorProject $project) {
+    $viewer = $this->getViewer();
+
+    $id = $project->getID();
+
+    $profile_uri = $this->getApplicationURI("profile/{$id}/");
+
+    return $this->newDialog()
+        ->setTitle(pht('Unable to Create Workboard'))
+        ->appendParagraph(
+            pht(
+                'The workboard for this project has not been created yet, '.
+                'but you do not have permission to create it. Only users '.
+                'who can edit this project can create a workboard for it.'))
+        ->addCancelButton($profile_uri);
   }
 
 }
