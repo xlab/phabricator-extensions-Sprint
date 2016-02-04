@@ -23,6 +23,8 @@ final class SprintBoardColumnDetailController
     }
     $this->setProject($project);
 
+    $project_id = $project->getID();
+
     $column = id(new PhabricatorProjectColumnQuery())
       ->setViewer($viewer)
       ->withIDs(array($id))
@@ -46,6 +48,10 @@ final class SprintBoardColumnDetailController
     $actions = $this->buildActionView($column);
     $properties = $this->buildPropertyView($column, $actions);
 
+    $crumbs = $this->buildApplicationCrumbs();
+    $crumbs->addTextCrumb(pht('Workboard'), "/project/board/{$project_id}/");
+    $crumbs->addTextCrumb(pht('Column: %s', $title));
+
     $box = id(new PHUIObjectBoxView())
       ->setHeader($header)
       ->addPropertyList($properties);
@@ -53,13 +59,14 @@ final class SprintBoardColumnDetailController
     $nav = $this->getProfileMenu();
 
     return $this->newPage()
-        ->setTitle($title)
-        ->setNavigation($nav)
-        ->appendChild(
-            array(
-                $box,
-                $timeline,
-            ));
+      ->setTitle($title)
+      ->setNavigation($nav)
+      ->setCrumbs($crumbs)
+      ->appendChild(
+        array(
+          $box,
+          $timeline,
+        ));
   }
 
   private function buildHeaderView(PhabricatorProjectColumn $column) {

@@ -4,6 +4,7 @@ final class SprintBoardTaskCard extends Phobject {
 
   private $project;
   private $viewer;
+  private $projectHandles;
   private $task;
   private $owner;
   private $canEdit;
@@ -26,6 +27,15 @@ final class SprintBoardTaskCard extends Phobject {
 
   public function getViewer() {
     return $this->viewer;
+  }
+
+  public function setProjectHandles(array $handles) {
+    $this->projectHandles = $handles;
+    return $this;
+  }
+
+  public function getProjectHandles() {
+    return $this->projectHandles;
   }
 
   public function setTask(ManiphestTask $task) {
@@ -128,14 +138,12 @@ final class SprintBoardTaskCard extends Phobject {
       $card->addHandleIcon($owner, $owner->getName());
     }
     $card->addAttribute($this->getCardAttributes());
-    $project_phids = array_fuse($task->getProjectPHIDs());
-    unset($project_phids[$this->project->getPHID()]);
 
-    if ($project_phids) {
-      $handle_list = $viewer->loadHandles($project_phids);
+    $project_handles = $this->getProjectHandles();
+    if ($project_handles) {
       $tag_list = id(new PHUIHandleTagListView())
-          ->setSlim(true)
-          ->setHandles($handle_list);
+        ->setSlim(true)
+        ->setHandles($project_handles);
       $card->addAttribute($tag_list);
     }
     return $card;

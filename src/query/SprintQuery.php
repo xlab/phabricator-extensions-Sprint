@@ -304,8 +304,7 @@ final class SprintQuery extends SprintDAO {
             ->setViewer($this->viewer)
             ->withBoardPHIDs(array($this->projectPHID))
             ->withObjectPHIDs(mpull($tasks, 'getPHID'))
-            ->withColumns($columns)
-            ->needColumns(true)
+            ->withColumnPHIDs(mpull($columns, 'getPHID'))
             ->execute();
         $positions = mpull($positions, null, 'getObjectPHID');
      } else {
