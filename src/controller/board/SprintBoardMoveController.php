@@ -229,7 +229,6 @@ final class SprintBoardMoveController
           ->setProjectHandles($project_handles)
           ->setOwner($owner)
           ->setCanEdit(true)
-          ->setProject($project)
           ->getItem();
     }
     $card->addClass('phui-workcard');

@@ -356,7 +356,6 @@ final class SprintBoardViewController
         } else {
           $cards->addItem(id(new ProjectBoardTaskCard())
               ->setViewer($viewer)
-              ->setProject($project)
               ->setProjectHandles($handles)
               ->setTask($task)
               ->setOwner($owner)
