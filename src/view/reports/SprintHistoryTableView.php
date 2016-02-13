@@ -6,12 +6,12 @@ final class SprintHistoryTableView extends SprintView {
   private $tableData;
   protected $viewer;
 
-  public function setViewer (PhabricatorUser $viewer) {
+  public function setViewer(PhabricatorUser $viewer) {
     $this->user = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
@@ -28,12 +28,12 @@ final class SprintHistoryTableView extends SprintView {
     return array($filter, $table);
   }
 
-  public function setTableData ($table_data) {
+  public function setTableData($table_data) {
     $this->tableData = $table_data;
     return $this;
   }
 
-  public function buildProjectsTable () {
+  public function buildProjectsTable() {
     if ($this->tableData) {
       $id = 'history-table';
       Javelin::initBehavior('sprint-history-table', array(

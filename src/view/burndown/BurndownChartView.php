@@ -1,6 +1,6 @@
 <?php
 
-final class BurndownChartView extends Phobject{
+final class BurndownChartView extends Phobject {
   private $data;
 
   public function setChartData($chart_data) {

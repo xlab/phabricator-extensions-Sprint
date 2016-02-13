@@ -28,9 +28,6 @@
       "type": "phutil-library",
       "include": "(^\\.php$)"
     },
-    "phutil-xhpast": {
-      "type": "phutil-xhpast"
-    },
     "spelling": {
       "type": "spelling"
     },

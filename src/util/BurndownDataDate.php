@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Michael Peters
  * @author Christopher Johnson
@@ -28,27 +29,27 @@ final class BurndownDataDate extends Phobject {
     $this->date = $date;
   }
 
-  public function setTasksAddedToday () {
+  public function setTasksAddedToday() {
     return $this->tasks_added_today = $this->tasks_added_today + 1;
   }
 
-  public function getTasksAddedToday () {
+  public function getTasksAddedToday() {
     return $this->tasks_added_today;
   }
 
-   public function setTasksClosedToday () {
+   public function setTasksClosedToday() {
     return $this->tasks_closed_today = $this->tasks_closed_today + 1;
   }
 
-  public function getTasksClosedToday () {
+  public function getTasksClosedToday() {
     return $this->tasks_closed_today;
   }
 
-  public function setTasksReopenedToday () {
+  public function setTasksReopenedToday() {
       return $this->tasks_reopened_today = $this->tasks_reopened_today + 1;
   }
 
-  public function getTasksReopenedToday () {
+  public function getTasksReopenedToday() {
     return $this->tasks_reopened_today;
   }
 
@@ -76,27 +77,27 @@ final class BurndownDataDate extends Phobject {
     return $this->tasks_remaining;
   }
 
-  public function setPointsAddedToday ($points) {
+  public function setPointsAddedToday($points) {
     $this->points_added_today = $this->points_added_today + $points;
   }
 
-  public function getPointsAddedToday () {
+  public function getPointsAddedToday() {
     return $this->points_added_today;
   }
 
-  public function setPointsClosedToday ($points) {
+  public function setPointsClosedToday($points) {
     $this->points_closed_today = $this->points_closed_today + $points;
   }
 
-  public function getPointsClosedToday () {
+  public function getPointsClosedToday() {
     return $this->points_closed_today;
   }
 
-  public function setPointsReopenedToday ($points) {
+  public function setPointsReopenedToday($points) {
     $this->points_reopened_today = $this->points_reopened_today + $points;
   }
 
-  public function getPointsReopenedToday () {
+  public function getPointsReopenedToday() {
     return $this->points_reopened_today;
   }
 

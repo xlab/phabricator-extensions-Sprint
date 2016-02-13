@@ -6,17 +6,17 @@ final class SprintReportOpenTasksView extends SprintView {
     private $request;
     private $view;
 
-  public function setUser (PhabricatorUser $viewer) {
+  public function setUser(PhabricatorUser $viewer) {
     $this->user = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
 
-  public function setView ($view) {
+  public function setView($view) {
     $this->view = $view;
     return $this;
   }
@@ -57,11 +57,11 @@ final class SprintReportOpenTasksView extends SprintView {
 
     if (($this->view) == 'user') {
        list($leftover, $leftover_closed, $base_link, $leftover_name,
-           $col_header, $header, $result_closed, $result ) =
+           $col_header, $header, $result_closed, $result) =
            ($viewer_task_view->execute($tasks, $recently_closed, $date));
     } else if (($this->view) == 'project') {
         list($leftover, $base_link, $leftover_name, $col_header, $header,
-            $result_closed, $leftover_closed, $result ) =
+            $result_closed, $leftover_closed, $result) =
            ($project_task_view->execute($tasks, $recently_closed, $date));
     } else {
       $result = array();
@@ -84,7 +84,7 @@ final class SprintReportOpenTasksView extends SprintView {
         $base_link, $leftover, $leftover_name, $leftover_closed, $order,
         $reverse);
 
-    list ($cname, $cclass) = $this->buildTableColumns($col_header);
+    list($cname, $cclass) = $this->buildTableColumns($col_header);
     $table = $this->buildOpenTasksTable($rows, $cname, $cclass, $order,
         $reverse);
     $panel = new PHUIObjectBoxView();
@@ -104,7 +104,7 @@ final class SprintReportOpenTasksView extends SprintView {
   /**
    * @param integer $total
    */
-  private function setSortOrder ($row, $order, $total, $oldest_all, $oldest_pri,
+  private function setSortOrder($row, $order, $total, $oldest_all, $oldest_pri,
                                  $closed, $handle) {
     switch ($order) {
       case 'total':
@@ -133,7 +133,7 @@ final class SprintReportOpenTasksView extends SprintView {
    * @param string $order
    * @param integer $reverse
    */
-  private function buildRowsfromResult ($project_handle, $result,
+  private function buildRowsfromResult($project_handle, $result,
                                         $result_closed, $base_link, $leftover,
                                         $leftover_name, $leftover_closed,
                                         $order, $reverse) {
@@ -144,15 +144,15 @@ final class SprintReportOpenTasksView extends SprintView {
     $rows = array();
 
     foreach ($handles as $handle) {
-      list ($tasks, $name, $closed) = $this->setTaskArrays($handle,
+      list($tasks, $name, $closed) = $this->setTaskArrays($handle,
           $project_handle, $result, $result_closed, $base_link, $leftover,
           $leftover_name, $leftover_closed);
 
       $taskv = $tasks;
       $tasks = mgroup($tasks, 'getPriority');
 
-      list ($row, $total) = $this->getPriorityMap($name, $tasks);
-      list ($row, $oldest_all, $oldest_pri ) = $this->renderTaskLinks($taskv,
+      list($row, $total) = $this->getPriorityMap($name, $tasks);
+      list($row, $oldest_all, $oldest_pri) = $this->renderTaskLinks($taskv,
           $closed, $row);
 
       $row['sort'] = $this->setSortOrder($row, $order, $total, $oldest_all,
@@ -172,7 +172,7 @@ final class SprintReportOpenTasksView extends SprintView {
     return $rows;
   }
 
-  private function renderTaskLinks ($taskv, $closed, $row) {
+  private function renderTaskLinks($taskv, $closed, $row) {
     list($link, $oldest_all) = $this->renderOldest($taskv);
     $row[] = $link;
 
@@ -201,10 +201,10 @@ final class SprintReportOpenTasksView extends SprintView {
     } else {
       $row[] = '-';
     }
-    return array ($row, $oldest_all, $oldest_pri);
+    return array($row, $oldest_all, $oldest_pri);
   }
 
-  private function getPriorityMap ($name, $tasks) {
+  private function getPriorityMap($name, $tasks) {
     $row = array();
     $row[] = $name;
     $total = 0;
@@ -218,7 +218,7 @@ final class SprintReportOpenTasksView extends SprintView {
       $total += $n;
     }
     $row[] = number_format($total);
-    return array ($row, $total);
+    return array($row, $total);
   }
 
   private function setTaskArrays($handle, $project_handle, $result,
@@ -246,7 +246,7 @@ final class SprintReportOpenTasksView extends SprintView {
       $name  = $leftover_name;
       $closed = $leftover_closed;
     }
-    return array ($tasks, $name, $closed);
+    return array($tasks, $name, $closed);
   }
 
   /**
@@ -299,7 +299,7 @@ final class SprintReportOpenTasksView extends SprintView {
         ),
         pht('Recently Closed'));
     $cclass[] = 'center narrow';
-    return array ($cname, $cclass);
+    return array($cname, $cclass);
   }
 
   /**

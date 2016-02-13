@@ -1,4 +1,5 @@
 <?php
+
 final class ProjectOpenTasksView extends OpenTasksView {
 
   /**
@@ -36,8 +37,15 @@ final class ProjectOpenTasksView extends OpenTasksView {
     $col_header = pht('Project');
     $header = pht('Open Tasks by Project and Priority (%s)', $date);
 
-    return array ($leftover, $base_link, $leftover_name, $col_header, $header,
-        $result_closed, $leftover_closed, $result,
+    return array(
+    $leftover,
+    $base_link,
+    $leftover_name,
+    $col_header,
+    $header,
+        $result_closed,
+        $leftover_closed,
+        $result,
     );
   }
 

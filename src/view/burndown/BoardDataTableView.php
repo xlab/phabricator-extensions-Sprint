@@ -1,10 +1,10 @@
 <?php
 
-final class BoardDataTableView extends Phobject{
+final class BoardDataTableView extends Phobject {
 
   private $boardData;
 
-  public function setBoardData ($board_data) {
+  public function setBoardData($board_data) {
     $this->boardData = $board_data;
     return $this;
   }

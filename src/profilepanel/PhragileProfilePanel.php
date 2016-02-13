@@ -1,17 +1,25 @@
 <?php
 
-final class SprintProjectWorkboardProfilePanel
+final class PhragileProfilePanel
     extends PhabricatorProfilePanel {
 
-  const PANEL_WORKBOARD = 'project.workboard';
-  const PANELKEY = 'sprint.workboard';
+  const PANELKEY = 'project.phragile';
 
   public function getPanelTypeName() {
-    return pht('Project Workboard');
+    return pht('Phragile');
   }
 
   private function getDefaultName() {
-    return pht('Workboard');
+    return pht('Phragile');
+  }
+
+  public function shouldEnableForObject($object) {
+    $enable_phragile = PhabricatorEnv::getEnvConfig('sprint.enable-phragile');
+
+    if ($enable_phragile) {
+      return true;
+    }
+    return false;
   }
 
   public function getDisplayName(
@@ -38,33 +46,23 @@ final class SprintProjectWorkboardProfilePanel
 
   protected function newNavigationMenuItems(
       PhabricatorProfilePanelConfiguration $config) {
-    $viewer = $this->getViewer();
-
-    // Workboards are only available if Maniphest is installed.
-    $class = 'PhabricatorManiphestApplication';
-    if (!PhabricatorApplication::isClassInstalledForViewer($class, $viewer)) {
-      return array();
-    }
 
     $project = $config->getProfileObject();
 
-    $columns = id(new PhabricatorProjectColumnQuery())
-        ->setViewer($viewer)
-        ->withProjectPHIDs(array($project->getPHID()))
-        ->execute();
-    if ($columns) {
-      $icon = 'fa-columns';
-    } else {
-      $icon = 'fa-columns grey';
-    }
+    $has_children = ($project->getHasSubprojects()) ||
+        ($project->getHasMilestones());
 
     $id = $project->getID();
-    $href = "/project/sprint/board/{$id}/";
+
     $name = $this->getDisplayName($config);
+    $icon = 'fa-link';
+    $phragile_base_uri = PhabricatorEnv::getEnvConfig('sprint.phragile-uri');
+    $href = $phragile_base_uri.$id;
 
     $item = $this->newItem()
         ->setHref($href)
         ->setName($name)
+        ->setDisabled(!$has_children)
         ->setIcon($icon);
 
     return array(

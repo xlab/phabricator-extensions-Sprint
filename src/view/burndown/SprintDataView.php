@@ -57,7 +57,6 @@ final class SprintDataView extends SprintView {
           ->setRequest($this->request)
           ->setTasks($this->tasks)
           ->setTimezone($this->timezone)
-          ->setTaskPoints($this->taskpoints)
           ->setStats($stats)
           ->setQuery($query)
           ->setTimeSeries($this->timeseries)
@@ -97,7 +96,6 @@ final class SprintDataView extends SprintView {
           ->setViewer($this->viewer)
           ->setRequest($this->request)
           ->setTasks($this->tasks)
-          ->setTaskPoints($this->taskpoints)
           ->setQuery($query)
           ->execute();
       $tasks_table_view = id(new TasksTableView())
@@ -122,7 +120,11 @@ final class SprintDataView extends SprintView {
       $event_table = null;
     }
 
-    return array($board_chart, $board_table, $pies, $tasks_table,
+    return array(
+    $board_chart,
+    $board_table,
+    $pies,
+    $tasks_table,
      $event_table,
     );
   }

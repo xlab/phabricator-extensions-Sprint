@@ -7,21 +7,21 @@ final class SprintListDataProvider {
   private $sprints;
   private $rows;
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
 
-  public function getRequest () {
+  public function getRequest() {
     return $this->request;
   }
 
-  public function getRows () {
+  public function getRows() {
     return $this->rows;
   }
 
@@ -59,13 +59,13 @@ final class SprintListDataProvider {
       $rows[] = $row;
     }
 
-    $this->rows = array_map(function($a) { return $a['0']; }, $rows);
+    $this->rows = array_map(function ($a) { return $a['0']; }, $rows);
     return $this;
   }
 
   private function buildRowSet($project_id, $project_name, $start, $end) {
     $rows = array();
-    $rows[] =  array (
+    $rows[] =  array(
         phutil_tag(
         'a',
         array(

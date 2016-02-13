@@ -9,7 +9,6 @@ final class BoardDataProvider {
   private $viewer;
   private $request;
   private $tasks;
-  private $taskpoints;
   private $query;
   private $stats;
   private $timezone;
@@ -17,81 +16,72 @@ final class BoardDataProvider {
   private $chartdata;
   private $coldata;
 
-  public function setStart ($start) {
+  public function setStart($start) {
     $this->start = $start;
     return $this;
   }
 
-  public function setEnd ($end) {
+  public function setEnd($end) {
     $this->end = $end;
     return $this;
   }
 
-  public function setProject ($project) {
+  public function setProject($project) {
     $this->project = $project;
     return $this;
   }
 
-  public function getProject () {
+  public function getProject() {
     return $this->project;
   }
 
-  public function getColumnData () {
+  public function getColumnData() {
     return $this->coldata;
   }
 
-  public function getChartData () {
+  public function getChartData() {
     return $this->chartdata;
   }
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
 
-  public function setTimezone ($timezone) {
+  public function setTimezone($timezone) {
     $this->timezone = $timezone;
     return $this;
   }
 
-  public function setTimeSeries ($timeseries) {
+  public function setTimeSeries($timeseries) {
     $this->timeseries = $timeseries;
     return $this;
   }
 
-  public function getTimeSeries () {
+  public function getTimeSeries() {
     return $this->timeseries;
   }
 
-  public function setTasks ($tasks) {
+  public function setTasks($tasks) {
     $this->tasks = $tasks;
     return $this;
   }
 
-  public function getTasks () {
+  public function getTasks() {
     return $this->tasks;
   }
 
-  public function setTaskPoints ($taskpoints) {
-    $this->taskpoints = $taskpoints;
-    return $this;
-  }
-
-  public function getTaskPoints() {
-    return $this->taskpoints;
-  }
-
-  public function setStats ($stats) {
+  public function setStats($stats) {
     $this->stats = $stats;
     return $this;
   }
 
-  public function setQuery ($query) {
+  public function setQuery($query) {
     $this->query = $query;
     return $this;
   }
@@ -134,7 +124,9 @@ final class BoardDataProvider {
       $task_count = count($tasks);
       $task_points_total = $this->getTaskPointsSum($tasks);
       $coldata[] = array(
-          $colname, $task_count, $task_points_total,
+          $colname,
+          $task_count,
+          $task_points_total,
       );
     }
     return $coldata;
@@ -157,17 +149,17 @@ final class BoardDataProvider {
 
   private function getTaskPointsSum($tasks) {
     $points_sum = null;
-    $taskpoints = mpull($this->taskpoints, null, 'getObjectPHID');
-    $column_points = array_intersect_key($taskpoints, $tasks);
-    if (!empty($column_points)) {
-      foreach ($column_points as $key => $value) {
-          $points = $value->getfieldValue();
+ //   $taskpoints = mpull($this->taskpoints, null, 'getObjectPHID');
+ //   $column_points = array_intersect_key($taskpoints, $tasks);
+ //   if (!empty($column_points)) {
+      foreach ($tasks as $task) {
+          $points = $task->getPoints();
           $points_sum += $points;
       }
       if (!isset($points_sum)) {
         $points_sum = '0';
       }
-    }
+//    }
     return $points_sum;
   }
 
@@ -201,13 +193,13 @@ final class BoardDataProvider {
 
     $sprint_xaction = id(new SprintColumnTransaction())
         ->setViewer($this->viewer)
-        ->setTaskPoints($this->taskpoints)
+        ->setTasks($this->tasks)
         ->setQuery($this->query)
         ->setProject($this->project)
         ->setEvents($xactions);
 
     $dates = $sprint_xaction->parseEvents($date_array, $xaction_map);
-    $this->stats->setTaskPoints($this->taskpoints);
+    $this->stats->setTasks($this->tasks);
     $sprint_data = $this->stats->setSprintData($dates);
     $data = $this->stats->buildDataSet($sprint_data);
     $this->chartdata = $this->stats->transposeArray($data);

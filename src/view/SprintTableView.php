@@ -239,7 +239,8 @@ final class SprintTableView extends AphrontView {
       $table_id = celerity_generate_unique_node_id();
     }
 
-    $html = phutil_tag('table', array('class' => $table_class,
+    $html = phutil_tag('table', array(
+    'class' => $table_class,
         'id' => $table_id,
     ), $table);
     return phutil_tag_div('aphront-table-wrap', $html);

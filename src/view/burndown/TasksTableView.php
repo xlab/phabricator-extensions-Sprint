@@ -1,11 +1,11 @@
 <?php
 
-final class TasksTableView extends Phobject{
+final class TasksTableView extends Phobject {
 
   private $tableData;
 
 
-  public function setTableData ($table_data) {
+  public function setTableData($table_data) {
     $this->tableData = $table_data;
     return $this;
   }

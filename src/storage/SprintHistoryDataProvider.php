@@ -7,21 +7,21 @@ final class SprintHistoryDataProvider {
   private $history;
   private $project;
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
 
-   public function getRequest () {
+   public function getRequest() {
     return $this->request;
   }
 
-  public function getRows () {
+  public function getRows() {
     return $this->rows;
   }
 
@@ -55,13 +55,13 @@ final class SprintHistoryDataProvider {
       $rows[] = $row;
     }
 
-    $this->rows = array_map(function($a) { return $a['0']; }, $rows);
+    $this->rows = array_map(function ($a) { return $a['0']; }, $rows);
     return $this;
   }
 
   private function buildRowSet($remove_action, $add_action, $projectname, $taskname, $createdEpoch, $created) {
     $rows = array();
-    $rows[] =  array (
+    $rows[] =  array(
     $remove_action,
     $add_action,
     $projectname,

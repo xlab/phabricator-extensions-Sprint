@@ -2,9 +2,9 @@
 
 final class SprintStats {
   private $timezone;
-  private $taskpoints;
+  private $tasks;
 
-  public function setTimezone ($viewer) {
+  public function setTimezone($viewer) {
     $this->timezone = new DateTimeZone($viewer->getTimezoneIdentifier());
     return $this->timezone;
   }
@@ -15,8 +15,8 @@ final class SprintStats {
     return $dates;
   }
 
-  public function setTaskPoints ($taskpoints) {
-    $this->taskpoints = $taskpoints;
+  public function setTasks($tasks) {
+    $this->tasks = $tasks;
     return $this;
   }
 
@@ -42,14 +42,14 @@ final class SprintStats {
 
   public function buildTimeSeries($start, $end) {
     $timezone = $this->timezone;
-    $timeseries = array_keys($this->buildDateArray ($start, $end, $timezone));
+    $timeseries = array_keys($this->buildDateArray($start, $end, $timezone));
     return $timeseries;
   }
 
   /**
    * @param string $date
    */
-  public function getBurndownDate ($date) {
+  public function getBurndownDate($date) {
     $sprint_date = id(new BurndownDataDate($date));
     return $sprint_date;
   }
@@ -63,7 +63,7 @@ final class SprintStats {
 
   public function sumTotalPoints($dates) {
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTasks($this->tasks);
     $points_total = $sprintpoints->sumTotalTaskPoints();
     foreach ($dates as $date) {
       $date->setPointsTotal($points_total);
@@ -73,7 +73,7 @@ final class SprintStats {
 
   public function sumTotalTasks($dates) {
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTaskPoints($this->tasks);
     $points_total = $sprintpoints->sumTotalTasks();
     foreach ($dates as $date) {
       $date->setTasksTotal($points_total);
@@ -85,7 +85,7 @@ final class SprintStats {
     $first = true;
     $previous = new BurndownDataDate($date = null);
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTasks($this->tasks);
     $points_total = $sprintpoints->sumTotalTaskPoints();
 
     foreach ($dates as $date) {
@@ -113,7 +113,7 @@ final class SprintStats {
     $first = true;
     $previous = new BurndownDataDate($date = null);
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTasks($this->tasks);
     $tasks_total = $sprintpoints->sumTotalTasks();
     foreach ($dates as $date) {
       $tasks_closed_today = $date->getTasksClosedToday();
@@ -151,14 +151,15 @@ final class SprintStats {
         $elapsed_business_days++;
       }
 
-      $date->setPointsIdealRemaining (round($date->getPointsTotal() *
+      $date->setPointsIdealRemaining(round($date->getPointsTotal() *
           (1 - ($elapsed_business_days / $total_business_days)), 1));
     }
     return $dates;
   }
 
-  public function buildDataSet ($dates) {
-    $data = array(array(
+  public function buildDataSet($dates) {
+    $data = array(
+    array(
         pht('Start Points'),
         pht('Remaining Points'),
         pht('Ideal Points'),

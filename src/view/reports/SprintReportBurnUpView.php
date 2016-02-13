@@ -4,12 +4,12 @@ final class SprintReportBurnUpView extends SprintView {
 
   private $request;
 
-  public function setUser (PhabricatorUser $viewer) {
+  public function setUser(PhabricatorUser $viewer) {
     $this->user = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
@@ -35,7 +35,7 @@ final class SprintReportBurnUpView extends SprintView {
     return $data;
   }
 
-  private function addTaskStatustoData ($data) {
+  private function addTaskStatustoData($data) {
    foreach ($data as $key => $row) {
 
      // NOTE: Hack to avoid json_decode().
@@ -65,9 +65,9 @@ final class SprintReportBurnUpView extends SprintView {
    return $data;
  }
 
-  private function buildStatsfromEvents ($data) {
+  private function buildStatsfromEvents($data) {
    $stats = array();
-   $data = $this->addTaskStatustoData ($data);
+   $data = $this->addTaskStatustoData($data);
 
     foreach ($data as $key => $row) {
 
@@ -88,7 +88,7 @@ final class SprintReportBurnUpView extends SprintView {
     return $stats;
   }
 
-  private function buildDayBucketsfromEvents ($data) {
+  private function buildDayBucketsfromEvents($data) {
       $day_buckets = array();
       foreach ($data as $key => $row) {
 
@@ -113,7 +113,7 @@ final class SprintReportBurnUpView extends SprintView {
   }
 
 
-  private function formatBucketRows ($stats, $day_buckets) {
+  private function formatBucketRows($stats, $day_buckets) {
     $template = array(
         'open' => 0,
         'close' => 0,
@@ -172,10 +172,10 @@ final class SprintReportBurnUpView extends SprintView {
       $period['open'] += $info['open'];
       $period['close'] += $info['close'];
     }
-    return array ($rows, $rowc, $week, $month, $period);
+    return array($rows, $rowc, $week, $month, $period);
   }
 
-  private function renderCaption ($handle) {
+  private function renderCaption($handle) {
       $inst = pht(
           'NOTE: This table reflects tasks currently in '.
           'the project. If a task was opened in the past but added to '.
@@ -185,7 +185,7 @@ final class SprintReportBurnUpView extends SprintView {
           'counted at all.');
       $header = pht('Task Burn Rate for Project %s', $handle->renderLink());
       $caption = phutil_tag('p', array(), $inst);
-   return array ($caption, $header);
+   return array($caption, $header);
   }
 
   private function formatStatsTableHeaders($week, $month, $period, $rows,
@@ -211,7 +211,7 @@ final class SprintReportBurnUpView extends SprintView {
 
     $rows = array_reverse($rows);
     $rowc = array_reverse($rowc);
-  return array ($rows, $rowc);
+  return array($rows, $rowc);
   }
 
   private function buildStatsTable() {
@@ -220,7 +220,7 @@ final class SprintReportBurnUpView extends SprintView {
 
     if ($project_phid) {
       $phids = array($project_phid);
-      $handle = $this->getProjectHandle ($phids, $project_phid, $this->request);
+      $handle = $this->getProjectHandle($phids, $project_phid, $this->request);
     }
 
     $data = $this->getXactionData($project_phid);
@@ -228,15 +228,15 @@ final class SprintReportBurnUpView extends SprintView {
     $stats = $this->buildStatsfromEvents($data);
     $day_buckets = $this->buildDayBucketsfromEvents($data);
 
-    list ($rows, $rowc, $week, $month, $period) =
+    list($rows, $rowc, $week, $month, $period) =
         $this->formatBucketRows($stats, $day_buckets);
-    list ($rows, $rowc) = $this->formatStatsTableHeaders($week, $month, $period,
+    list($rows, $rowc) = $this->formatStatsTableHeaders($week, $month, $period,
         $rows, $rowc);
 
     $table = $this->statsTableView($rows, $rowc);
 
   if ($handle) {
-    list ($caption, $header) = $this->renderCaption ($handle);
+    list($caption, $header) = $this->renderCaption($handle);
     $caption = id(new PHUIInfoView())
         ->appendChild($caption)
         ->setSeverity(PHUIInfoView::SEVERITY_NOTICE);
@@ -311,11 +311,12 @@ final class SprintReportBurnUpView extends SprintView {
     }
 
   private function buildSeries(array $data) {
-    $output = array(array(
+    $output = array(
+    array(
         pht('Dates'),
         pht('Tasks'),
     ),);
-      $tdata = $this->addTaskStatustoData ($data);
+      $tdata = $this->addTaskStatustoData($data);
       $counter = 0;
       foreach ($tdata as $key => $row) {
         $t = (int)$row['dateCreated'] * 1000;
@@ -325,7 +326,8 @@ final class SprintReportBurnUpView extends SprintView {
           ++$counter;
         }
         $output[] = array(
-        $t, $counter,
+        $t,
+        $counter,
         );
 
       }

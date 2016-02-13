@@ -77,17 +77,6 @@ final class SprintConfigOptions
                 pht(
                     "The Pie Charts are optional".
                     "\n\n.")),
-        $this->newOption('sprint.enable-sprint-board', 'bool', true)
-            ->setBoolOptions(
-                array(
-                    pht('Enable Sprint Board'),
-                    pht('Disble Sprint Board'),
-                ))
-            ->setSummary(pht('Enable or Disable Sprint Board.'))
-            ->setDescription(
-                pht(
-                    "The Sprint Board is optional".
-                    "\n\n.")),
         $this->newOption('sprint.enable-phragile', 'bool', false)
             ->setBoolOptions(
                 array(

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Michael Peters
  * @author Christopher Johnson
@@ -23,44 +24,11 @@ final class SprintApplication extends PhabricatorApplication {
     return 'Build Sprints';
   }
 
-  public function getEventListeners() {
-    return array(
-      new BurndownActionMenuEventListener(),
-    );
-  }
-
   public function getRoutes() {
-    $enable_board = PhabricatorEnv::getEnvConfig('sprint.enable-sprint-board');
-    if ($enable_board == true) {
       return array(
         // this is the default application route controller
           '/project/sprint/' => array(
               '' => 'SprintListController',
-            // these are forked controllers for the Sprint Board
-              'board/(?P<projectID>[1-9]\d*)/' => array(
-                  'edit/(?:(?P<id>\d+)/)?'
-                  => 'SprintBoardColumnEditController',
-                  'hide/(?:(?P<id>\d+)/)?'
-                  => 'SprintBoardColumnHideController',
-                  'column/(?:(?P<id>\d+)/)?'
-                  => 'SprintBoardColumnDetailController',
-                  'import/'
-                  => 'SprintBoardImportController',
-                  'reorder/'
-                  => 'SprintBoardReorderController',
-              ),
-            // these allow task creation and editing from a Sprint Board
-              'board/task/edit/(?P<id>[1-9]\d*)/'
-              => 'SprintBoardTaskEditController',
-              'board/task/create/'
-              => 'SprintBoardTaskEditController',
-              'board/batch/'
-              => 'SprintBoardBatchEditController',
-            // these are for board filters and column queries
-              'board/(?P<id>[1-9]\d*)/'.
-              '(?P<filter>filter/)?'.
-              '(?:query/(?P<queryKey>[^/]+)/)?'
-              => 'SprintBoardViewController',
             // these are native Sprint application controllers
               'burn/(?P<id>\d+)/' => 'SprintDataViewController',
               'profile/(?P<id>[1-9]\d*)/'
@@ -69,93 +37,9 @@ final class SprintApplication extends PhabricatorApplication {
               'report/history/' => 'SprintHistoryController',
               'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
               'view/(?P<id>\d+)/' => 'SprintDataViewController',
-            // all routes following point to default controllers
-              'archive/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectArchiveController',
-              $this->getEditRoutePattern('edit/')
-              => 'PhabricatorProjectEditController',
-              'feed/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectFeedController',
-              'icon/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditIconController',
-              'members/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectMembersEditController',
-              'members/(?P<id>[1-9]\d*)/remove/'
-              => 'PhabricatorProjectMembersRemoveController',
-              'milestones/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectMilestonesController',
-              'move/(?P<id>[1-9]\d*)/' => 'SprintBoardMoveController',
-              'picture/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditPictureController',
-              'subprojects/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectSubprojectsController',
-              'update/(?P<id>[1-9]\d*)/(?P<action>[^/]+)/'
-              => 'PhabricatorProjectUpdateController',
-          ),
-        // primary tag route override
-          '/tag/' => array(
-              '(?P<slug>[^/]+)/' => 'SprintProjectViewController',
-              '(?P<slug>[^/]+)/board/' => 'SprintBoardViewController',
-          ),
-      );
-    } else {
-      return array(
-        // this is the default application route controller
-          '/project/sprint/' => array(
-              '' => 'SprintListController',
-              'board/(?P<projectID>[1-9]\d*)/' => array(
-                  'edit/(?:(?P<id>\d+)/)?'
-                  => 'PhabricatorProjectBoardColumnEditController',
-                  'hide/(?:(?P<id>\d+)/)?'
-                  => 'PhabricatorProjectBoardColumnHideController',
-                  'column/(?:(?P<id>\d+)/)?'
-                  => 'PhabricatorProjectBoardColumnDetailController',
-                  'import/'
-                  => 'PhabricatorProjectBoardImportController',
-                  'reorder/'
-                  => 'PhabricatorProjectBoardReorderController',
-              ),
-            // these are for board filters and column queries
-              'board/(?P<id>[1-9]\d*)/'.
-              '(?P<filter>filter/)?'.
-              '(?:query/(?P<queryKey>[^/]+)/)?'
-              => 'PhabricatorProjectBoardViewController',
-            // these are native Sprint application controllers
-              'burn/(?P<id>\d+)/' => 'SprintDataViewController',
-              'profile/(?P<id>[1-9]\d*)/'
-              => 'SprintProjectProfileController',
-              'report/list/' => 'SprintListController',
-              'report/history/' => 'SprintHistoryController',
-              'report/(?:(?P<view>\w+)/)?' => 'SprintReportController',
-              'view/(?P<id>\d+)/' => 'SprintDataViewController',
-            // all routes following point to default controllers
-              'archive/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectArchiveController',
-              'details/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditDetailsController',
-              'feed/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectFeedController',
-              'icon/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditIconController',
-              'lock/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectLockController',
-              'members/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectMembersEditController',
-              'members/(?P<id>[1-9]\d*)/remove/'
-              => 'PhabricatorProjectMembersRemoveController',
-              'move/(?P<id>[1-9]\d*)/' => 'SprintBoardMoveController',
-              'milestones/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectMilestonesController',
-              'picture/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectEditPictureController',
-              'subprojects/(?P<id>[1-9]\d*)/'
-              => 'PhabricatorProjectSubprojectsController',
-              'update/(?P<id>[1-9]\d*)/(?P<action>[^/]+)/'
-              => 'PhabricatorProjectUpdateController',
           ),
       );
     }
-  }
 
   protected function getCustomCapabilities() {
     return array(

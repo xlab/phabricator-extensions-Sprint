@@ -35,6 +35,14 @@ To install the Sprint extension:
 
         ./config set load-libraries '{"sprint":"/srv/phab/libext/sprint/src"}'
 
+**Release Notes: Projects v3.0**
+As of 13.02.2016, sprint charts now depend on the global maniphest.points field setting being enabled.
+
+To do this, enter the JSON
+{"enabled": true} in the maniphest.points configuration.
+
+To migrate story points to maniphest.points, see <https://secure.phabricator.com/T10350>.
+
 **BUGS**
 
 Report issues by creating a task here:

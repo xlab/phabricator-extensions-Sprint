@@ -6,17 +6,17 @@ final class SprintQuery extends SprintDAO {
   private $project;
   private $projectPHID;
 
-  public function setProject ($project) {
+  public function setProject($project) {
     $this->project = $project;
     return $this;
   }
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setPHID ($project_phid) {
+  public function setPHID($project_phid) {
     $this->projectPHID = $project_phid;
     return $this;
   }
@@ -178,22 +178,22 @@ final class SprintQuery extends SprintDAO {
     return $xactions;
   }
 
-  public function getXActionObj () {
+  public function getXActionObj() {
     $table = new ManiphestTransaction();
     return $table;
   }
 
-  public function getXActionConn () {
+  public function getXActionConn() {
     $conn = $this->getXActionObj()->establishConnection('r');
     return $conn;
   }
 
-  public function getCustomFieldObj () {
+  public function getCustomFieldObj() {
     $table = new ManiphestCustomFieldStorage();
     return $table;
   }
 
-  public function getCustomFieldConn () {
+  public function getCustomFieldConn() {
     $conn = $this->getCustomFieldObj()->establishConnection('r');
     return $conn;
   }
@@ -256,11 +256,12 @@ final class SprintQuery extends SprintDAO {
     return $task_data;
   }
 
-  public function getEdges ($tasks) {
+  public function getEdges($tasks) {
     // Load all edges of depends and depended on tasks
     $edges = id(new PhabricatorEdgeQuery())
         ->withSourcePHIDs(array_keys($tasks))
-        ->withEdgeTypes(array( ManiphestTaskDependsOnTaskEdgeType::EDGECONST,
+        ->withEdgeTypes(array(
+        ManiphestTaskDependsOnTaskEdgeType::EDGECONST,
             ManiphestTaskDependedOnByTaskEdgeType::EDGECONST,
         ))
         ->execute();
@@ -313,7 +314,7 @@ final class SprintQuery extends SprintDAO {
     return $positions;
   }
 
-  public function getProjectNamefromPHID ($phid) {
+  public function getProjectNamefromPHID($phid) {
       $project = id(new PhabricatorProjectQuery())
           ->setViewer(PhabricatorUser::getOmnipotentUser())
           ->withPHIDs(array($phid))
@@ -322,7 +323,7 @@ final class SprintQuery extends SprintDAO {
       return $name;
   }
 
-  public function getTaskNamefromPHID ($phid) {
+  public function getTaskNamefromPHID($phid) {
     $task = id(new ManiphestTaskQuery())
         ->setViewer(PhabricatorUser::getOmnipotentUser())
         ->withPHIDs(array($phid))

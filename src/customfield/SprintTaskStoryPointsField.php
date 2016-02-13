@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Michael Peters
  * @author Christopher Johnson
@@ -14,7 +15,7 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
 
   public function __construct() {
     $this->obj = clone $this;
-    $this->textproxy = id(new PhabricatorStandardCustomFieldText())
+    $this->textproxy = id(new PhabricatorStandardCustomFieldInt())
       ->setFieldKey($this->getFieldKey())
       ->setApplicationField($this->obj)
       ->setFieldConfig(array(

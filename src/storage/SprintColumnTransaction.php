@@ -5,27 +5,27 @@ final class SprintColumnTransaction {
   private $viewer;
   private $project;
   private $query;
-  private $taskpoints;
+  private $tasks;
   private $events;
   private $xquery;
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setProject ($project) {
+  public function setProject($project) {
     $this->project = $project;
     return $this;
   }
 
-  public function setQuery ($query) {
+  public function setQuery($query) {
     $this->query = $query;
     return $this;
   }
 
-  public function setTaskPoints ($taskpoints) {
-    $this->taskpoints = $taskpoints;
+  public function setTasks($tasks) {
+    $this->tasks = $tasks;
     return $this;
   }
 
@@ -44,13 +44,14 @@ final class SprintColumnTransaction {
   public function parseEvents($dates) {
 
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTasks($this->tasks)
+        ->setViewer($this->viewer);
 
     foreach ($this->events as $event) {
       $modify_date = $event['modified'];
       $task_phid = $event['objectPHID'];
 
-      $points = $sprintpoints->getTaskPoints($task_phid);
+      $points = $sprintpoints->getTaskPointsbyPHID($task_phid);
 
       $date = phabricator_format_local_time($modify_date,
           $this->viewer, 'D M j');
@@ -89,7 +90,7 @@ final class SprintColumnTransaction {
     return $dates;
   }
 
-  private function setXActionEventType ($old_col_name, $new_col_name) {
+  private function setXActionEventType($old_col_name, $new_col_name) {
     $old_is_closed = ($old_col_name === null) ||
         SprintConstants::TYPE_CLOSED_STATUS_COLUMN == $old_col_name;
 

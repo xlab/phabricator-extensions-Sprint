@@ -6,7 +6,6 @@ final class TaskTableDataProvider {
   private $viewer;
   private $request;
   private $tasks;
-  private $taskpoints;
   private $query;
   private $rows;
   private $blocked;
@@ -16,41 +15,36 @@ final class TaskTableDataProvider {
   private $handles;
 
 
-  public function setProject ($project) {
+  public function setProject($project) {
     $this->project = $project;
     return $this;
   }
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request = $request;
     return $this;
   }
 
-  public function setTasks ($tasks) {
+  public function setTasks($tasks) {
     $this->tasks = $tasks;
     return $this;
   }
 
-  public function setTaskPoints ($taskpoints) {
-    $this->taskpoints = $taskpoints;
-    return $this;
-  }
-
-  public function setQuery ($query) {
+  public function setQuery($query) {
     $this->query = $query;
     return $this;
   }
 
-  public function getRows () {
+  public function getRows() {
     return $this->rows;
   }
 
-  public function getRequest () {
+  public function getRequest() {
     return $this->request;
   }
 
@@ -85,7 +79,7 @@ final class TaskTableDataProvider {
         $ptasks = array_merge($ptasks, $ptask);
       }
     }
-    return array ($blocker, $ptasks);
+    return array($blocker, $ptasks);
   }
 
 
@@ -93,26 +87,26 @@ final class TaskTableDataProvider {
     $edges = $this->query->getEdges($this->tasks);
     $map = $this->buildTaskMap($edges, $this->tasks);
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->taskpoints);
+        ->setTasks($this->tasks);
 
     $this->handles = $this->getHandles();
 
     $rows = array();
     foreach ($this->tasks as $task) {
       $this->blocked = $this->checkForBlocked($task, $map);
-      list ($this->blocker, $this->ptasks) = $this->checkForBlocker($task,
+      list($this->blocker, $this->ptasks) = $this->checkForBlocker($task,
           $map);
-      $this->points = $sprintpoints->getTaskPoints($task->getPHID());
+      $this->points = $sprintpoints->getTaskPoints($task);
 
       $row = $this->addTaskToTree($task);
       $rows[] = $row;
     }
 
-    $this->rows = array_map(function($a) { return $a['0']; }, $rows);
+    $this->rows = array_map(function ($a) { return $a['0']; }, $rows);
     return $this;
   }
 
-  private function buildTaskMap ($edges, $tasks) {
+  private function buildTaskMap($edges, $tasks) {
     $map = array();
     foreach ($tasks as $task) {
       $phid = $task->getPHID();
@@ -209,7 +203,9 @@ final class TaskTableDataProvider {
                     ? 'phui-tag-core-closed'
                     : '',
             ),
-            array ($this->buildTaskLink($task), $blockericon,
+            array(
+            $this->buildTaskLink($task),
+            $blockericon,
                 $blockedicon,
             ))),
         $cdate,

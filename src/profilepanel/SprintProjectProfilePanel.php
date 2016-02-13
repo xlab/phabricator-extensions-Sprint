@@ -1,17 +1,20 @@
 <?php
 
-final class SprintProjectDetailsProfilePanel
+final class SprintProjectProfilePanel
     extends PhabricatorProfilePanel {
 
-  const PANEL_PROFILE = 'sprint.profile';
-  const PANELKEY = 'sprint.details';
+  const PANELKEY = 'project.sprint';
 
   public function getPanelTypeName() {
-    return pht('Sprint Details');
+    return pht('Project Burndown');
   }
 
   private function getDefaultName() {
-    return pht('Sprint Details');
+    return pht('Burndown');
+  }
+
+  public function shouldEnableForObject($object) {
+    return true;
   }
 
   public function getDisplayName(
@@ -41,16 +44,20 @@ final class SprintProjectDetailsProfilePanel
 
     $project = $config->getProfileObject();
 
-    $id = $project->getID();
-    $picture = $project->getProfileImageURI();
-    $name = $project->getName();
+    $has_children = ($project->getHasSubprojects()) ||
+        ($project->getHasMilestones());
 
-    $href = "/project/sprint/profile/{$id}/";
+    $id = $project->getID();
+
+    $name = $this->getDisplayName($config);
+    $icon = 'fa-calendar';
+    $href = "/project/sprint/view/{$id}/";
 
     $item = $this->newItem()
         ->setHref($href)
         ->setName($name)
-        ->setProfileImage($picture);
+        ->setDisabled(!$has_children)
+        ->setIcon($icon);
 
     return array(
         $item,

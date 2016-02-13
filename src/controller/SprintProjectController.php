@@ -5,6 +5,8 @@ abstract class SprintProjectController extends SprintController {
   private $project;
   private $profileMenu;
 
+  const PANEL_BURNDOWN = 'project.sprint';
+
   protected function setProject(PhabricatorProject $project) {
     $this->project = $project;
     return $this;

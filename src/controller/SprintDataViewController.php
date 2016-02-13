@@ -71,11 +71,6 @@ final class SprintDataViewController extends SprintController {
         $this->project->getName(),
         $this->getApplicationURI().'profile/'.$this->projectID);
     $crumbs->addTextCrumb(pht('Burndown'));
-    $crumbs->addAction(
-        id(new PHUIListItemView())
-            ->setName(pht('Sprint Board'))
-            ->setHref($this->getApplicationURI().'board/'.$this->projectID)
-            ->setIcon('fa-columns'));
    return $crumbs;
   }
 

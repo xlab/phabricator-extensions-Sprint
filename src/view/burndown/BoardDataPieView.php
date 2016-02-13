@@ -1,10 +1,10 @@
 <?php
 
-final class BoardDataPieView extends Phobject{
+final class BoardDataPieView extends Phobject {
 
   private $boardData;
 
-  public function setBoardData ($board_data) {
+  public function setBoardData($board_data) {
     $this->boardData = $board_data;
     return $this;
   }
@@ -86,7 +86,6 @@ final class BoardDataPieView extends Phobject{
 
   private function initTaskStatusPie() {
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->boardData->getTaskPoints())
         ->setTasks($this->boardData->getTasks());
 
     list($task_open_status_sum, $task_closed_status_sum) = $sprintpoints
@@ -106,7 +105,6 @@ final class BoardDataPieView extends Phobject{
 
   private function initTaskPriorityPie() {
     $sprintpoints = id(new SprintPoints())
-        ->setTaskPoints($this->boardData->getTaskPoints())
         ->setTasks($this->boardData->getTasks());
 
     $task_priority_sum = $sprintpoints

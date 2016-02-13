@@ -1,33 +1,33 @@
 <?php
 
-final class EventTableView extends Phobject{
+final class EventTableView extends Phobject {
   private $project;
   private $viewer;
   private $request;
   private $events;
   private $tasks;
 
-  public function setProject ($project) {
+  public function setProject($project) {
     $this->project = $project;
     return $this;
   }
 
-  public function setViewer ($viewer) {
+  public function setViewer($viewer) {
     $this->viewer = $viewer;
     return $this;
   }
 
-  public function setEvents ($events) {
+  public function setEvents($events) {
     $this->events = $events;
     return $this;
   }
 
-  public function setTasks ($tasks) {
+  public function setTasks($tasks) {
     $this->tasks = $tasks;
     return $this;
   }
 
-  public function setRequest ($request) {
+  public function setRequest($request) {
     $this->request =  $request;
     return $this;
   }
@@ -71,7 +71,7 @@ final class EventTableView extends Phobject{
     return $box;
   }
 
-  private function buildEventsTree ($start, $end) {
+  private function buildEventsTree($start, $end) {
 
     $rows = array();
     foreach ($this->events as $event) {

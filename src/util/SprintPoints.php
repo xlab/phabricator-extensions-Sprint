@@ -2,31 +2,26 @@
 
 final class SprintPoints extends Phobject {
 
-private $taskpoints;
 private $task_open_status_sum;
 private $task_closed_status_sum;
 private $tasks;
 private $taskPrioritySum = array();
+private $viewer;
 
-  public function setTaskPoints ($taskpoints) {
-    $this->taskpoints = $taskpoints;
-    return $this;
-  }
-
-  public function setTasks ($tasks) {
+  public function setTasks($tasks) {
     $this->tasks = $tasks;
     return $this;
   }
 
-  public function getTaskPoints($task_phid) {
+  public function setViewer($viewer) {
+    $this->viewer = $viewer;
+    return $this;
+  }
+
+  public function getTaskPoints($task) {
     $points = null;
-    $taskpoints = mpull($this->taskpoints, null, 'getObjectPHID');
-    if (!empty($taskpoints)) {
-      foreach ($taskpoints as $key => $value) {
-        if ($key == $task_phid) {
-            $points = $value->getfieldValue();
-        }
-      }
+    if (!empty($task)) {
+            $points = $task->getPoints();
       if (!isset($points)) {
         $points = '0';
       }
@@ -34,12 +29,25 @@ private $taskPrioritySum = array();
     return $points;
   }
 
+  public function getTaskPointsbyPHID($task_phid) {
+    $task = $this->getTaskforPHID($task_phid);
+    $points = $this->getTaskPoints($task);
+    return $points;
+  }
+
+  public function getTaskforPHID($phid) {
+    $task = id(new ManiphestTaskQuery())
+        ->setViewer($this->viewer)
+        ->withPHIDs(array($phid))
+        ->executeOne();
+    return $task;
+  }
+
   public function sumTotalTaskPoints() {
     $points = null;
-    if (!empty($this->taskpoints)) {
-      $taskpoints = mpull($this->taskpoints, null, 'getObjectPHID');
-      foreach ($taskpoints as $key => $value) {
-        $points += $value->getfieldValue();
+    if (!empty($this->tasks)) {
+      foreach ($this->tasks as $task) {
+        $points += $task->getPoints();
       }
     }
     if (!isset($points)) {
@@ -50,8 +58,8 @@ private $taskPrioritySum = array();
 
   public function sumTotalTasks() {
     $total_tasks = null;
-    if (!empty($this->taskpoints)) {
-        $total_tasks += count($this->taskpoints);
+    if (!empty($this->tasks)) {
+        $total_tasks += count($this->tasks);
     }
     return $total_tasks;
   }
@@ -66,10 +74,10 @@ private $taskPrioritySum = array();
     return $priority_name->getTaskPriorityName($task->getPriority());
   }
 
-  private function sumPointsbyStatus ($task) {
+  private function sumPointsbyStatus($task) {
     $status = $this->getTaskStatus($task);
 
-    $points = $this->getTaskPoints($task->getPHID());
+    $points = $this->getTaskPoints($task);
 
     if ($status == 'open') {
       $this->task_open_status_sum =
@@ -81,9 +89,9 @@ private $taskPrioritySum = array();
     return;
   }
 
-  private function sumPointsbyPriority ($task) {
+  private function sumPointsbyPriority($task) {
     $priority_name = $this->getPriorityName($task);
-    $points = $this->getTaskPoints($task->getPHID());
+    $points = $this->getTaskPoints($task);
     if ($priority_name) {
       $this->taskPrioritySum = $this->setTaskPrioritySum($this->taskPrioritySum,
           $priority_name,
@@ -92,7 +100,7 @@ private $taskPrioritySum = array();
     return;
   }
 
-  private function setTaskPrioritySum ($task_priority_sum, $priority_name,
+  private function setTaskPrioritySum($task_priority_sum, $priority_name,
                                       $points) {
         if (empty($task_priority_sum)) {
           $task_priority_sum[$priority_name] = $points;
@@ -106,24 +114,24 @@ private $taskPrioritySum = array();
     return $task_priority_sum;
   }
 
-  private function setTaskOpenStatusSum ($task_open_status_sum, $points) {
+  private function setTaskOpenStatusSum($task_open_status_sum, $points) {
     $task_open_status_sum += $points;
     return $task_open_status_sum;
   }
 
-  private function setTaskClosedStatusSum ($task_closed_status_sum, $points) {
+  private function setTaskClosedStatusSum($task_closed_status_sum, $points) {
     $task_closed_status_sum += $points;
     return $task_closed_status_sum;
   }
 
-  private function setStatusPoints () {
+  private function setStatusPoints() {
     foreach ($this->tasks as $task) {
       $this->sumPointsbyStatus($task);
     }
     return $this;
   }
 
-  private function setPriorityPoints () {
+  private function setPriorityPoints() {
     foreach ($this->tasks as $task) {
       $this->sumPointsbyPriority($task);
     }
@@ -134,7 +142,7 @@ private $taskPrioritySum = array();
     $this->setStatusPoints();
     $opensum = $this->getOpenStatusSum();
     $closedsum = $this->getClosedStatusSum();
-    return array ($opensum, $closedsum);
+    return array($opensum, $closedsum);
   }
 
   private function getOpenStatusSum() {

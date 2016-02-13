@@ -21,6 +21,10 @@ final class SprintProjectProfilePanelEngine
         ->setPanelKey(PhabricatorProjectDetailsProfilePanel::PANELKEY);
 
     $panels[] = $this->newPanel()
+        ->setBuiltinKey(PhabricatorProject::PANEL_POINTS)
+        ->setPanelKey(PhabricatorProjectPointsProfilePanel::PANELKEY);
+
+    $panels[] = $this->newPanel()
         ->setBuiltinKey(PhabricatorProject::PANEL_WORKBOARD)
         ->setPanelKey(PhabricatorProjectWorkboardProfilePanel::PANELKEY);
 
@@ -29,10 +33,21 @@ final class SprintProjectProfilePanelEngine
         ->setPanelKey(PhabricatorProjectMembersProfilePanel::PANELKEY);
 
     $panels[] = $this->newPanel()
+        ->setBuiltinKey(PhabricatorProject::PANEL_SUBPROJECTS)
+        ->setPanelKey(PhabricatorProjectSubprojectsProfilePanel::PANELKEY);
+
+    $panels[] = $this->newPanel()
         ->setBuiltinKey(PhabricatorProject::PANEL_MANAGE)
         ->setPanelKey(PhabricatorProjectManageProfilePanel::PANELKEY);
 
+    $panels[] = $this->newPanel()
+        ->setBuiltinKey(SprintConstants::PANEL_BURNDOWN)
+        ->setPanelKey(SprintProjectProfilePanel::PANELKEY);
+
+    $panels[] = $this->newPanel()
+        ->setBuiltinKey(SprintConstants::PANEL_PHRAGILE)
+        ->setPanelKey(PhragileProfilePanel::PANELKEY);
+
     return $panels;
   }
-
 }

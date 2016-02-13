@@ -68,7 +68,7 @@ abstract class SprintView extends AphrontView {
     $project_phid = $request->getStr('project');
     if ($project_phid) {
       $phids = array($project_phid);
-      $handle = $this->getProjectHandle ($phids, $project_phid, $request);
+      $handle = $this->getProjectHandle($phids, $project_phid, $request);
     }
     $tokens = array();
     if ($handle) {

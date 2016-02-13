@@ -4,12 +4,12 @@ final class SprintListTableView extends Phobject {
 
   private $tableData;
 
-  public function setTableData ($table_data) {
+  public function setTableData($table_data) {
     $this->tableData = $table_data;
     return $this;
   }
 
-  public function buildProjectsTable () {
+  public function buildProjectsTable() {
     $id = 'list-table';
     Javelin::initBehavior('sprint-table', array(
         'hardpoint' => $id,

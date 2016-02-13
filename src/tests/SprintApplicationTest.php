@@ -1,13 +1,14 @@
 <?php
+
 final class SprintApplicationTest extends SprintTestCase {
 
-  public function testGetName () {
+  public function testGetName() {
     $burndown_application = new SprintApplication();
     $name = $burndown_application->getName();
     $this->assertEquals('Sprint', $name);
   }
 
-  public function testBaseURI () {
+  public function testBaseURI() {
     $burndown_application = new SprintApplication();
     $baseuri = $burndown_application->getBaseURI();
     $this->assertEquals('/project/sprint/', $baseuri);

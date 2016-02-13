@@ -1,4 +1,5 @@
 <?php
+
 final class SprintStatsTest extends SprintTestCase {
 
 

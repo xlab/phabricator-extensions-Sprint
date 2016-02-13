@@ -1,4 +1,5 @@
 <?php
+
 final class SprintQueryTest extends SprintTestCase {
 
   public function getRequestObject() {

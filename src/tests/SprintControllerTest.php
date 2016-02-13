@@ -1,4 +1,5 @@
 <?php
+
 final class SprintControllerTest extends SprintTestCase {
 
   public function testshouldAllowPublic() {
