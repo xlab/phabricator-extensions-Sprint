@@ -19,6 +19,9 @@ final class SprintBeginDateField extends SprintProjectCustomField {
   public function getFieldKey() {
     return 'isdc:sprint:startdate';
   }
+  public function getModernFieldKey() {
+    return 'startdate';
+  }
 
   public function getFieldName() {
     return 'Sprint Start Date';
