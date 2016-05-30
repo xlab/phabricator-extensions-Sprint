@@ -19,7 +19,7 @@ final class SprintDataView extends SprintView {
     return $this;
   }
 
-  public function setViewer($viewer) {
+  public function setViewer(PhabricatorUser $viewer) {
     $this->viewer = $viewer;
     return $this;
   }

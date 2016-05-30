@@ -63,7 +63,7 @@ final class SprintColumnTransaction {
             break;
           case 'reopen':
             $this->reopenedTasksToday($date, $dates);
-            $this->reopenedPointsToday($date, $points, $dates);
+           // $this->reopenedPointsToday($date, $points, $dates);
             break;
         }
       }
@@ -91,24 +91,25 @@ final class SprintColumnTransaction {
   }
 
   private function setXActionEventType($old_col_name, $new_col_name) {
-    $old_is_closed = ($old_col_name === null) ||
-        SprintConstants::TYPE_CLOSED_STATUS_COLUMN == $old_col_name;
+    $old_is_closed = ($old_col_name = SprintConstants::TYPE_CLOSED_STATUS_COLUMN and $new_col_name != SprintConstants::TYPE_CLOSED_STATUS_COLUMN);
 
     if ($old_is_closed) {
       return 'reopen';
-    } else {
+    } else if ($new_col_name) {
       switch ($new_col_name) {
-        case SprintConstants::TYPE_CLOSED_STATUS_COLUMN:
-          return 'close';
-        case SprintConstants::TYPE_REVIEW_STATUS_COLUMN:
-          return 'review';
-        case SprintConstants::TYPE_DOING_STATUS_COLUMN:
-          return 'doing';
-        case SprintConstants::TYPE_BACKLOG_STATUS_COLUMN:
-          return 'backlog';
-        default:
-          break;
+          case SprintConstants::TYPE_CLOSED_STATUS_COLUMN:
+              return 'close';
+          case SprintConstants::TYPE_REVIEW_STATUS_COLUMN:
+              return 'review';
+          case SprintConstants::TYPE_DOING_STATUS_COLUMN:
+              return 'doing';
+          case SprintConstants::TYPE_BACKLOG_STATUS_COLUMN:
+              return 'backlog';
+          default:
+              break;
       }
+    } else {
+    return null;
     }
   }
 
@@ -118,22 +119,28 @@ final class SprintColumnTransaction {
     $new_col_name = null;
     $events = array();
     foreach ($xactions as $xaction) {
-      $old_col_phid = idx($xaction->getOldValue(), 'columnPHIDs');
-      foreach ($old_col_phid as $phid) {
-        $old_col = $this->query->getColumnforPHID($phid);
-        foreach ($old_col as $obj) {
-          $old_col_name = $obj->getDisplayName();
+      $oldval = $xaction->getOldValue();
+      if (!empty($oldval)) {
+        $newArr = call_user_func_array('array_merge', $oldval);
+        $old_col_phid = idx($newArr, 'columnPHID');
+        foreach ($old_col_phid as $phid) {
+          $old_col = $this->query->getColumnforPHID($phid);
+          foreach ($old_col as $obj) {
+            $old_col_name = $obj->getDisplayName();
+          }
         }
       }
-      $new_col_phid = idx($xaction->getNewValue(), 'columnPHIDs');
-      foreach ($new_col_phid as $phid) {
-        $new_col = $this->query->getColumnforPHID($phid);
-        foreach ($new_col as $obj) {
-          $new_col_name = $obj->getDisplayName();
-        }
+      $newval = $xaction->getNewValue();
+      if (!empty($newval)) {
+        $newArr = call_user_func_array('array_merge', $newval);
+        $new_col_phid = idx($newArr, 'columnPHID');
+        $xaction_scope_phid = idx($newArr, 'boardPHID');
+          $new_col = $this->query->getColumnforPHID($new_col_phid);
+          foreach ($new_col as $obj) {
+            $new_col_name = $obj->getDisplayName();
+          }
       }
       $scope_phid = $this->project->getPHID();
-      $xaction_scope_phid = idx($xaction->getNewValue(), 'projectPHID');
       if ($scope_phid == $xaction_scope_phid) {
         $event_type = $this->setXActionEventType($old_col_name, $new_col_name);
         if ($event_type !== null) {

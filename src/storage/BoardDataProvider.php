@@ -168,7 +168,7 @@ final class BoardDataProvider {
     $scope_phid = $this->project->getPHID();
     $task_phids = mpull($this->tasks, 'getPHID');
     $query = new ManiphestTransactionQuery();
-    $query->withTransactionTypes(array(ManiphestTransaction::TYPE_PROJECT_COLUMN));
+    $query->withTransactionTypes(array(PhabricatorTransactions::TYPE_COLUMNS));
     $query->withObjectPHIDs($task_phids);
     $query->setViewer($this->viewer);
     $col_xactions = $query->execute();
@@ -176,9 +176,10 @@ final class BoardDataProvider {
       $xaction_date = $xaction->getDateCreated();
       if ($xaction_date >= $this->start && $xaction_date <= $this->end) {
         $newval = $xaction->getNewValue();
-        if ($newval['projectPHID'] == $scope_phid) {
-            $xactions[] = $xaction;
-        }
+          $newArr = call_user_func_array('array_merge', $newval);
+              if ($newArr['boardPHID'] == $scope_phid) {
+                  $xactions[] = $xaction;
+              }
       }
     }
     return $xactions;
