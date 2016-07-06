@@ -29,7 +29,7 @@ final class SprintProjectProfileController
 
     $header = id(new PHUIHeaderView())
       ->setHeader(array($project->getDisplayName(), $tag))
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setPolicyObject($project)
       ->setImage($picture)
       ->setProfileHeader(true);
@@ -58,14 +58,14 @@ final class SprintProjectProfileController
     $subproject_list = $this->buildSubprojectList($project);
 
     $member_list = id(new PhabricatorProjectMemberListView())
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setProject($project)
       ->setLimit(5)
       ->setBackground(PHUIBoxView::GREY)
       ->setUserPHIDs($project->getMemberPHIDs());
 
     $watcher_list = id(new PhabricatorProjectWatcherListView())
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setProject($project)
       ->setLimit(5)
       ->setBackground(PHUIBoxView::GREY)
@@ -131,7 +131,7 @@ final class SprintProjectProfileController
     $viewer = $request->getViewer();
 
     $view = id(new PHUIPropertyListView())
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setObject($project);
 
     $field_list = PhabricatorCustomField::getObjectFields(
@@ -214,7 +214,7 @@ final class SprintProjectProfileController
     }
 
     $milestone_list = id(new PhabricatorProjectListView())
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setProjects($milestones)
       ->renderList();
 
@@ -262,7 +262,7 @@ final class SprintProjectProfileController
     }
 
     $subproject_list = id(new PhabricatorProjectListView())
-      ->setUser($viewer)
+      ->setViewer($viewer)
       ->setProjects($subprojects)
       ->renderList();
 

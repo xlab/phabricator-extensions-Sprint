@@ -10,7 +10,7 @@ final class SprintQueryTest extends SprintTestCase {
   public function testRequestSetUser() {
     $r = new AphrontRequest('example.com', '/');
     $viewer = $this->generateNewTestUser();
-    $r->setUser($viewer);
+    $r->setViewer($viewer);
     $this->assertEquals($viewer, $r->getUser());
     return $r;
   }

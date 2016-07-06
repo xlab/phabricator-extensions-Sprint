@@ -7,7 +7,7 @@ final class SprintHistoryTableView extends SprintView {
   protected $viewer;
 
   public function setViewer(PhabricatorUser $viewer) {
-    $this->user = $viewer;
+    $this->viewer = $viewer;
     return $this;
   }
 

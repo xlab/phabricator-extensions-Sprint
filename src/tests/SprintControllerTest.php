@@ -34,7 +34,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['id'] =  18;
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('AphrontResponse', $response);
@@ -50,7 +50,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['id'] =  3;
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('Aphront404Response', $response);
@@ -66,7 +66,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['id'] =  18;
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('AphrontResponse', $response);
@@ -82,7 +82,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['id'] =  3;
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('Aphront404Response', $response);
@@ -98,7 +98,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['slug'] =  'null_project';
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('AphrontResponse', $response);
@@ -114,7 +114,7 @@ final class SprintControllerTest extends SprintTestCase {
     $data['slug'] =  'fail_project';
     $request->setURIMap($data);
     $viewer = $this->generateNewTestUser();
-    $request->setUser($viewer);
+    $request->setViewer($viewer);
     $dvcontroller->willProcessRequest($data);
     $response = $dvcontroller->handleRequest($request);
     $this->assertInstanceOf('Aphront404Response', $response);

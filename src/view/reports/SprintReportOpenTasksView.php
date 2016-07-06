@@ -6,8 +6,8 @@ final class SprintReportOpenTasksView extends SprintView {
     private $request;
     private $view;
 
-  public function setUser(PhabricatorUser $viewer) {
-    $this->user = $viewer;
+  public function setViewer(PhabricatorUser $viewer) {
+    $this->viewer = $viewer;
     return $this;
   }
 
@@ -44,13 +44,13 @@ final class SprintReportOpenTasksView extends SprintView {
     if ($project_phid) {
       $phids = array($project_phid);
       $project_handle = $this->getProjectHandle($phids, $project_phid, $this->request);
-      $tasks = $this->getOpenTasksforProject($this->user, $phids);
+      $tasks = $this->getOpenTasksforProject($this->viewer, $phids);
     } else {
-      $tasks = $this->getOpenTasks($this->user);
+      $tasks = $this->getOpenTasks($this->viewer);
     }
     $recently_closed = $this->loadRecentlyClosedTasks();
 
-    $date = phabricator_date(time(), $this->user);
+    $date = phabricator_date(time(), $this->viewer);
 
     $viewer_task_view = new UserOpenTasksView();
     $project_task_view = new ProjectOpenTasksView();
@@ -96,7 +96,7 @@ final class SprintReportOpenTasksView extends SprintView {
       $tokens = array($project_handle);
     }
     $filter = $this->renderReportFilters($tokens, $has_window = false,
-        $this->request, $this->user);
+        $this->request, $this->viewer);
 
     return array($filter, $panel);
   }
@@ -286,8 +286,8 @@ final class SprintReportOpenTasksView extends SprintView {
         pht('Oldest (Pri)'));
     $cclass[] = 'center narrow';
 
-    list($window_epoch) = $this->getWindow($this->request);
-    $edate = phabricator_datetime($window_epoch, $this->user);
+    list($window_epoch) = $this->getWindow($this->request, $this->viewer);
+    $edate = phabricator_datetime($window_epoch, $this->viewer);
     $cname[] = javelin_tag(
         'span',
         array(
@@ -337,7 +337,7 @@ final class SprintReportOpenTasksView extends SprintView {
    * Load all the tasks that have been recently closed.
    */
   private function loadRecentlyClosedTasks() {
-    list(, , $window_epoch) = $this->getWindow($this->request);
+    list(, , $window_epoch) = $this->getWindow($this->request, $this->viewer);
 
     $table = new ManiphestTask();
     $xtable = new ManiphestTransaction();
