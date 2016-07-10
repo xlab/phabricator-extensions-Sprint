@@ -33,18 +33,18 @@ final class SprintReportController extends SprintController {
       case 'user':
       case 'project':
       $core = id(new SprintReportOpenTasksView())
-          ->setUser($viewer)
+          ->setViewer($viewer)
           ->setRequest($request)
           ->setView($this->view);
         break;
       case 'burn':
         $core = id(new SprintReportBurnUpView())
-            ->setUser($viewer)
+            ->setViewer($viewer)
             ->setRequest($request);
         break;
       case 'history':
         $core = id(new SprintHistoryTableView())
-            ->setUser($viewer)
+            ->setViewer($viewer)
             ->setRequest($request);
         break;
       default:

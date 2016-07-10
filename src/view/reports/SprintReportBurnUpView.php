@@ -3,9 +3,10 @@
 final class SprintReportBurnUpView extends SprintView {
 
   private $request;
+  private $viewer;
 
-  public function setUser(PhabricatorUser $viewer) {
-    $this->user = $viewer;
+  public function setViewer(PhabricatorUser $viewer) {
+    $this->viewer = $viewer;
     return $this;
   }
 
@@ -16,7 +17,7 @@ final class SprintReportBurnUpView extends SprintView {
 
   public function render() {
     require_celerity_resource('sprint-report-css', 'sprint');
-    $filter = $this->BuildFilter($this->request);
+    $filter = $this->BuildFilter($this->request, $this->viewer);
     if ($this->request->getStr('project')) {
       $chart = $this->buildBurnDownChart();
       $table = $this->buildStatsTable();
@@ -73,7 +74,7 @@ final class SprintReportBurnUpView extends SprintView {
 
      $day_bucket = phabricator_format_local_time(
           $row['dateCreated'],
-          $this->user,
+          $this->viewer,
           'Yz');
 
       if (empty($stats[$day_bucket])) {
@@ -94,7 +95,7 @@ final class SprintReportBurnUpView extends SprintView {
 
        $day_bucket = phabricator_format_local_time(
             $row['dateCreated'],
-            $this->user,
+            $this->viewer,
             'Yz');
        $day_buckets[$day_bucket] = $row['dateCreated'];
        }
@@ -107,7 +108,7 @@ final class SprintReportBurnUpView extends SprintView {
   private function buildBucket($epoch, $format) {
     $bucket = phabricator_format_local_time(
         $epoch,
-        $this->user,
+        $this->viewer,
         $format);
     return $bucket;
   }
@@ -138,7 +139,7 @@ final class SprintReportBurnUpView extends SprintView {
       if ($week_bucket != $last_week) {
         if ($week) {
           $rows[] = $this->formatBurnRow(
-              'Week of '.phabricator_date($last_week_epoch, $this->user),
+              'Week of '.phabricator_date($last_week_epoch, $this->viewer),
               $week);
           $rowc[] = 'week';
         }
@@ -153,7 +154,7 @@ final class SprintReportBurnUpView extends SprintView {
         if ($month) {
           $rows[] = $this->formatBurnRow(
               phabricator_format_local_time($last_month_epoch,
-                  $this->user, 'F, Y'),
+                  $this->viewer, 'F, Y'),
               $month);
           $rowc[] = 'month';
         }
@@ -162,7 +163,7 @@ final class SprintReportBurnUpView extends SprintView {
         $last_month_epoch = $epoch;
       }
 
-      $rows[] = $this->formatBurnRow(phabricator_date($epoch, $this->user),
+      $rows[] = $this->formatBurnRow(phabricator_date($epoch, $this->viewer),
           $info);
       $rowc[] = null;
       $week['open'] += $info['open'];

@@ -80,9 +80,9 @@ final class SprintCreateConduitAPIMethod extends SprintConduitAPIMethod {
         ->setNewValue(strtotime($request->getValue('enddate')));
 
     $editor = id(new PhabricatorProjectTransactionEditor())
-      ->setActor($user)
-      ->setContinueOnNoEffect(true)
-      ->setContentSourceFromConduitRequest($request);
+        ->setActor($user)
+        ->setContinueOnNoEffect(true)
+        ->setContentSource($request->newContentSource());
 
     $editor->applyTransactions($project, $xactions);
 

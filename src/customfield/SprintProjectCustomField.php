@@ -109,7 +109,7 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
     $control = id(new AphrontFormDateControl())
         ->setLabel($proxy->getFieldName())
         ->setName($proxy->getFieldKey())
-        ->setUser($proxy->getViewer())
+        ->setViewer($proxy->getViewer())
         ->setCaption($proxy->getCaption())
         ->setAllowNull(!$proxy->getRequired())
         ->setInitialTime($time);

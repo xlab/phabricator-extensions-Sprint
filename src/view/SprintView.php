@@ -2,11 +2,19 @@
 
 
 abstract class SprintView extends AphrontView {
+
+  private $viewer;
+
+  public function setViewer(PhabricatorUser $viewer) {
+    $this->viewer = $viewer;
+    return $this;
+  }
+
   public function renderReportFilters(array $tokens, $has_window, $request,
-                                      $viewer) {
+                                      PhabricatorUser $viewer) {
 
     $form = id(new AphrontFormView())
-        ->setUser($viewer)
+        ->setViewer($viewer)
         ->appendControl(
             id(new AphrontFormTokenizerControl())
                 ->setDatasource(new PhabricatorProjectDatasource())
@@ -16,7 +24,7 @@ abstract class SprintView extends AphrontView {
                 ->setValue(mpull($tokens, 'getPHID')));
 
     if ($has_window) {
-      list($window_str, , $window_error) = $this->getWindow($request);
+      list($window_str, , $window_error) = $this->getWindow($request, $viewer);
       $form
           ->appendChild(
               id(new AphrontFormDividerControl()));
@@ -34,7 +42,7 @@ abstract class SprintView extends AphrontView {
   }
 
 
-  public function getWindow($request) {
+  public function getWindow($request, PhabricatorUser $viewer) {
     $window_str = $request->getStr('window', '12 AM 7 days ago');
 
     $error = null;
@@ -42,7 +50,7 @@ abstract class SprintView extends AphrontView {
     // Do locale-aware parsing so that the user's timezone is assumed for
     // time windows like "3 PM", rather than assuming the server timezone.
 
-    $window_epoch = PhabricatorTime::parseLocalTime($window_str, $this->user);
+    $window_epoch = PhabricatorTime::parseLocalTime($window_str, $viewer);
     if ($window_epoch === null) {
       $error = 'Invalid';
       $window_epoch = time() - (60 * 60 * 24 * 7);
@@ -63,7 +71,7 @@ abstract class SprintView extends AphrontView {
     return array($window_str, $window_epoch, $error);
   }
 
-  public function buildFilter($request) {
+  public function buildFilter($request, $viewer) {
     $handle = null;
     $project_phid = $request->getStr('project');
     if ($project_phid) {
@@ -75,7 +83,7 @@ abstract class SprintView extends AphrontView {
       $tokens = $this->getTokens($handle);
     }
     $filter = $this->renderReportFilters($tokens, $has_window = true,
-        $request, $this->user);
+        $request, $viewer);
     return $filter;
   }
 
