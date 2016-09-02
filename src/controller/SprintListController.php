@@ -42,12 +42,9 @@ final class SprintListController extends SprintController {
             $help,
             $sprintlist_table,
         ));
-
-    return $this->buildApplicationPage(
-      $nav,
-      array(
-        'title' => array(pht('Sprint List')),
-        'device' => true,
-      ));
+    $title = pht('Sprint List');
+    return $this->newPage()
+        ->setTitle($title)
+        ->appendChild($nav);
   }
 }
