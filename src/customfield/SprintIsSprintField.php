@@ -14,6 +14,10 @@ final class SprintIsSprintField extends SprintProjectCustomField {
     return 'isdc:sprint:issprint';
   }
 
+  public function getModernFieldKey() {
+    return 'issprint';
+  }
+
   public function getFieldName() {
     return 'Is Sprint';
   }

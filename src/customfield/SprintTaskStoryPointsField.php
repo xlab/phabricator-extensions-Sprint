@@ -33,6 +33,10 @@ final class SprintTaskStoryPointsField extends ManiphestCustomField
     return 'isdc:sprint:storypoints';
   }
 
+  public function getModernFieldKey() {
+    return 'storypoints';
+  }
+
   public function getFieldName() {
     return 'Story Points';
   }
