@@ -22,6 +22,7 @@ final class SprintHistoryController extends SprintController {
     }
 
     $error_box = null;
+    $sprintlist_table = null;
     $history_model = id(new SprintHistoryDataProvider())
         ->setViewer($this->viewer)
         ->setRequest($request)
@@ -60,12 +61,9 @@ final class SprintHistoryController extends SprintController {
             $help,
             $sprintlist_table,
         ));
-
-    return $this->buildApplicationPage(
-        $nav,
-        array(
-            'title' => array(pht('Task Project History')),
-            'device' => true,
-        ));
+    $title = pht('Task Project History');
+    return $this->newPage()
+        ->setTitle($title)
+        ->appendChild($nav);
   }
 }

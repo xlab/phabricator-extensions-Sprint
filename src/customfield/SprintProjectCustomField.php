@@ -48,6 +48,7 @@ abstract class SprintProjectCustomField extends PhabricatorProjectCustomField
   public function getBoolFieldProxy($field, $name, $description) {
     $obj = clone $field;
     $fieldproxy = id(new PhabricatorStandardCustomFieldBool())
+
         ->setFieldKey($this->getFieldKey())
         ->setApplicationField($obj)
         ->setFieldConfig(array(

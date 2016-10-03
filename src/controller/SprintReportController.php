@@ -58,12 +58,9 @@ final class SprintReportController extends SprintController {
         $this->buildSprintApplicationCrumbs($can_create)
             ->setBorder(true)
             ->addTextCrumb(pht('Reports')));
-
-    return $this->buildApplicationPage(
-        $nav,
-        array(
-            'title' => pht('Sprint Reports'),
-            'device' => false,
-        ));
+    $title = pht('Sprint Reports');
+    return $this->newPage()
+        ->setTitle($title)
+        ->appendChild($nav);
   }
 }
