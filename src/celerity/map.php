@@ -23,7 +23,7 @@ return array(
     'images/Screenshot-1.png' => '500c0ca0',
     'jquery-1.11.3.js' => '944b5c07',
     'jquery.dataTables.js' => 'd78eac7f',
-    'phui-object-box.css' => '7177101e',
+    'phui-object-box.css' => 'ade5179a',
     'sprint-report.css' => 'f6959ade',
     'webroot-static/sort_asc.png' => '68adbacc',
     'webroot-static/sort_both.png' => '9c425f1b',
@@ -45,7 +45,7 @@ return array(
     'javelin-behavior-sprint-table' => '7fb99402',
     'javelin-behavior-tasks-table' => '04f4d973',
     'jquery' => '944b5c07',
-    'phui-object-box-css' => '7177101e',
+    'phui-object-box-css' => 'ade5179a',
     'sprint-report-css' => 'f6959ade',
   ),
   'requires' => array(

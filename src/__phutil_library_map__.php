@@ -124,7 +124,7 @@ phutil_register_library_map(array(
     ),
     'SprintProjectProfileController' => 'SprintProjectController',
     'SprintProjectProfilePanel' => 'PhabricatorProfilePanel',
-    'SprintProjectProfilePanelEngine' => 'PhabricatorProfilePanelEngine',
+    'SprintProjectProfilePanelEngine' => 'PhabricatorProfileMenuEngine',
     'SprintProjectViewController' => 'SprintController',
     'SprintQuery' => 'SprintDAO',
     'SprintQueryTest' => 'SprintTestCase',
