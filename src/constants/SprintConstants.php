@@ -5,7 +5,7 @@ final class SprintConstants {
   const CUSTOMFIELD_TYPE_STATUS  = 'core:customfield';
   const PHABRICATOR_ROOT_DIR = 'vendor/phabricator/phabricator';
   const LIBPHUTIL_ROOT_DIR = 'vendor/libphutil/libphutil';
-  const ROOT_DIR = '/srv/phab';
+  const ROOT_DIR = '/srv/phabricator';
   const POINTFIELD_INDEX = 'yERhvoZPNPtM';
   const SPRINTFIELD_INDEX = 'scsOmkpB9Tqi';
   const TYPE_CLOSED_STATUS_COLUMN = 'Done';

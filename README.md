@@ -30,10 +30,10 @@ Requirements: PHP: You need PHP 5.4 or newer.
 To install the Sprint extension:
 
 1. update your phabricator and libphutil to HEAD
-2. run git clone https://github.com/wikimedia/phabricator-extensions-Sprint.git /srv/phab/libext/sprint
-3. from the /srv/phab/phabricator/bin directory run:
+2. run git clone https://github.com/wikimedia/phabricator-extensions-Sprint.git /srv/phabricator/libext/sprint
+3. from the /srv/phabricator/phabricator/bin directory run:
 
-        ./config set load-libraries '{"sprint":"/srv/phab/libext/sprint/src"}'
+        ./config set load-libraries '{"sprint":"/srv/phabricator/libext/sprint/src"}'
 
 **Release Notes: Projects v3.0**
 As of 13.02.2016, sprint charts now depend on the global maniphest.points field setting being enabled.
